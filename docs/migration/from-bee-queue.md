@@ -44,6 +44,97 @@ npm install glide-mq
 | **Cluster** | Not supported | Native cluster support |
 | **TLS** | Manual ioredis config | `useTLS: true` |
 
+## Queue Settings Mapping
+
+Bee-Queue has 15 constructor settings. Here's how each maps to glide-mq:
+
+| Bee-Queue Setting | Default | glide-mq Equivalent | Notes |
+|-------------------|---------|---------------------|-------|
+| `redis` | `{}` | `connection: { addresses: [...] }` | See connection section below |
+| `isWorker` | `true` | Use `Producer` or `Queue` class | Separate classes instead of flag |
+| `getEvents` | `true` | Use `QueueEvents` class | Separate class for event subscription |
+| `sendEvents` | `true` | `events: true` on Worker | Controls whether job lifecycle emits to stream |
+| `storeJobs` | `true` | Always true | glide-mq always stores jobs |
+| `ensureScripts` | `true` | Automatic | Server Functions loaded automatically |
+| `activateDelayedJobs` | `false` | Automatic via Scheduler | glide-mq handles delayed activation internally |
+| `removeOnSuccess` | `false` | `{ removeOnComplete: true }` | Per-job or via `defaultJobOptions` |
+| `removeOnFailure` | `false` | `{ removeOnFail: true }` | Per-job or via `defaultJobOptions` |
+| `stallInterval` | `5000` | `lockDuration` on Worker | glide-mq uses lock-based stall detection |
+| `nearTermWindow` | `20000` | N/A | glide-mq uses Valkey-native delayed processing |
+| `delayedDebounce` | `1000` | N/A | Not needed - server-side scheduling |
+| `prefix` | `bq` | `prefix` on Queue | Key prefix (default: `glide`) |
+| `quitCommandClient` | `true` | Automatic | Handled by graceful shutdown |
+| `redisScanCount` | `100` | N/A | Not applicable (different key strategy) |
+
+## Backoff Strategy Mapping
+
+| Bee-Queue | glide-mq |
+|-----------|----------|
+| `'immediate'` | `{ type: 'fixed', delay: 0 }` |
+| `'fixed'` | `{ type: 'fixed', delay: ms }` |
+| `'exponential'` | `{ type: 'exponential', delay: ms }` |
+| Custom via `backoffStrategies` Map | Custom via `backoffStrategies` on Worker |
+
+```typescript
+// BEFORE (Bee-Queue) - custom backoff
+const queue = new Queue('tasks', {
+  settings: {
+    backoffStrategies: {
+      linear: (attemptsMade) => attemptsMade * 1000,
+    }
+  }
+});
+queue.createJob(data).backoff('linear', 1000).save();
+
+// AFTER (glide-mq) - custom backoff
+const worker = new Worker('tasks', processor, {
+  connection,
+  backoffStrategies: {
+    linear: (attemptsMade) => attemptsMade * 1000,
+  }
+});
+await queue.add('job', data, { backoff: { type: 'linear', delay: 1000 } });
+```
+
+## Queue Method Mapping
+
+| Bee-Queue Method | glide-mq Equivalent | Notes |
+|------------------|---------------------|-------|
+| `queue.createJob(data)` | `queue.add(name, data, opts)` | Returns Job vs returns jobId |
+| `queue.process(n, handler)` | `new Worker(name, handler, { concurrency: n })` | Separate class |
+| `queue.checkStalledJobs(interval)` | Automatic on Worker | No manual call needed |
+| `queue.checkHealth()` | `queue.getJobCounts(...)` | Different return shape |
+| `queue.close()` | `gracefulShutdown([...])` | Or individual `.close()` calls |
+| `queue.ready()` | `worker.waitUntilReady()` | On Worker, not Queue |
+| `queue.isRunning()` | `worker.isRunning()` | On Worker |
+| `queue.getJob(id)` | `queue.getJob(id)` | Same API |
+| `queue.getJobs(type, page)` | `queue.getJobs(type, start, end)` | Range-based instead of paginated |
+| `queue.removeJob(id)` | `(await queue.getJob(id)).remove()` | Via Job instance |
+| `queue.saveAll(jobs)` | `queue.addBulk(jobs)` | Different input format |
+| `queue.destroy()` | `queue.obliterate()` | Removes all queue data |
+
+## Event Mapping
+
+| Bee-Queue Event | Source | glide-mq Equivalent | Source |
+|-----------------|--------|---------------------|--------|
+| `queue.on('ready')` | Queue | `worker.waitUntilReady()` | Worker |
+| `queue.on('error', err)` | Queue | `worker.on('error', err)` | Worker |
+| `queue.on('succeeded', job, result)` | Queue (local) | `worker.on('completed', job)` | Worker |
+| `queue.on('retrying', job, err)` | Queue (local) | `worker.on('failed', job, err)` | Worker (with retries remaining) |
+| `queue.on('failed', job, err)` | Queue (local) | `worker.on('failed', job, err)` | Worker |
+| `queue.on('stalled', jobId)` | Queue | `worker.on('stalled', jobId)` | Worker |
+| `queue.on('job succeeded', id, result)` | Queue (PubSub) | `events.on('completed', { jobId })` | QueueEvents |
+| `queue.on('job failed', id, err)` | Queue (PubSub) | `events.on('failed', { jobId, failedReason })` | QueueEvents |
+| `queue.on('job retrying', id, err)` | Queue (PubSub) | No direct equivalent | Use `events.on('failed')` + retry check |
+| `queue.on('job progress', id, data)` | Queue (PubSub) | `events.on('progress', { jobId, data })` | QueueEvents |
+| `job.on('succeeded', result)` | Job | `events.on('completed', { jobId })` | QueueEvents (filter by jobId) |
+| `job.on('failed', err)` | Job | `events.on('failed', { jobId })` | QueueEvents (filter by jobId) |
+| `job.on('progress', data)` | Job | `events.on('progress', { jobId })` | QueueEvents (filter by jobId) |
+
+::: warning Per-Job Events
+Bee-Queue supports per-job event listeners (`job.on('succeeded', ...)`). glide-mq uses a centralized `QueueEvents` class instead. Filter by `jobId` in the event handler, or use `queue.addAndWait()` for request-reply patterns.
+:::
+
 ## Step-by-Step Conversion
 
 ### 1. Connection
@@ -252,6 +343,32 @@ await queue.close();
 // AFTER (glide-mq)
 import { gracefulShutdown } from 'glide-mq';
 await gracefulShutdown([worker, queue, events]);
+```
+
+### 10. Destroying a Queue
+
+```typescript
+// BEFORE (Bee-Queue) - remove all Redis keys for queue
+await queue.destroy();
+
+// AFTER (glide-mq)
+await queue.obliterate();
+```
+
+### 11. Web UI (Arena -> Dashboard)
+
+```typescript
+// BEFORE (Bee-Queue) - Arena web UI
+const Arena = require('bull-arena');
+const express = require('express');
+const app = express();
+app.use('/', Arena({ Bee: require('bee-queue'), queues: [{ name: 'tasks' }] }));
+
+// AFTER (glide-mq) - Dashboard
+import { createDashboard } from '@glidemq/dashboard';
+import express from 'express';
+const app = express();
+app.use('/dashboard', createDashboard([queue]));
 ```
 
 ## What You Gain
