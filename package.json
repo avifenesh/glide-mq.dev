@@ -6,10 +6,9 @@
   "scripts": {
     "typedoc": "typedoc",
     "typedoc:fix": "typedoc && python fix-generics.py",
-    "predocs:dev": "npm run typedoc:fix",
     "docs:dev": "vitepress dev docs",
-    "predocs:build": "npm run typedoc:fix",
     "docs:build": "vitepress build docs",
+    "docs:gen": "npm run typedoc:fix && npm run docs:build",
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
