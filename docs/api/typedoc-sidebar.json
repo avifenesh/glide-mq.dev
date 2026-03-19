@@ -1,0 +1,304 @@
+[
+  {
+    "text": "Classes",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "BatchError",
+        "link": "/api/classes/BatchError.md"
+      },
+      {
+        "text": "Broadcast",
+        "link": "/api/classes/Broadcast.md"
+      },
+      {
+        "text": "BroadcastWorker",
+        "link": "/api/classes/BroadcastWorker.md"
+      },
+      {
+        "text": "ConnectionError",
+        "link": "/api/classes/ConnectionError.md"
+      },
+      {
+        "text": "CycleError",
+        "link": "/api/classes/CycleError.md"
+      },
+      {
+        "text": "DelayedError",
+        "link": "/api/classes/DelayedError.md"
+      },
+      {
+        "text": "FlowProducer",
+        "link": "/api/classes/FlowProducer.md"
+      },
+      {
+        "text": "GlideMQError",
+        "link": "/api/classes/GlideMQError.md"
+      },
+      {
+        "text": "Job",
+        "link": "/api/classes/Job.md"
+      },
+      {
+        "text": "Producer",
+        "link": "/api/classes/Producer.md"
+      },
+      {
+        "text": "Queue",
+        "link": "/api/classes/Queue.md"
+      },
+      {
+        "text": "QueueEvents",
+        "link": "/api/classes/QueueEvents.md"
+      },
+      {
+        "text": "ServerlessPool",
+        "link": "/api/classes/ServerlessPool.md"
+      },
+      {
+        "text": "UnrecoverableError",
+        "link": "/api/classes/UnrecoverableError.md"
+      },
+      {
+        "text": "WaitingChildrenError",
+        "link": "/api/classes/WaitingChildrenError.md"
+      },
+      {
+        "text": "Worker",
+        "link": "/api/classes/Worker.md"
+      }
+    ]
+  },
+  {
+    "text": "Interfaces",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "AddAndWaitOptions",
+        "link": "/api/interfaces/AddAndWaitOptions.md"
+      },
+      {
+        "text": "BatchOptions",
+        "link": "/api/interfaces/BatchOptions.md"
+      },
+      {
+        "text": "BroadcastOptions",
+        "link": "/api/interfaces/BroadcastOptions.md"
+      },
+      {
+        "text": "BroadcastWorkerOptions",
+        "link": "/api/interfaces/BroadcastWorkerOptions.md"
+      },
+      {
+        "text": "ConnectionOptions",
+        "link": "/api/interfaces/ConnectionOptions.md"
+      },
+      {
+        "text": "DAGFlow",
+        "link": "/api/interfaces/DAGFlow.md"
+      },
+      {
+        "text": "DAGNode",
+        "link": "/api/interfaces/DAGNode.md"
+      },
+      {
+        "text": "DeadLetterQueueOptions",
+        "link": "/api/interfaces/DeadLetterQueueOptions.md"
+      },
+      {
+        "text": "FlowJob",
+        "link": "/api/interfaces/FlowJob.md"
+      },
+      {
+        "text": "FlowProducerOptions",
+        "link": "/api/interfaces/FlowProducerOptions.md"
+      },
+      {
+        "text": "GetJobsOptions",
+        "link": "/api/interfaces/GetJobsOptions.md"
+      },
+      {
+        "text": "IamCredentials",
+        "link": "/api/interfaces/IamCredentials.md"
+      },
+      {
+        "text": "JobCounts",
+        "link": "/api/interfaces/JobCounts.md"
+      },
+      {
+        "text": "JobData",
+        "link": "/api/interfaces/JobData.md"
+      },
+      {
+        "text": "JobNode",
+        "link": "/api/interfaces/JobNode.md"
+      },
+      {
+        "text": "JobOptions",
+        "link": "/api/interfaces/JobOptions.md"
+      },
+      {
+        "text": "JobTemplate",
+        "link": "/api/interfaces/JobTemplate.md"
+      },
+      {
+        "text": "Metrics",
+        "link": "/api/interfaces/Metrics.md"
+      },
+      {
+        "text": "MetricsDataPoint",
+        "link": "/api/interfaces/MetricsDataPoint.md"
+      },
+      {
+        "text": "MetricsOptions",
+        "link": "/api/interfaces/MetricsOptions.md"
+      },
+      {
+        "text": "PasswordCredentials",
+        "link": "/api/interfaces/PasswordCredentials.md"
+      },
+      {
+        "text": "ProducerOptions",
+        "link": "/api/interfaces/ProducerOptions.md"
+      },
+      {
+        "text": "QueueEventsOptions",
+        "link": "/api/interfaces/QueueEventsOptions.md"
+      },
+      {
+        "text": "QueueOptions",
+        "link": "/api/interfaces/QueueOptions.md"
+      },
+      {
+        "text": "RateLimitConfig",
+        "link": "/api/interfaces/RateLimitConfig.md"
+      },
+      {
+        "text": "SandboxOptions",
+        "link": "/api/interfaces/SandboxOptions.md"
+      },
+      {
+        "text": "ScheduleOpts",
+        "link": "/api/interfaces/ScheduleOpts.md"
+      },
+      {
+        "text": "SchedulerEntry",
+        "link": "/api/interfaces/SchedulerEntry.md"
+      },
+      {
+        "text": "SearchJobsOptions",
+        "link": "/api/interfaces/SearchJobsOptions.md"
+      },
+      {
+        "text": "Serializer",
+        "link": "/api/interfaces/Serializer.md"
+      },
+      {
+        "text": "TokenBucketConfig",
+        "link": "/api/interfaces/TokenBucketConfig.md"
+      },
+      {
+        "text": "WorkerInfo",
+        "link": "/api/interfaces/WorkerInfo.md"
+      },
+      {
+        "text": "WorkerOptions",
+        "link": "/api/interfaces/WorkerOptions.md"
+      },
+      {
+        "text": "WorkflowJobDef",
+        "link": "/api/interfaces/WorkflowJobDef.md"
+      }
+    ]
+  },
+  {
+    "text": "Type Aliases",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "BatchProcessor",
+        "link": "/api/type-aliases/BatchProcessor.md"
+      },
+      {
+        "text": "GracefulShutdownHandle",
+        "link": "/api/type-aliases/GracefulShutdownHandle.md"
+      },
+      {
+        "text": "Processor",
+        "link": "/api/type-aliases/Processor.md"
+      },
+      {
+        "text": "ReadFrom",
+        "link": "/api/type-aliases/ReadFrom.md"
+      }
+    ]
+  },
+  {
+    "text": "Variables",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "JSON_SERIALIZER",
+        "link": "/api/variables/JSON_SERIALIZER.md"
+      },
+      {
+        "text": "serverlessPool",
+        "link": "/api/variables/serverlessPool.md"
+      }
+    ]
+  },
+  {
+    "text": "Functions",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "chain",
+        "link": "/api/functions/chain.md"
+      },
+      {
+        "text": "chord",
+        "link": "/api/functions/chord.md"
+      },
+      {
+        "text": "compileSubjectMatcher",
+        "link": "/api/functions/compileSubjectMatcher.md"
+      },
+      {
+        "text": "dag",
+        "link": "/api/functions/dag.md"
+      },
+      {
+        "text": "gracefulShutdown",
+        "link": "/api/functions/gracefulShutdown.md"
+      },
+      {
+        "text": "group",
+        "link": "/api/functions/group.md"
+      },
+      {
+        "text": "isClusterClient",
+        "link": "/api/functions/isClusterClient.md"
+      },
+      {
+        "text": "isTracingEnabled",
+        "link": "/api/functions/isTracingEnabled.md"
+      },
+      {
+        "text": "matchSubject",
+        "link": "/api/functions/matchSubject.md"
+      },
+      {
+        "text": "setTracer",
+        "link": "/api/functions/setTracer.md"
+      },
+      {
+        "text": "topoSort",
+        "link": "/api/functions/topoSort.md"
+      },
+      {
+        "text": "validateDAG",
+        "link": "/api/functions/validateDAG.md"
+      }
+    ]
+  }
+]

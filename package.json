@@ -1,0 +1,21 @@
+{
+  "name": "glide-mq.dev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typedoc": "typedoc",
+    "typedoc:fix": "typedoc && python fix-generics.py",
+    "predocs:dev": "npm run typedoc:fix",
+    "docs:dev": "vitepress dev docs",
+    "predocs:build": "npm run typedoc:fix",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "typedoc": "^0.28.0",
+    "typedoc-plugin-markdown": "^4.4.0",
+    "typedoc-vitepress-theme": "^1.1.0",
+    "vitepress": "^1.6.3"
+  }
+}
