@@ -96,9 +96,8 @@ worker.on('completed', (job) => console.log(`Completed: ${job.id}`));
 worker.on('failed', (job, err) => console.error(`Failed: ${err.message}`));
 worker.on('error', (err) => console.error('Worker error:', err));
 
-process.on('SIGTERM', async () => {
-  await gracefulShutdown([worker, queue]);
-});
+// Registers SIGTERM/SIGINT handlers, closes all on signal
+const handle = gracefulShutdown([worker, queue]);
 ```
 Correct connection format, proper `gracefulShutdown`, accurate API. Ready to run.
 :::
@@ -193,21 +192,17 @@ Copy `skills/glide-mq-migrate-bee/` from the [glide-mq repo](https://github.com/
 
 We gave both agents a Bee-Queue source file with chained job builder, `queue.process()`, `reportProgress()`, `checkHealth()`, and stall detection.
 
-::: danger Without skill - 3 bugs
+::: danger Without skill - 1 bug, 1 wrong default
 ```typescript
-// Bug 1: Wrong attempts count
+// Bug: Wrong attempts count
 attempts: 4, // ← WRONG: claims "1 initial + 3 retries"
 // glide-mq attempts means total attempts, same as Bee's retries(3) → attempts: 3
 
-// Bug 2: Wrong updateProgress type
-await job.updateProgress({ percent: 50 }); // ← WRONG: takes number, not object
-// Should be: await job.updateProgress(50);
-
-// Bug 3: Invented option name
-stalledInterval: 5000, // ← WRONG: not a real glide-mq option
-// Should be: lockDuration on Worker
+// Wrong default value
+stalledInterval: 5000, // ← value copied from Bee-Queue's default
+// glide-mq default is 30000, not 5000
 ```
-The agent misunderstood the `attempts` semantics, passed an object to `updateProgress` (which takes a number), and invented `stalledInterval`.
+The agent misunderstood `attempts` semantics (total attempts, not 1+retries) and copied Bee-Queue's stall interval default instead of glide-mq's.
 :::
 
 ::: tip With skill - correct output
@@ -215,9 +210,8 @@ The agent misunderstood the `attempts` semantics, passed an object to `updatePro
 // Correct attempts mapping
 attempts: 3, // ✓ same as Bee-Queue's .retries(3)
 
-// Correct progress API (number, not object)
-await job.updateProgress(50); // ✓
-await job.updateProgress(100); // ✓
+// Correct progress API
+await job.updateProgress(50); // ✓ (accepts number or object)
 
 // Correct stall detection config
 { connection, concurrency: 5, lockDuration: 5000 } // ✓
