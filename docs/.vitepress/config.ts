@@ -36,6 +36,7 @@ export default defineConfig({
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'Usage', link: '/guide/usage' },
+            { text: 'Agent Skills', link: '/guide/skills' },
           ],
         },
         {
