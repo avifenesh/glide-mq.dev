@@ -54,30 +54,54 @@ The skill contains a main `SKILL.md` with quick-start examples and a problem-to-
 | `observability.md` | QueueEvents, OpenTelemetry, time-series metrics, job logs, progress tracking |
 | `serverless.md` | Producer, ServerlessPool, HTTP proxy, TestQueue/TestWorker for in-memory testing |
 
-### Example: What the Agent Sees
+### Real Test: With vs Without
 
-When you ask your agent to "create a queue with delayed jobs and retries", it loads the skill and generates:
+We ran Claude Code (Sonnet) on the same prompt with and without the skill installed.
 
+**Prompt:** *"Write a complete TypeScript file that creates a glide-mq queue, adds a delayed job with 3 retries and exponential backoff, and creates a worker with concurrency 5. Include connection setup, error handling, and graceful shutdown."*
+
+::: danger Without skill (35s)
+```
+I couldn't find `glide-mq` in any documentation sources — it doesn't
+appear to be a known npm package.
+
+Could you clarify what you mean by `glide-mq`? You might be thinking
+of one of these popular TypeScript-compatible queue libraries:
+
+- BullMQ — Redis-backed queue with workers, delayed jobs...
+- bee-queue — Lightweight Redis-backed job queue
+```
+The agent doesn't know glide-mq exists. Zero usable output.
+:::
+
+::: tip With skill installed (20s)
 ```typescript
-import { Queue, Worker } from 'glide-mq';
+import { Queue, Worker, gracefulShutdown } from 'glide-mq';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
-const queue = new Queue('tasks', { connection });
+const queue = new Queue('my-queue', { connection });
 
-await queue.add('send-email', { to: 'user@example.com' }, {
-  delay: 300_000,           // 5 minutes
+await queue.add('delayed-task', { message: 'hello' }, {
+  delay: 10_000,
   attempts: 3,
   backoff: { type: 'exponential', delay: 1000 },
-  priority: 0,              // lower = higher priority
 });
 
-const worker = new Worker('tasks', async (job) => {
-  await sendEmail(job.data.to);
-  return { sent: true };
-}, { connection, concurrency: 10 });
-```
+const worker = new Worker('my-queue', async (job) => {
+  console.log(`Processing ${job.id}:`, job.data);
+  return { processed: true };
+}, { connection, concurrency: 5 });
 
-Without the skill, the agent might guess wrong on connection format, priority direction, or method names.
+worker.on('completed', (job) => console.log(`Completed: ${job.id}`));
+worker.on('failed', (job, err) => console.error(`Failed: ${err.message}`));
+worker.on('error', (err) => console.error('Worker error:', err));
+
+process.on('SIGTERM', async () => {
+  await gracefulShutdown([worker, queue]);
+});
+```
+Correct connection format, proper `gracefulShutdown`, accurate API. Ready to run.
+:::
 
 ## Migrate from BullMQ {#migrate-from-bullmq}
 
@@ -103,23 +127,43 @@ Copy `skills/glide-mq-migrate-bullmq/` from the [glide-mq repo](https://github.c
 - **Troubleshooting table** - 11 common errors with fixes
 - **Performance comparison** - benchmark data at different concurrency levels
 
-### Example: Connection Migration
+### Real Test: Migration Quality
 
-The biggest change is connection format. The skill teaches agents to convert:
+We gave both agents the same BullMQ source file (Queue + Worker + FlowProducer + QueueEvents with TLS and `defaultJobOptions`) and asked to convert it.
 
+::: danger Without skill - 2 bugs
 ```typescript
-// BullMQ
-const queue = new Queue('tasks', {
-  connection: { host: 'localhost', port: 6379 }
-});
+// Bug 1: Wrong method name
+const flow = new FlowProducer({ connection });
+await flow.addFlow({ ... }); // ← WRONG: should be flow.add()
 
-// glide-mq (what the agent generates with the skill)
-const queue = new Queue('tasks', {
-  connection: { addresses: [{ host: 'localhost', port: 6379 }] }
-});
+// Bug 2: Wrong removeOnComplete type
+removeOnComplete: true // ← WRONG: glide-mq supports { count: 100 }
 ```
+The agent guessed `flow.addFlow()` (doesn't exist) and lost the `removeOnComplete` count configuration.
+:::
 
-Without the skill, the agent would use BullMQ's `{ host, port }` format and get a runtime error.
+::: tip With skill - correct output
+```typescript
+// Correct method name
+await flow.add({ ... }); // ✓
+
+// Correct removeOnComplete with count preservation
+removeOnComplete: { count: 100 } // ✓
+
+// Correct defaultJobOptions handling (removed from Queue, spread per-job)
+const defaultJobOptions = {
+  attempts: 3,
+  backoff: { type: 'exponential', delay: 1000 },
+  removeOnComplete: { count: 100 },
+};
+await queue.add('welcome', data, { ...defaultJobOptions, delay: 5000 });
+
+// Correct graceful shutdown
+await gracefulShutdown([worker, queue, events, flow]); // ✓
+```
+The skill correctly handles `defaultJobOptions` removal, `removeOnComplete` shape, and method names.
+:::
 
 ## Migrate from Bee-Queue {#migrate-from-bee-queue}
 
@@ -145,29 +189,46 @@ Copy `skills/glide-mq-migrate-bee/` from the [glide-mq repo](https://github.com/
 - **Migration checklist** - 18 checkbox items
 - **Troubleshooting table** - 10 common errors
 
-### Example: Job Creation
+### Real Test: Migration Accuracy
 
-The biggest change is the chained builder pattern. The skill teaches agents to convert:
+We gave both agents a Bee-Queue source file with chained job builder, `queue.process()`, `reportProgress()`, `checkHealth()`, and stall detection.
 
+::: danger Without skill - 3 bugs
 ```typescript
-// Bee-Queue (chained builder)
-const job = queue.createJob({ email: 'user@example.com' })
-  .retries(3)
-  .backoff('exponential', 1000)
-  .delayUntil(Date.now() + 60000)
-  .setId('unique-123')
-  .save();
+// Bug 1: Wrong attempts count
+attempts: 4, // ← WRONG: claims "1 initial + 3 retries"
+// glide-mq attempts means total attempts, same as Bee's retries(3) → attempts: 3
 
-// glide-mq (what the agent generates with the skill)
-await queue.add('send-email', { email: 'user@example.com' }, {
-  attempts: 3,
-  backoff: { type: 'exponential', delay: 1000 },
-  delay: 60000,
-  jobId: 'unique-123',
+// Bug 2: Wrong updateProgress type
+await job.updateProgress({ percent: 50 }); // ← WRONG: takes number, not object
+// Should be: await job.updateProgress(50);
+
+// Bug 3: Invented option name
+stalledInterval: 5000, // ← WRONG: not a real glide-mq option
+// Should be: lockDuration on Worker
+```
+The agent misunderstood the `attempts` semantics, passed an object to `updateProgress` (which takes a number), and invented `stalledInterval`.
+:::
+
+::: tip With skill - correct output
+```typescript
+// Correct attempts mapping
+attempts: 3, // ✓ same as Bee-Queue's .retries(3)
+
+// Correct progress API (number, not object)
+await job.updateProgress(50); // ✓
+await job.updateProgress(100); // ✓
+
+// Correct stall detection config
+{ connection, concurrency: 5, lockDuration: 5000 } // ✓
+
+// Correct per-job event pattern (QueueEvents + filter)
+events.on('completed', ({ jobId, returnvalue }) => {
+  if (jobId === job.id) console.log('Job done:', returnvalue);
 });
 ```
-
-Key differences the skill captures: `.retries(n)` becomes `attempts` (different name), `.delayUntil(date)` becomes `delay` in milliseconds, `.setId()` becomes `jobId` option, and `queue.process()` becomes a separate `Worker` class.
+The skill correctly maps `.retries(n)` to `attempts`, `reportProgress(json)` to `updateProgress(number)`, and `stallInterval` to `lockDuration`.
+:::
 
 ## Installing All Skills
 
