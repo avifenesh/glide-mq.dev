@@ -23,8 +23,8 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'Migration', link: '/migration/from-bullmq' },
-      { text: 'Integrations', link: '/integrations/hono' },
+      { text: 'Migration', link: '/migration/' },
+      { text: 'Integrations', link: '/integrations/' },
       { text: 'Examples', link: '/examples/' },
       { text: 'API', link: '/api/' },
     ],
@@ -69,6 +69,7 @@ export default defineConfig({
         {
           text: 'Migration Guides',
           items: [
+            { text: 'Overview', link: '/migration/' },
             { text: 'From BullMQ', link: '/migration/from-bullmq' },
             { text: 'From Bee-Queue', link: '/migration/from-bee-queue' },
           ],
@@ -79,6 +80,7 @@ export default defineConfig({
         {
           text: 'Framework Integrations',
           items: [
+            { text: 'Overview', link: '/integrations/' },
             { text: 'Hono', link: '/integrations/hono' },
             { text: 'Fastify', link: '/integrations/fastify' },
             { text: 'NestJS', link: '/integrations/nestjs' },

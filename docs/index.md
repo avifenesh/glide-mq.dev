@@ -13,8 +13,8 @@ hero:
       text: View on GitHub
       link: https://github.com/avifenesh/glide-mq
     - theme: alt
-      text: Migration from BullMQ
-      link: /migration/from-bullmq
+      text: Migration Guides
+      link: /migration/
 
 features:
   - icon: "&#9889;"
@@ -41,7 +41,7 @@ features:
 
 Benchmarked on AWS ElastiCache Valkey 8.2 (r7g.large) with TLS enabled:
 
-| Concurrency | glide-mq | BullMQ | Delta |
+| Concurrency | glide-mq | Leading Alternative | Delta |
 |---|---|---|---|
 | c=1 | 2,479 j/s | 2,535 j/s | -2% |
 | c=5 | 10,754 j/s | 9,866 j/s | +9% |
