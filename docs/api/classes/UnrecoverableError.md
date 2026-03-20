@@ -1,6 +1,6 @@
 # Class: UnrecoverableError
 
-Defined in: [glide-mq/src/errors.ts:15](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/errors.ts#L15)
+Defined in: [glide-mq/src/errors.ts:15](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L15)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/errors.ts:15](https://github.com/avifenesh/glide-mq/bl
 new UnrecoverableError(message): UnrecoverableError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:16](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/errors.ts#L16)
+Defined in: [glide-mq/src/errors.ts:16](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L16)
 
 #### Parameters
 

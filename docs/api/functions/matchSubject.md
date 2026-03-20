@@ -4,7 +4,7 @@
 function matchSubject(pattern, subject): boolean;
 ```
 
-Defined in: [glide-mq/src/utils.ts:826](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/utils.ts#L826)
+Defined in: [glide-mq/src/utils.ts:827](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/utils.ts#L827)
 
 Match a dot-separated subject against a pattern.
 - `*` matches exactly one segment

@@ -1,6 +1,6 @@
 # Class: ServerlessPool
 
-Defined in: [glide-mq/src/serverless-pool.ts:29](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/serverless-pool.ts#L29)
+Defined in: [glide-mq/src/serverless-pool.ts:29](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/serverless-pool.ts#L29)
 
 ## Constructors
 
@@ -24,7 +24,7 @@ new ServerlessPool(): ServerlessPool;
 get size(): number;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:72](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/serverless-pool.ts#L72)
+Defined in: [glide-mq/src/serverless-pool.ts:72](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/serverless-pool.ts#L72)
 
 Number of cached producers.
 
@@ -37,17 +37,17 @@ Number of cached producers.
 ### closeAll()
 
 ```ts
-closeAll(): Promise&lt;void>;
+closeAll(): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:63](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/serverless-pool.ts#L63)
+Defined in: [glide-mq/src/serverless-pool.ts:63](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/serverless-pool.ts#L63)
 
 Close all cached producers and clear the cache.
 Call this during Lambda SIGTERM or explicit cleanup.
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -57,7 +57,7 @@ Call this during Lambda SIGTERM or explicit cleanup.
 getProducer<D>(name, opts): Producer<D>;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:40](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/serverless-pool.ts#L40)
+Defined in: [glide-mq/src/serverless-pool.ts:40](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/serverless-pool.ts#L40)
 
 Get or create a Producer for the given queue name and options.
 Returns a cached instance if one exists with matching connection parameters.
@@ -80,4 +80,4 @@ collisions where different instances could map to the same cache key.
 
 #### Returns
 
-[`Producer`](Producer.md)&lt;`D`&gt;
+[`Producer`](Producer.md)\<`D`\>

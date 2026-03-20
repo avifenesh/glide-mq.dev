@@ -1,6 +1,6 @@
 # Interface: SandboxOptions
 
-Defined in: [glide-mq/src/types.ts:90](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L90)
+Defined in: [glide-mq/src/types.ts:90](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L90)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/types.ts:90](https://github.com/avifenesh/glide-mq/blo
 optional maxWorkers?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:94](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L94)
+Defined in: [glide-mq/src/types.ts:94](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L94)
 
 Maximum number of concurrent sandbox workers. Defaults to the Worker concurrency.
 
@@ -22,6 +22,6 @@ Maximum number of concurrent sandbox workers. Defaults to the Worker concurrency
 optional useWorkerThreads?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:92](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L92)
+Defined in: [glide-mq/src/types.ts:92](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L92)
 
 Use worker_threads (default: true). When false, uses child_process.fork.

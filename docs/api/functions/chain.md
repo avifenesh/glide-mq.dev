@@ -8,7 +8,7 @@ function chain(
 prefix?): Promise<JobNode>;
 ```
 
-Defined in: [glide-mq/src/workflows.ts:20](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/workflows.ts#L20)
+Defined in: [glide-mq/src/workflows.ts:20](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/workflows.ts#L20)
 
 Chain: execute jobs sequentially. Each step becomes a child of the next,
 so step N+1 only runs after step N completes. The last job in the array
@@ -29,4 +29,4 @@ to access results from children.
 
 ## Returns
 
-`Promise`&lt;[`JobNode`](../interfaces/JobNode.md)&gt;
+`Promise`\<[`JobNode`](../interfaces/JobNode.md)\>

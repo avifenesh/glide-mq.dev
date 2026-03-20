@@ -1,6 +1,6 @@
 # Class: BatchError
 
-Defined in: [glide-mq/src/errors.ts:22](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/errors.ts#L22)
+Defined in: [glide-mq/src/errors.ts:22](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L22)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/errors.ts:22](https://github.com/avifenesh/glide-mq/bl
 new BatchError(results): BatchError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:25](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/errors.ts#L25)
+Defined in: [glide-mq/src/errors.ts:25](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L25)
 
 #### Parameters
 
@@ -80,7 +80,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 readonly results: unknown[];
 ```
 
-Defined in: [glide-mq/src/errors.ts:23](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/errors.ts#L23)
+Defined in: [glide-mq/src/errors.ts:23](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L23)
 
 ***
 

@@ -36,6 +36,10 @@
         "link": "/api/classes/GlideMQError.md"
       },
       {
+        "text": "GroupRateLimitError",
+        "link": "/api/classes/GroupRateLimitError.md"
+      },
+      {
         "text": "Job",
         "link": "/api/classes/Job.md"
       },
@@ -116,6 +120,10 @@
       {
         "text": "GetJobsOptions",
         "link": "/api/interfaces/GetJobsOptions.md"
+      },
+      {
+        "text": "GroupRateLimitOptions",
+        "link": "/api/interfaces/GroupRateLimitOptions.md"
       },
       {
         "text": "IamCredentials",

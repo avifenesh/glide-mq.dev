@@ -16,5 +16,8 @@
     "typedoc-plugin-markdown": "^4.4.0",
     "typedoc-vitepress-theme": "^1.1.0",
     "vitepress": "^1.6.3"
+  },
+  "dependencies": {
+    "glide-mq": "file:../glide-mq"
   }
 }

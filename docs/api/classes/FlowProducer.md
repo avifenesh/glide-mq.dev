@@ -1,6 +1,6 @@
 # Class: FlowProducer
 
-Defined in: [glide-mq/src/flow-producer.ts:29](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L29)
+Defined in: [glide-mq/src/flow-producer.ts:29](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L29)
 
 ## Constructors
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/flow-producer.ts:29](https://github.com/avifenesh/glid
 new FlowProducer(opts): FlowProducer;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:36](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L36)
+Defined in: [glide-mq/src/flow-producer.ts:36](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L36)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [glide-mq/src/flow-producer.ts:36](https://github.com/avifenesh/glid
 add(flow): Promise<JobNode>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:70](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L70)
+Defined in: [glide-mq/src/flow-producer.ts:70](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L70)
 
 Add a flow (parent with children) atomically.
 Children can have their own children (recursive flows), which are flattened
@@ -44,7 +44,7 @@ into multiple addFlow calls (one per level with children).
 
 #### Returns
 
-`Promise`&lt;[`JobNode`](../interfaces/JobNode.md)&gt;
+`Promise`\<[`JobNode`](../interfaces/JobNode.md)\>
 
 ***
 
@@ -54,7 +54,7 @@ into multiple addFlow calls (one per level with children).
 addBulk(flows): Promise<JobNode[]>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:88](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L88)
+Defined in: [glide-mq/src/flow-producer.ts:88](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L88)
 
 Add multiple independent flows.
 
@@ -66,17 +66,17 @@ Add multiple independent flows.
 
 #### Returns
 
-`Promise`&lt;[`JobNode`](../interfaces/JobNode.md)[]&gt;
+`Promise`\<[`JobNode`](../interfaces/JobNode.md)[]\>
 
 ***
 
 ### addDAG()
 
 ```ts
-addDAG(dag): Promise<Map&lt;string, Job&lt;any, any>>>;
+addDAG(dag): Promise<Map<string, Job<any, any>>>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:331](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L331)
+Defined in: [glide-mq/src/flow-producer.ts:330](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L330)
 
 Add a DAG (Directed Acyclic Graph) flow where jobs can have multiple parents.
 Validates the graph for cycles, performs topological sort, and submits nodes
@@ -93,21 +93,21 @@ Returns a map of node name to Job instance.
 
 #### Returns
 
-`Promise`&lt;`Map`&lt;`string`, [`Job`](Job.md)&lt;`any`, `any`&gt;&gt;&gt;
+`Promise`\<`Map`\<`string`, [`Job`](Job.md)\<`any`, `any`\>\>\>
 
 ***
 
 ### close()
 
 ```ts
-close(): Promise&lt;void>;
+close(): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:634](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/flow-producer.ts#L634)
+Defined in: [glide-mq/src/flow-producer.ts:636](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L636)
 
 Close the FlowProducer and release the underlying client connection.
 Idempotent: safe to call multiple times.
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>

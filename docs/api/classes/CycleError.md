@@ -1,6 +1,6 @@
 # Class: CycleError
 
-Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/dag-utils.ts#L8)
+Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/dag-utils.ts#L8)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/
 new CycleError(cycle): CycleError;
 ```
 
-Defined in: [glide-mq/src/dag-utils.ts:11](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/dag-utils.ts#L11)
+Defined in: [glide-mq/src/dag-utils.ts:11](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/dag-utils.ts#L11)
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Error.cause
 readonly cycle: string[];
 ```
 
-Defined in: [glide-mq/src/dag-utils.ts:9](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/dag-utils.ts#L9)
+Defined in: [glide-mq/src/dag-utils.ts:9](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/dag-utils.ts#L9)
 
 ***
 

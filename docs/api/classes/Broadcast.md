@@ -1,6 +1,6 @@
-# Class: Broadcast&lt;D&gt;
+# Class: Broadcast\<D\>
 
-Defined in: [glide-mq/src/broadcast.ts:30](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L30)
+Defined in: [glide-mq/src/broadcast.ts:30](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L30)
 
 Broadcast - Fan-out message publisher for pub/sub patterns.
 
@@ -42,7 +42,7 @@ await broadcast.publish('order.placed', { orderId: 42 });
 new Broadcast<D>(name, opts): Broadcast<D>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L36)
+Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L36)
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq
 
 #### Returns
 
-`Broadcast`&lt;`D`&gt;
+`Broadcast`\<`D`\>
 
 #### Overrides
 
@@ -69,7 +69,7 @@ EventEmitter.constructor
 readonly keys: object;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:34](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L34)
+Defined in: [glide-mq/src/broadcast.ts:34](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L34)
 
 #### completed
 
@@ -293,7 +293,7 @@ worker: (id) => string;
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:31](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L31)
+Defined in: [glide-mq/src/broadcast.ts:31](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L31)
 
 ***
 
@@ -505,16 +505,16 @@ EventEmitter.addListener
 ### close()
 
 ```ts
-close(): Promise&lt;void>;
+close(): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:117](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L117)
+Defined in: [glide-mq/src/broadcast.ts:117](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L117)
 
 Close the broadcast publisher and release connections.
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -640,13 +640,13 @@ EventEmitter.eventNames
 getClient(): Promise<Client>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:110](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L110)
+Defined in: [glide-mq/src/broadcast.ts:110](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L110)
 
 Get the underlying client for advanced operations.
 
 #### Returns
 
-`Promise`&lt;`Client`&gt;
+`Promise`\<`Client`\>
 
 ***
 
@@ -932,16 +932,16 @@ EventEmitter.once
 ### pause()
 
 ```ts
-pause(): Promise&lt;void>;
+pause(): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L96)
+Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L96)
 
 Pause message publication (delayed/scheduled messages won't be promoted).
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -1049,10 +1049,10 @@ EventEmitter.prependOnceListener
 publish(
    subject, 
    data, 
-opts?): Promise&lt;string | null>;
+opts?): Promise<string | null>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:65](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L65)
+Defined in: [glide-mq/src/broadcast.ts:65](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L65)
 
 Publish a message to all subscribers.
 Each subscriber (consumer group) receives a copy.
@@ -1067,7 +1067,7 @@ Each subscriber (consumer group) receives a copy.
 
 #### Returns
 
-`Promise`&lt;`string` \| `null`&gt;
+`Promise`\<`string` \| `null`\>
 
 Message ID or null if skipped (e.g., due to dedup)
 
@@ -1295,26 +1295,26 @@ EventEmitter.removeListener
 ### resume()
 
 ```ts
-resume(): Promise&lt;void>;
+resume(): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:103](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L103)
+Defined in: [glide-mq/src/broadcast.ts:103](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L103)
 
 Resume message publication.
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>
 
 ***
 
 ### setGlobalRateLimit()
 
 ```ts
-setGlobalRateLimit(config): Promise&lt;void>;
+setGlobalRateLimit(config): Promise<void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:86](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/broadcast.ts#L86)
+Defined in: [glide-mq/src/broadcast.ts:86](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/broadcast.ts#L86)
 
 Set global rate limit for all subscribers.
 
@@ -1326,7 +1326,7 @@ Set global rate limit for all subscribers.
 
 #### Returns
 
-`Promise`&lt;`void`&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -1467,7 +1467,7 @@ import { getEventListeners, EventEmitter } from 'node:events';
 
 | Parameter | Type |
 | ------ | ------ |
-| `emitter` | `EventEmitter`&lt;`DefaultEventMap`&gt; \| `EventTarget` |
+| `emitter` | `EventEmitter`\<`DefaultEventMap`\> \| `EventTarget` |
 | `name` | `string` \| `symbol` |
 
 #### Returns
@@ -1524,7 +1524,7 @@ import { getMaxListeners, setMaxListeners, EventEmitter } from 'node:events';
 
 | Parameter | Type |
 | ------ | ------ |
-| `emitter` | `EventEmitter`&lt;`DefaultEventMap`&gt; \| `EventTarget` |
+| `emitter` | `EventEmitter`\<`DefaultEventMap`\> \| `EventTarget` |
 
 #### Returns
 
@@ -1597,7 +1597,7 @@ EventEmitter.listenerCount
 static on(
    emitter, 
    eventName, 
-options?): AsyncIterator&lt;any[]>;
+options?): AsyncIterator<any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:270
@@ -1689,7 +1689,7 @@ console.log('done'); // prints 'done'
 
 ##### Returns
 
-`AsyncIterator`&lt;`any`[]&gt;
+`AsyncIterator`\<`any`[]\>
 
 An `AsyncIterator` that iterates `eventName` events emitted by the `emitter`
 
@@ -1709,7 +1709,7 @@ EventEmitter.on
 static on(
    emitter, 
    eventName, 
-options?): AsyncIterator&lt;any[]>;
+options?): AsyncIterator<any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:275
@@ -1801,7 +1801,7 @@ console.log('done'); // prints 'done'
 
 ##### Returns
 
-`AsyncIterator`&lt;`any`[]&gt;
+`AsyncIterator`\<`any`[]\>
 
 An `AsyncIterator` that iterates `eventName` events emitted by the `emitter`
 
@@ -1825,7 +1825,7 @@ EventEmitter.on
 static once(
    emitter, 
    eventName, 
-options?): Promise&lt;any[]>;
+options?): Promise<any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:184
@@ -1917,7 +1917,7 @@ ee.emit('foo'); // Prints: Waiting for the event was canceled!
 
 ##### Returns
 
-`Promise`&lt;`any`[]&gt;
+`Promise`\<`any`[]\>
 
 ##### Since
 
@@ -1935,7 +1935,7 @@ EventEmitter.once
 static once(
    emitter, 
    eventName, 
-options?): Promise&lt;any[]>;
+options?): Promise<any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:189
@@ -2027,7 +2027,7 @@ ee.emit('foo'); // Prints: Waiting for the event was canceled!
 
 ##### Returns
 
-`Promise`&lt;`any`[]&gt;
+`Promise`\<`any`[]\>
 
 ##### Since
 
@@ -2063,7 +2063,7 @@ setMaxListeners(5, target, emitter);
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `n?` | `number` | A non-negative number. The maximum number of listeners per `EventTarget` event. |
-| ...`eventTargets?` | (`EventEmitter`&lt;`DefaultEventMap`&gt; \| `EventTarget`)[] | Zero or more {EventTarget} or {EventEmitter} instances. If none are specified, `n` is set as the default max for all newly created {EventTarget} and {EventEmitter} objects. |
+| ...`eventTargets?` | (`EventEmitter`\<`DefaultEventMap`\> \| `EventTarget`)[] | Zero or more {EventTarget} or {EventEmitter} instances. If none are specified, `n` is set as the default max for all newly created {EventTarget} and {EventEmitter} objects. |
 
 #### Returns
 

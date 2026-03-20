@@ -1,6 +1,6 @@
 # Interface: Serializer
 
-Defined in: [glide-mq/src/types.ts:243](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L243)
+Defined in: [glide-mq/src/types.ts:243](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L243)
 
 Custom serializer for job data and return values.
 
@@ -19,7 +19,7 @@ as a processor failure (in Worker) or skipped (in Scheduler).
 deserialize(raw): unknown;
 ```
 
-Defined in: [glide-mq/src/types.ts:247](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L247)
+Defined in: [glide-mq/src/types.ts:247](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L247)
 
 Deserialize a string from Valkey back to a value.
 
@@ -41,7 +41,7 @@ Deserialize a string from Valkey back to a value.
 serialize(data): string;
 ```
 
-Defined in: [glide-mq/src/types.ts:245](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L245)
+Defined in: [glide-mq/src/types.ts:245](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L245)
 
 Serialize a value to a string for storage in Valkey.
 

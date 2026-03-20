@@ -1,45 +1,35 @@
-# Class: GlideMQError
+# Class: GroupRateLimitError
 
-Defined in: [glide-mq/src/errors.ts:1](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L1)
+Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L61)
 
 ## Extends
 
-- `Error`
-
-## Extended by
-
-- [`ConnectionError`](ConnectionError.md)
-- [`UnrecoverableError`](UnrecoverableError.md)
-- [`DelayedError`](DelayedError.md)
-- [`BatchError`](BatchError.md)
-- [`WaitingChildrenError`](WaitingChildrenError.md)
-- [`GroupRateLimitError`](GroupRateLimitError.md)
+- [`GlideMQError`](GlideMQError.md)
 
 ## Constructors
 
 ### Constructor
 
 ```ts
-new GlideMQError(message): GlideMQError;
+new GroupRateLimitError(delayMs, opts?): GroupRateLimitError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:2](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L2)
+Defined in: [glide-mq/src/errors.ts:65](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L65)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `message` | `string` |
+| `delayMs` | `number` |
+| `opts?` | [`GroupRateLimitOptions`](../interfaces/GroupRateLimitOptions.md) |
 
 #### Returns
 
-`GlideMQError`
+`GroupRateLimitError`
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+[`GlideMQError`](GlideMQError.md).[`constructor`](GlideMQError.md#constructor)
 
 ## Properties
 
@@ -53,9 +43,17 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
 
 #### Inherited from
 
+[`GlideMQError`](GlideMQError.md).[`cause`](GlideMQError.md#cause)
+
+***
+
+### delayMs
+
 ```ts
-Error.cause
+readonly delayMs: number;
 ```
+
+Defined in: [glide-mq/src/errors.ts:62](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L62)
 
 ***
 
@@ -69,9 +67,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1077
 
 #### Inherited from
 
-```ts
-Error.message
-```
+[`GlideMQError`](GlideMQError.md).[`message`](GlideMQError.md#message)
 
 ***
 
@@ -85,9 +81,17 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 
+[`GlideMQError`](GlideMQError.md).[`name`](GlideMQError.md#name)
+
+***
+
+### opts
+
 ```ts
-Error.name
+readonly opts: Required<GroupRateLimitOptions>;
 ```
+
+Defined in: [glide-mq/src/errors.ts:63](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L63)
 
 ***
 
@@ -101,9 +105,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1078
 
 #### Inherited from
 
-```ts
-Error.stack
-```
+[`GlideMQError`](GlideMQError.md).[`stack`](GlideMQError.md#stack)
 
 ***
 
@@ -127,9 +129,7 @@ not capture any frames.
 
 #### Inherited from
 
-```ts
-Error.stackTraceLimit
-```
+[`GlideMQError`](GlideMQError.md).[`stackTraceLimit`](GlideMQError.md#stacktracelimit)
 
 ## Methods
 
@@ -198,9 +198,7 @@ a();
 
 #### Inherited from
 
-```ts
-Error.captureStackTrace
-```
+[`GlideMQError`](GlideMQError.md).[`captureStackTrace`](GlideMQError.md#capturestacktrace)
 
 ***
 
@@ -229,6 +227,4 @@ https://v8.dev/docs/stack-trace-api#customizing-stack-traces
 
 #### Inherited from
 
-```ts
-Error.prepareStackTrace
-```
+[`GlideMQError`](GlideMQError.md).[`prepareStackTrace`](GlideMQError.md#preparestacktrace)

@@ -1,6 +1,6 @@
 # Interface: SchedulerEntry
 
-Defined in: [glide-mq/src/types.ts:332](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L332)
+Defined in: [glide-mq/src/types.ts:332](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L332)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/types.ts:332](https://github.com/avifenesh/glide-mq/bl
 optional endDate?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:340](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L340)
+Defined in: [glide-mq/src/types.ts:340](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L340)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [glide-mq/src/types.ts:340](https://github.com/avifenesh/glide-mq/bl
 optional every?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:334](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L334)
+Defined in: [glide-mq/src/types.ts:334](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L334)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [glide-mq/src/types.ts:334](https://github.com/avifenesh/glide-mq/bl
 optional iterationCount?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:342](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L342)
+Defined in: [glide-mq/src/types.ts:342](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L342)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [glide-mq/src/types.ts:342](https://github.com/avifenesh/glide-mq/bl
 optional lastRun?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:344](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L344)
+Defined in: [glide-mq/src/types.ts:344](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L344)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [glide-mq/src/types.ts:344](https://github.com/avifenesh/glide-mq/bl
 optional limit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:341](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L341)
+Defined in: [glide-mq/src/types.ts:341](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L341)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: [glide-mq/src/types.ts:341](https://github.com/avifenesh/glide-mq/bl
 nextRun: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:345](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L345)
+Defined in: [glide-mq/src/types.ts:345](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L345)
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: [glide-mq/src/types.ts:345](https://github.com/avifenesh/glide-mq/bl
 optional pattern?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:333](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L333)
+Defined in: [glide-mq/src/types.ts:333](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L333)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [glide-mq/src/types.ts:333](https://github.com/avifenesh/glide-mq/bl
 optional repeatAfterComplete?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:336](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L336)
+Defined in: [glide-mq/src/types.ts:336](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L336)
 
 Delay in ms after completion before scheduling the next job.
 
@@ -92,7 +92,7 @@ Delay in ms after completion before scheduling the next job.
 optional startDate?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:339](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L339)
+Defined in: [glide-mq/src/types.ts:339](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L339)
 
 ***
 
@@ -102,7 +102,7 @@ Defined in: [glide-mq/src/types.ts:339](https://github.com/avifenesh/glide-mq/bl
 optional template?: JobTemplate;
 ```
 
-Defined in: [glide-mq/src/types.ts:343](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L343)
+Defined in: [glide-mq/src/types.ts:343](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L343)
 
 ***
 
@@ -112,6 +112,6 @@ Defined in: [glide-mq/src/types.ts:343](https://github.com/avifenesh/glide-mq/bl
 optional tz?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:338](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L338)
+Defined in: [glide-mq/src/types.ts:338](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L338)
 
 IANA timezone for cron patterns (e.g. 'America/New_York'). Defaults to UTC.

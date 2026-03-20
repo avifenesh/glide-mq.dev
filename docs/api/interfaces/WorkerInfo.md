@@ -1,6 +1,6 @@
 # Interface: WorkerInfo
 
-Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L395)
+Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L395)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/bl
 activeJobs: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L401)
+Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L401)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/bl
 addr: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L397)
+Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L397)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/bl
 age: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:400](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L400)
+Defined in: [glide-mq/src/types.ts:400](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L400)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [glide-mq/src/types.ts:400](https://github.com/avifenesh/glide-mq/bl
 id: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:396](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L396)
+Defined in: [glide-mq/src/types.ts:396](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L396)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [glide-mq/src/types.ts:396](https://github.com/avifenesh/glide-mq/bl
 pid: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:398](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L398)
+Defined in: [glide-mq/src/types.ts:398](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L398)
 
 ***
 
@@ -60,4 +60,4 @@ Defined in: [glide-mq/src/types.ts:398](https://github.com/avifenesh/glide-mq/bl
 startedAt: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:399](https://github.com/avifenesh/glide-mq/blob/195fb052b319e67e504b78342e7d404036dba946/src/types.ts#L399)
+Defined in: [glide-mq/src/types.ts:399](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L399)

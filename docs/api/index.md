@@ -12,6 +12,7 @@
 | [DelayedError](classes/DelayedError.md) | - |
 | [FlowProducer](classes/FlowProducer.md) | - |
 | [GlideMQError](classes/GlideMQError.md) | - |
+| [GroupRateLimitError](classes/GroupRateLimitError.md) | - |
 | [Job](classes/Job.md) | - |
 | [Producer](classes/Producer.md) | - |
 | [Queue](classes/Queue.md) | - |
@@ -36,6 +37,7 @@
 | [FlowJob](interfaces/FlowJob.md) | - |
 | [FlowProducerOptions](interfaces/FlowProducerOptions.md) | - |
 | [GetJobsOptions](interfaces/GetJobsOptions.md) | - |
+| [GroupRateLimitOptions](interfaces/GroupRateLimitOptions.md) | - |
 | [IamCredentials](interfaces/IamCredentials.md) | IAM authentication credentials for AWS ElastiCache/MemoryDB. |
 | [JobCounts](interfaces/JobCounts.md) | - |
 | [JobData](interfaces/JobData.md) | - |
