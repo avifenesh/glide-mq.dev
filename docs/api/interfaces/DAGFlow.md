@@ -1,6 +1,6 @@
 # Interface: DAGFlow
 
-Defined in: [glide-mq/src/types.ts:424](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L424)
+Defined in: [glide-mq/src/types.ts:424](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L424)
 
 A complete DAG flow definition for submission via FlowProducer.addDAG().
 
@@ -12,6 +12,6 @@ A complete DAG flow definition for submission via FlowProducer.addDAG().
 nodes: DAGNode[];
 ```
 
-Defined in: [glide-mq/src/types.ts:426](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L426)
+Defined in: [glide-mq/src/types.ts:426](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L426)
 
 The nodes of the DAG. Order does not matter - topological sort is applied.

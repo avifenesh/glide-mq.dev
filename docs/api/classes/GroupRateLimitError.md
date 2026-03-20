@@ -1,6 +1,6 @@
 # Class: GroupRateLimitError
 
-Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L61)
+Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L61)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/bl
 new GroupRateLimitError(delayMs, opts?): GroupRateLimitError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:65](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L65)
+Defined in: [glide-mq/src/errors.ts:65](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L65)
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
 readonly delayMs: number;
 ```
 
-Defined in: [glide-mq/src/errors.ts:62](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L62)
+Defined in: [glide-mq/src/errors.ts:62](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L62)
 
 ***
 
@@ -91,7 +91,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 readonly opts: Required<GroupRateLimitOptions>;
 ```
 
-Defined in: [glide-mq/src/errors.ts:63](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L63)
+Defined in: [glide-mq/src/errors.ts:63](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L63)
 
 ***
 

@@ -4,10 +4,10 @@
 function dag(
    nodes, 
    connection, 
-prefix?): Promise<Map<string, Job<any, any>>>;
+prefix?): Promise<Map&lt;string, Job&lt;any, any>>>;
 ```
 
-Defined in: [glide-mq/src/workflows.ts:165](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/workflows.ts#L165)
+Defined in: [glide-mq/src/workflows.ts:165](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/workflows.ts#L165)
 
 DAG: submit a directed acyclic graph of jobs where each job can depend on
 multiple other jobs. The graph is validated for cycles and submitted in
@@ -35,4 +35,4 @@ const jobs = await dag([
 
 ## Returns
 
-`Promise`\<`Map`\<`string`, [`Job`](../classes/Job.md)\<`any`, `any`\>\>\>
+`Promise`&lt;`Map`&lt;`string`, [`Job`](../classes/Job.md)&lt;`any`, `any`&gt;&gt;&gt;

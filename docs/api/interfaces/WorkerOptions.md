@@ -1,6 +1,6 @@
 # Interface: WorkerOptions
 
-Defined in: [glide-mq/src/types.ts:97](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L97)
+Defined in: [glide-mq/src/types.ts:97](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L97)
 
 ## Extends
 
@@ -15,10 +15,10 @@ Defined in: [glide-mq/src/types.ts:97](https://github.com/avifenesh/glide-mq/blo
 ### backoffStrategies?
 
 ```ts
-optional backoffStrategies?: Record<string, (attemptsMade, err) => number>;
+optional backoffStrategies?: Record&lt;string, (attemptsMade, err) => number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:113](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L113)
+Defined in: [glide-mq/src/types.ts:113](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L113)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [glide-mq/src/types.ts:113](https://github.com/avifenesh/glide-mq/bl
 optional batch?: BatchOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:121](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L121)
+Defined in: [glide-mq/src/types.ts:121](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L121)
 
 Enable batch processing. When set, the processor receives an array of jobs.
 
@@ -40,7 +40,7 @@ Enable batch processing. When set, the processor receives an array of jobs.
 optional blockTimeout?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:108](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L108)
+Defined in: [glide-mq/src/types.ts:108](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L108)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [glide-mq/src/types.ts:108](https://github.com/avifenesh/glide-mq/bl
 optional client?: Client;
 ```
 
-Defined in: [glide-mq/src/types.ts:71](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L71)
+Defined in: [glide-mq/src/types.ts:71](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L71)
 
 Pre-existing GLIDE client for non-blocking commands.
 When provided, the component does NOT own this client - close() will not destroy it.
@@ -68,7 +68,7 @@ Must not be used for blocking reads (XREADGROUP BLOCK / XREAD BLOCK).
 optional commandClient?: Client;
 ```
 
-Defined in: [glide-mq/src/types.ts:104](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L104)
+Defined in: [glide-mq/src/types.ts:104](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L104)
 
 Pre-existing GLIDE client for non-blocking commands (alias for `client`).
 The blocking client for XREADGROUP is always auto-created from `connection`.
@@ -83,7 +83,7 @@ Provide either `commandClient` or `client`, not both.
 optional compression?: "none" | "gzip";
 ```
 
-Defined in: [glide-mq/src/types.ts:76](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L76)
+Defined in: [glide-mq/src/types.ts:76](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L76)
 
 Enable transparent compression of job data. Default: 'none'.
 
@@ -99,7 +99,7 @@ Enable transparent compression of job data. Default: 'none'.
 optional concurrency?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:105](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L105)
+Defined in: [glide-mq/src/types.ts:105](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L105)
 
 ***
 
@@ -109,7 +109,7 @@ Defined in: [glide-mq/src/types.ts:105](https://github.com/avifenesh/glide-mq/bl
 optional connection?: ConnectionOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:65](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L65)
+Defined in: [glide-mq/src/types.ts:65](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L65)
 
 Connection options for creating a new client. Required unless `client` is provided.
 
@@ -125,7 +125,7 @@ Connection options for creating a new client. Required unless `client` is provid
 optional deadLetterQueue?: DeadLetterQueueOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:74](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L74)
+Defined in: [glide-mq/src/types.ts:74](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L74)
 
 Dead letter queue configuration. Jobs that exhaust retries are moved here.
 
@@ -141,7 +141,7 @@ Dead letter queue configuration. Jobs that exhaust retries are moved here.
 optional events?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:125](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L125)
+Defined in: [glide-mq/src/types.ts:125](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L125)
 
 Emit events to Valkey event stream on job completion/activation. Default: true.
  Set to false to skip XADD events in hot path (~1 fewer redis.call per job).
@@ -159,7 +159,7 @@ Emit events to Valkey event stream on job completion/activation. Default: true.
 optional globalConcurrency?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:106](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L106)
+Defined in: [glide-mq/src/types.ts:106](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L106)
 
 ***
 
@@ -169,7 +169,7 @@ Defined in: [glide-mq/src/types.ts:106](https://github.com/avifenesh/glide-mq/bl
 optional limiter?: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:112](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L112)
+Defined in: [glide-mq/src/types.ts:112](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L112)
 
 #### duration
 
@@ -191,7 +191,7 @@ max: number;
 optional lockDuration?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:117](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L117)
+Defined in: [glide-mq/src/types.ts:117](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L117)
 
 Lock duration in ms. The worker sends a heartbeat every lockDuration/2.
  Jobs with a recent heartbeat are not reclaimed as stalled.
@@ -205,7 +205,7 @@ Lock duration in ms. The worker sends a heartbeat every lockDuration/2.
 optional maxStalledCount?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:110](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L110)
+Defined in: [glide-mq/src/types.ts:110](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L110)
 
 ***
 
@@ -215,7 +215,7 @@ Defined in: [glide-mq/src/types.ts:110](https://github.com/avifenesh/glide-mq/bl
 optional metrics?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:128](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L128)
+Defined in: [glide-mq/src/types.ts:128](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L128)
 
 Record per-minute timing metrics in Valkey on job completion. Default: true.
  Set to false to skip HINCRBY metrics recording (~1-2 fewer redis.call per job).
@@ -228,7 +228,7 @@ Record per-minute timing metrics in Valkey on job completion. Default: true.
 optional prefetch?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:107](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L107)
+Defined in: [glide-mq/src/types.ts:107](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L107)
 
 ***
 
@@ -238,7 +238,7 @@ Defined in: [glide-mq/src/types.ts:107](https://github.com/avifenesh/glide-mq/bl
 optional prefix?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:72](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L72)
+Defined in: [glide-mq/src/types.ts:72](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L72)
 
 #### Inherited from
 
@@ -252,7 +252,7 @@ Defined in: [glide-mq/src/types.ts:72](https://github.com/avifenesh/glide-mq/blo
 optional promotionInterval?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:111](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L111)
+Defined in: [glide-mq/src/types.ts:111](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L111)
 
 ***
 
@@ -262,7 +262,7 @@ Defined in: [glide-mq/src/types.ts:111](https://github.com/avifenesh/glide-mq/bl
 optional sandbox?: SandboxOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:119](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L119)
+Defined in: [glide-mq/src/types.ts:119](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L119)
 
 Sandbox options for file-path processors. Only used when processor is a string.
 
@@ -274,7 +274,7 @@ Sandbox options for file-path processors. Only used when processor is a string.
 optional serializer?: Serializer;
 ```
 
-Defined in: [glide-mq/src/types.ts:85](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L85)
+Defined in: [glide-mq/src/types.ts:85](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L85)
 
 Custom serializer for job data and return values. Default: JSON.
 
@@ -295,4 +295,4 @@ causes silent data corruption - the consumer will see `{}` and the job's
 optional stalledInterval?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:109](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L109)
+Defined in: [glide-mq/src/types.ts:109](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L109)

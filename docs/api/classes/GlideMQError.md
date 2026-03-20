@@ -1,6 +1,6 @@
 # Class: GlideMQError
 
-Defined in: [glide-mq/src/errors.ts:1](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L1)
+Defined in: [glide-mq/src/errors.ts:1](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L1)
 
 ## Extends
 
@@ -23,7 +23,7 @@ Defined in: [glide-mq/src/errors.ts:1](https://github.com/avifenesh/glide-mq/blo
 new GlideMQError(message): GlideMQError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:2](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L2)
+Defined in: [glide-mq/src/errors.ts:2](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L2)
 
 #### Parameters
 

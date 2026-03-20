@@ -1,6 +1,6 @@
 # Interface: JobTemplate
 
-Defined in: [glide-mq/src/types.ts:326](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L326)
+Defined in: [glide-mq/src/types.ts:326](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L326)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/types.ts:326](https://github.com/avifenesh/glide-mq/bl
 optional data?: any;
 ```
 
-Defined in: [glide-mq/src/types.ts:328](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L328)
+Defined in: [glide-mq/src/types.ts:328](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L328)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: [glide-mq/src/types.ts:328](https://github.com/avifenesh/glide-mq/bl
 optional name?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:327](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L327)
+Defined in: [glide-mq/src/types.ts:327](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L327)
 
 ***
 
@@ -30,4 +30,4 @@ Defined in: [glide-mq/src/types.ts:327](https://github.com/avifenesh/glide-mq/bl
 optional opts?: Omit<JobOptions, "delay" | "deduplication" | "parent">;
 ```
 
-Defined in: [glide-mq/src/types.ts:329](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/types.ts#L329)
+Defined in: [glide-mq/src/types.ts:329](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L329)

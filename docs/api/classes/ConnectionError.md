@@ -1,6 +1,6 @@
 # Class: ConnectionError
 
-Defined in: [glide-mq/src/errors.ts:8](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L8)
+Defined in: [glide-mq/src/errors.ts:8](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L8)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/errors.ts:8](https://github.com/avifenesh/glide-mq/blo
 new ConnectionError(message): ConnectionError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:9](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/errors.ts#L9)
+Defined in: [glide-mq/src/errors.ts:9](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L9)
 
 #### Parameters
 

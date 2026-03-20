@@ -1,6 +1,6 @@
 # Interface: JobNode
 
-Defined in: [glide-mq/src/flow-producer.ts:11](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L11)
+Defined in: [glide-mq/src/flow-producer.ts:11](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/flow-producer.ts#L11)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/flow-producer.ts:11](https://github.com/avifenesh/glid
 optional children?: JobNode[];
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:13](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L13)
+Defined in: [glide-mq/src/flow-producer.ts:13](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/flow-producer.ts#L13)
 
 ***
 
@@ -20,4 +20,4 @@ Defined in: [glide-mq/src/flow-producer.ts:13](https://github.com/avifenesh/glid
 job: Job;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:12](https://github.com/avifenesh/glide-mq/blob/8549c9d107cc7d61894a77c728c6336ae29eed82/src/flow-producer.ts#L12)
+Defined in: [glide-mq/src/flow-producer.ts:12](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/flow-producer.ts#L12)
