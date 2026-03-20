@@ -1025,3 +1025,57 @@ describe('Email service with TestQueue/TestWorker', () => {
 ```
 
 [View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/testing)
+
+
+## Per-Key Ordering
+
+Guarantee that all jobs with the same ordering key are processed sequentially, even under high concurrency and mixed priority.
+
+```typescript
+import { Queue, Worker } from 'glide-mq';
+
+const queue = new Queue('payments', { connection });
+
+// All jobs for 'user:42' process in order, regardless of priority
+await queue.addBulk([
+  { name: 'charge', data: { amount: 100 }, opts: { ordering: { key: 'user:42' }, priority: 2 } },
+  { name: 'refund', data: { amount: 50 },  opts: { ordering: { key: 'user:42' }, priority: 0 } },
+  { name: 'charge', data: { amount: 75 },  opts: { ordering: { key: 'user:42' }, priority: 3 } },
+]);
+
+// Despite different priorities, processing order is always: charge(100) -> refund(50) -> charge(75)
+const worker = new Worker('payments', async (job) => {
+  console.log(`${job.name}: $${job.data.amount}`);
+  return 'ok';
+}, { connection, concurrency: 10 });
+```
+
+[View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/ordering-key)
+
+## Group Rate Limiting
+
+Pause a specific ordering group at runtime - e.g., when a domain returns 429. Other groups keep processing.
+
+```typescript
+import { Queue, Worker, GroupRateLimitError } from 'glide-mq';
+
+const queue = new Queue('crawl', { connection });
+
+// API 1: from inside the processor
+const worker = new Worker('crawl', async (job) => {
+  const res = await fetch(job.data.url);
+  if (res.status === 429) {
+    const retryAfter = parseInt(res.headers.get('retry-after') || '60') * 1000;
+    await job.rateLimitGroup(retryAfter); // pauses only this domain
+  }
+  return res.text();
+}, { connection, concurrency: 10 });
+
+// API 2: throw-style sugar
+throw new GroupRateLimitError(60_000, { currentJob: 'requeue' });
+
+// API 3: from outside (webhook, health check)
+await queue.rateLimitGroup('example.com', 60_000);
+```
+
+[View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/group-rate-limit)

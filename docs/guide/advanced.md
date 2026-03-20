@@ -484,6 +484,75 @@ await queue.add('bulk-export', data, {
 - **Promotion latency**: same as sliding window - worst-case one `promotionInterval` (default 5 s).
 - **Composition**: token bucket composes with concurrency, sliding window, and global rate limits. All gates are enforced.
 
+### Runtime group rate limiting
+
+The static rate limits above (`rateLimit`, `tokenBucket`) are set at enqueue time. For dynamic scenarios - like a crawler hitting a 429 response - use runtime rate limiting to pause a specific group from inside or outside the processor.
+
+#### From inside the processor
+
+```typescript
+const worker = new Worker('crawl', async (job) => {
+  const res = await fetch(job.data.url);
+  if (res.status === 429) {
+    const retryAfter = parseInt(res.headers.get('retry-after') || '60') * 1000;
+    // Pause this domain group - other domains keep processing
+    await job.rateLimitGroup(retryAfter);
+  }
+  return { html: await res.text() };
+}, { connection });
+```
+
+`job.rateLimitGroup(duration, opts?)` re-parks the current job in the group queue and pauses the entire group for `duration` milliseconds. The job resumes automatically when the duration expires.
+
+#### Throw-style sugar
+
+```typescript
+import { GroupRateLimitError } from 'glide-mq';
+
+const worker = new Worker('crawl', async (job) => {
+  const res = await fetch(job.data.url);
+  if (res.status === 429) {
+    throw new GroupRateLimitError(60_000);
+  }
+  return res.text();
+}, { connection });
+```
+
+#### From outside the processor
+
+```typescript
+// From a webhook, health check, or admin API
+await queue.rateLimitGroup('example.com', 60_000);
+```
+
+`queue.rateLimitGroup(groupKey, duration, opts?)` registers the group as rate-limited. Jobs already in the group queue are held until the duration expires.
+
+#### Options
+
+All three APIs accept the same options:
+
+| Option | Values | Default | Description |
+|--------|--------|---------|-------------|
+| `currentJob` | `'requeue'` \| `'fail'` | `'requeue'` | Re-park the job (no retry consumed) or fail it |
+| `requeuePosition` | `'front'` \| `'back'` | `'front'` | Where to place the re-parked job in the group queue |
+| `extend` | `'max'` \| `'replace'` | `'max'` | Never shorten an existing pause, or overwrite it |
+
+```typescript
+await job.rateLimitGroup(30_000, {
+  currentJob: 'requeue',     // default: re-park without consuming retry
+  requeuePosition: 'front',  // default: this job resumes first
+  extend: 'max',             // default: if already paused for longer, keep the longer pause
+});
+```
+
+#### How it works
+
+1. The current job is atomically re-parked in the per-group ZSET queue
+2. The group is registered in the `ratelimited` sorted set with a resume timestamp
+3. The scheduler's promotion loop (`promoteRateLimited`) checks this set on every cycle
+4. When the resume timestamp passes, queued jobs are promoted back to the stream
+5. The re-parked job resumes as a "returning" activation - no ordering violations
+
 ### Notes
 
 - Jobs with different ordering keys (or no ordering key) are processed concurrently as normal.
