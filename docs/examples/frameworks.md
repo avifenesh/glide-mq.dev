@@ -1,6 +1,6 @@
 ---
 title: Framework Integrations
-description: glide-mq framework integration examples -- Hono, Fastify, Hapi, NestJS, Express, Koa, and Next.js.
+description: glide-mq framework integration examples -- Hono, Fastify, Hapi, NestJS, Express, Koa, Next.js, Vercel AI SDK, and LangChain.
 ---
 
 # Framework Integrations
@@ -1281,3 +1281,147 @@ process.on('SIGTERM', shutdown);
 ```
 
 [View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/nextjs-api-routes)
+
+---
+
+## Vercel AI SDK
+
+Use the Vercel AI SDK (`generateText`, `streamText`) inside a glide-mq worker for durable, retryable AI inference with token streaming and usage tracking.
+
+```typescript
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText, streamText } from 'ai';
+import { Queue, Worker } from 'glide-mq';
+
+const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
+
+const openrouter = createOpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+
+const queue = new Queue('ai-tasks', { connection });
+
+const worker = new Worker('ai-tasks', async (job) => {
+  const { prompt, model } = job.data;
+
+  if (job.data.mode === 'stream') {
+    // Stream tokens via job.stream()
+    const result = streamText({
+      model: openrouter.chat(model),
+      prompt,
+      maxTokens: 150,
+    });
+
+    for await (const chunk of result.textStream) {
+      await job.stream({ t: chunk });
+    }
+    await job.stream({ t: '', done: '1' });
+
+    const usage = await result.usage;
+    await job.reportUsage({
+      model,
+      provider: 'openrouter',
+      inputTokens: usage.inputTokens ?? 0,
+      outputTokens: usage.outputTokens ?? 0,
+    });
+
+    return { content: await result.text };
+  }
+
+  // Non-streaming: generateText
+  const result = await generateText({
+    model: openrouter.chat(model),
+    prompt,
+    maxTokens: 150,
+  });
+
+  await job.reportUsage({
+    model,
+    provider: 'openrouter',
+    inputTokens: result.usage.inputTokens ?? 0,
+    outputTokens: result.usage.outputTokens ?? 0,
+  });
+
+  return {
+    content: result.text,
+    finishReason: result.finishReason,
+  };
+}, { connection, concurrency: 1 });
+
+// Enqueue jobs
+await queue.add('generate', { prompt: 'Hello world', model: 'gpt-4.1-nano', mode: 'generate' });
+await queue.add('stream', { prompt: 'Write a haiku', model: 'gpt-4.1-nano', mode: 'stream' });
+```
+
+[View full source](https://github.com/avifenesh/glide-mq/blob/main/examples/with-vercel-ai-sdk.ts)
+
+---
+
+## LangChain
+
+LangChain chains (`prompt | model | parser`) run inside glide-mq workers for durable, retryable execution. Token usage is reported from LangChain's response metadata.
+
+```typescript
+import { ChatOpenAI } from '@langchain/openai';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { StringOutputParser } from '@langchain/core/output_parsers';
+import { Queue, Worker, FlowProducer } from 'glide-mq';
+
+const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
+
+const llm = new ChatOpenAI({
+  model: 'gpt-4.1-nano',
+  configuration: { baseURL: 'https://openrouter.ai/api/v1' },
+  apiKey: process.env.OPENROUTER_API_KEY,
+  maxTokens: 150,
+});
+
+const parser = new StringOutputParser();
+
+// Define chains for each pipeline step
+const researchChain = ChatPromptTemplate.fromMessages([
+  ['system', 'List 3 key facts about the topic.'],
+  ['user', '{topic}'],
+]).pipe(llm).pipe(parser);
+
+const summarizeChain = ChatPromptTemplate.fromMessages([
+  ['system', 'Summarize into one concise paragraph.'],
+  ['user', '{research}'],
+]).pipe(llm).pipe(parser);
+
+const queue = new Queue('langchain', { connection });
+
+const worker = new Worker('langchain', async (job) => {
+  const { step, topic, research } = job.data;
+
+  if (step === 'research') {
+    const prompt = researchChain.first;
+    const messages = await prompt.formatMessages({ topic });
+    const response = await llm.invoke(messages);
+    const text = String(response.content);
+    const usage = response.response_metadata?.tokenUsage;
+
+    if (usage) {
+      await job.reportUsage({
+        model: 'gpt-4.1-nano',
+        provider: 'openrouter',
+        inputTokens: usage.promptTokens ?? 0,
+        outputTokens: usage.completionTokens ?? 0,
+      });
+    }
+
+    return { output: text };
+  }
+
+  if (step === 'summarize') {
+    const prompt = summarizeChain.first;
+    const messages = await prompt.formatMessages({ research });
+    const response = await llm.invoke(messages);
+    // ... report usage similarly
+    return { output: String(response.content) };
+  }
+}, { connection });
+```
+
+[View full source](https://github.com/avifenesh/glide-mq/blob/main/examples/with-langchain.ts)

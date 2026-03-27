@@ -110,3 +110,30 @@ High-throughput tuning, batch processing, LIFO mode, custom serializers, and mor
 | [testing](./advanced#testing) | In-memory testing with TestQueue and TestWorker |
 
 [View all advanced examples &rarr;](./advanced)
+
+## AI Pipelines
+
+AI-native examples combining usage tracking, streaming, budgets, fallbacks, suspend/resume, and vector search.
+
+| Example | Description |
+|---------|-------------|
+| [rag-pipeline](./ai-pipelines#rag-pipeline) | RAG flow with embed, search, generate steps and budget caps |
+| [ai-agent-loop](./ai-pipelines#ai-agent-loop) | ReAct-style agent with plan/execute/observe loop and human input |
+| [content-pipeline](./ai-pipelines#content-pipeline) | Content moderation with classification, human review, and polishing |
+| [model-failover](./ai-pipelines#model-failover) | Automatic fallback through a chain of model alternatives |
+| [token-streaming](./ai-pipelines#token-streaming) | Stream LLM tokens to consumers in real time |
+| [budget-cap](./ai-pipelines#budget-cap) | Prevent runaway spending with flow-level token/cost caps |
+| [tpm-throttle](./ai-pipelines#tpm-throttle) | Dual-axis rate limiting (RPM + TPM) for API compliance |
+| [human-approval](./ai-pipelines#human-approval) | Suspend for human review, resume with approve/reject signals |
+| [usage-tracking](./ai-pipelines#usage-tracking) | Per-job and flow-level AI usage metadata |
+| [embedding-pipeline](./ai-pipelines#embedding-pipeline) | Batch embedding generation with vector storage |
+| [agent-memory](./ai-pipelines#agent-memory) | Vector search over agent interaction history |
+| [adaptive-timeout](./ai-pipelines#adaptive-timeout) | Per-job lock duration matched to model latency |
+| [search-dashboard](./ai-pipelines#search-dashboard) | Valkey Search index with TAG, NUMERIC, and VECTOR fields |
+| [with-vercel-ai-sdk](./ai-pipelines#vercel-ai-sdk) | Vercel AI SDK (generateText/streamText) integration |
+| [with-langchain](./ai-pipelines#langchain) | LangChain chain execution with usage tracking |
+| [testing-mode](./ai-pipelines#testing) | In-memory testing of AI primitives without Valkey |
+| [vector-search](./ai-pipelines#agent-memory) | Semantic similarity search over jobs |
+| [llm](./ai-pipelines#rag-pipeline) | Shared LLM helper module used by all AI examples |
+
+[View all AI pipeline examples &rarr;](./ai-pipelines)

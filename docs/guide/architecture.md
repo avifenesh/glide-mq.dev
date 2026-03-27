@@ -37,6 +37,44 @@ glide:{queueName}:group:{key}           # Hash - group state (active count, maxC
 glide:{queueName}:groupq:{key}          # List - FIFO wait list for group-limited jobs
 glide:{queueName}:ratelimited           # ZSet - scheduler-managed promotion queue for rate-limited jobs
                                 #        (score = earliest eligible timestamp)
+glide:{queueName}:jstream:{id}         # Stream - per-job streaming channel (LLM token streaming)
+glide:{queueName}:budget:{id}          # Hash - flow-level budget state (maxTotalTokens, maxCostUsd,
+                                #        usedTokens, usedCost, exceeded, onExceeded)
+glide:{queueName}:tpm                  # Hash - TPM (tokens-per-minute) rate limiter state
+                                #        (windowStart, tokenCount, maxTokens, duration)
+glide:{queueName}:parents:{id}        # Set - parent references for DAG multi-parent jobs
+```
+
+### AI-specific job hash fields
+
+Jobs that use AI primitives store additional fields in the job hash (`glide:{queueName}:job:{id}`):
+
+```
+usage:model           # String - model identifier (e.g. 'gpt-4o')
+usage:provider        # String - provider identifier (e.g. 'openai')
+usage:inputTokens     # String(int) - input/prompt tokens
+usage:outputTokens    # String(int) - output/completion tokens
+usage:totalTokens     # String(int) - total tokens
+usage:costUsd         # String(float) - USD cost
+usage:latencyMs       # String(int) - inference latency in ms
+usage:cached          # String('0'|'1') - cache hit flag
+tpmTokens             # String(int) - tokens reported for TPM limiting
+fallbackIndex         # String(int) - current position in fallback chain
+budgetKey             # String - reference to the flow's budget hash
+suspendReason         # String - why the job was suspended
+suspendedAt           # String(int) - epoch ms when suspended
+suspendTimeout        # String(int) - suspend timeout in ms
+signals               # String(JSON) - array of SignalEntry objects
+```
+
+### Valkey Search index
+
+When `queue.createJobIndex()` is called, a Valkey Search index is created over the job hashes:
+
+```
+{queueName}-idx       # FT index - auto-includes name (TAG), state (TAG),
+                      #   timestamp (NUMERIC), priority (NUMERIC), plus
+                      #   user-defined fields and an optional VECTOR field
 ```
 
 ## Job State Machine
@@ -126,7 +164,7 @@ redis.register_function('glidemq_complete', function(keys, args) ... end)
 ...
 ```
 
-### Functions (37 in 1 library, not 53 scripts)
+### Functions (37+ in 1 library, not 53 scripts)
 
 | Function                         | Keys | Purpose                                                                                 |
 | -------------------------------- | ---- | --------------------------------------------------------------------------------------- |
@@ -167,6 +205,9 @@ redis.register_function('glidemq_complete', function(keys, args) ... end)
 | glidemq_retryJobs                | 4    | Bulk-retry failed jobs                                                                  |
 | glidemq_healListActive           | 1    | Self-heal list-active counter drift caused by worker crashes                            |
 | glidemq_popLists                 | 2    | Check priority + LIFO lists in a single FCALL instead of 2 separate RPOPs               |
+| glidemq_suspendJob               | 2    | Move active job to suspended state, store reason/timeout                                |
+| glidemq_signalJob                | 3    | Deliver signal to suspended job and re-queue to stream                                  |
+| glidemq_rateLimitGroupExternal   | 3    | Pause an ordering group from outside the processor                                      |
 
 ### speedkey API for Functions
 
@@ -179,6 +220,16 @@ await client.fcall('glidemq_addJob', [key1, key2, key3, key4], [arg1, arg2, ...]
 
 // In cluster mode, load to all nodes
 await clusterClient.functionLoad(librarySource, true, { route: 'allPrimaries' });
+```
+
+### Valkey Search Module
+
+Vector search (`queue.createJobIndex()`, `queue.vectorSearch()`) uses the Valkey Search module (`valkey-search`) via the speedkey `GlideFt` API. The search module is optional - core queue operations work without it. Index creation calls `FT.CREATE`, vector queries call `FT.SEARCH` with KNN syntax, and index removal calls `FT.DROPINDEX`.
+
+The module is auto-detected at runtime. If not loaded, `createJobIndex()` throws a clear error:
+
+```
+Error: Valkey Search module is not loaded. Vector search requires the valkey-search module.
 ```
 
 ## Connection Model
@@ -263,6 +314,18 @@ class Queue<D = any, R = any> extends EventEmitter {
   getJobScheduler(name: string): Promise<SchedulerEntry | null>;
   getRepeatableJobs(): Promise<{ name: string; entry: SchedulerEntry }[]>;
   removeJobScheduler(name: string): Promise<void>;
+
+  // AI-native
+  signal(jobId: string, signalName: string, data?: any): Promise<boolean>;
+  getSuspendInfo(jobId: string): Promise<{ reason?: string; suspendedAt: number; timeout?: number; signals: SignalEntry[] } | null>;
+  readStream(jobId: string, opts?: ReadStreamOptions): Promise<{ id: string; fields: Record<string, string> }[]>;
+  getFlowUsage(parentJobId: string): Promise<{ totalInputTokens: number; totalOutputTokens: number; totalCostUsd: number; jobCount: number; models: Record<string, number> }>;
+  getFlowBudget(flowId: string): Promise<{ maxTotalTokens?: number; maxCostUsd?: number; usedTokens: number; usedCost: number; exceeded: boolean; onExceeded: 'pause' | 'fail' } | null>;
+
+  // Vector search
+  createJobIndex(opts?: JobIndexOptions): Promise<void>;
+  dropJobIndex(name?: string): Promise<void>;
+  vectorSearch(embedding: number[] | Float32Array, opts?: VectorSearchOptions): Promise<VectorSearchResult<D, R>[]>;
 }
 ```
 
@@ -298,6 +361,7 @@ interface WorkerOptions {
   maxStalledCount?: number; // max reclaims before fail
   promotionInterval?: number; // delayed job promotion interval
   limiter?: { max: number; duration: number };
+  tokenLimiter?: { maxTokens: number; duration: number; scope?: 'queue' | 'worker' | 'both' };
   backoffStrategies?: Record<string, (attemptsMade: number, err: Error) => number>;
   sandbox?: SandboxOptions; // run processor in child process/thread
   batch?: { size: number; timeout?: number }; // batch processing mode
@@ -327,6 +391,13 @@ class Job<D = any, R = any> {
   abortSignal?: AbortSignal;
   discarded: boolean;
 
+  // AI-native fields
+  usage?: JobUsage;
+  tpmTokens?: number;
+  signals: SignalEntry[];
+  fallbackIndex: number;
+  budgetKey?: string;
+
   // Lifecycle
   log(message: string): Promise<void>;
   updateProgress(progress: number | object): Promise<void>;
@@ -340,6 +411,14 @@ class Job<D = any, R = any> {
   moveToDelayed(timestampMs: number, nextStep?: string): Promise<never>;
   promote(): Promise<void>;
   waitUntilFinished(pollIntervalMs?: number, timeoutMs?: number): Promise<'completed' | 'failed'>;
+
+  // AI-native
+  reportUsage(usage: JobUsage): Promise<void>;
+  reportTokens(count: number): Promise<void>;
+  stream(chunk: Record<string, string>): Promise<string>;
+  suspend(opts?: SuspendOptions): Promise<never>;
+  storeVector(field: string, embedding: number[] | Float32Array): Promise<void>;
+  readonly currentFallback: { model: string; provider?: string; metadata?: Record<string, unknown> } | undefined;
 
   // Queries
   getChildrenValues(): Promise<Record<string, R>>;
@@ -362,6 +441,12 @@ interface JobOptions {
   removeOnFail?: boolean | number | { age: number; count: number };
   deduplication?: { id: string; ttl?: number; mode?: 'simple' | 'throttle' | 'debounce' };
   parent?: { queue: string; id: string };
+  /** Override worker-level lockDuration for this specific job (ms). */
+  lockDuration?: number;
+  /** Time-to-live in milliseconds. Jobs not processed within this window are failed as 'expired'. */
+  ttl?: number;
+  /** Ordered list of fallback model/provider entries tried on retryable failure. */
+  fallbacks?: Array<{ model: string; provider?: string; metadata?: Record<string, unknown> }>;
 }
 ```
 
@@ -432,11 +517,23 @@ glide-mq/
 │   ├── errors.ts               # Error classes (UnrecoverableError, DelayedError, BatchError)
 │   ├── utils.ts                # Key builders, score encoding, backoff calc, subject matching
 │   ├── scheduler.ts            # Internal: promote delayed, reclaim stalled, job schedulers
-│   ├── testing.ts              # In-memory TestQueue and TestWorker
+│   ├── testing.ts              # In-memory TestQueue, TestWorker, TestJob (with AI methods)
 │   ├── workflows.ts            # chain, group, chord, dag helpers
-│   ├── telemetry.ts            # OpenTelemetry integration
+│   ├── telemetry.ts            # OpenTelemetry integration + AI usage spans
 │   └── graceful-shutdown.ts    # Process signal handling
-├── tests/                      # 82 test files (vitest)
+├── examples/                   # 18+ AI example files
+│   ├── rag-pipeline.ts         # RAG flow with embed/search/generate
+│   ├── ai-agent-loop.ts        # ReAct-style agent loop
+│   ├── content-pipeline.ts     # Content moderation pipeline
+│   ├── model-failover.ts       # Fallback chain demo
+│   ├── token-streaming.ts      # LLM token streaming
+│   ├── budget-cap.ts           # Flow-level budget caps
+│   ├── tpm-throttle.ts         # TPM rate limiting
+│   ├── human-approval.ts       # Suspend/resume for human review
+│   ├── with-vercel-ai-sdk.ts   # Vercel AI SDK integration
+│   ├── with-langchain.ts       # LangChain integration
+│   └── ...                     # More AI examples
+├── tests/                      # 82+ test files (vitest)
 │   ├── integration.test.ts     # Full integration tests
 │   ├── testing-mode.test.ts    # In-memory mode tests (no Valkey)
 │   ├── search.test.ts          # Search feature tests
@@ -481,14 +578,16 @@ Complex workflows with arbitrary dependency graphs are submitted via `FlowProduc
 
 ## Differentiators vs BullMQ
 
-1. **Streams-first**: PEL replaces active list + lock tokens. XAUTOCLAIM replaces stalled job checker scripts. Single function library (37 functions vs 53 EVAL scripts).
-2. **Native NAPI performance**: speedkey's Rust core handles I/O, freeing Node.js event loop. No ioredis overhead.
-3. **Cluster-native**: Hash tags enforced at queue creation. No afterthought `{braces}` requirement.
-4. **Batch API**: Use speedkey's non-atomic Batch for pipelined multi-command operations (auto-splits across cluster nodes).
-5. **Built-in observability**: Events stream + OpenTelemetry via speedkey's native integration.
-6. **Typed end-to-end**: Generics on Queue/Worker/Job for data and result types.
-7. **Simpler reliability model**: Consumer group semantics (XREADGROUP + XACK + XAUTOCLAIM) vs lock-renew-check-stall cycle.
-8. **Server Functions**: Single FUNCTION LOAD, persistent across restarts, no NOSCRIPT cache-miss errors, named calls via FCALL. BullMQ uses ephemeral EVAL/EVALSHA with 53 scripts that must be re-cached on every new connection.
+1. **AI-native primitives**: 7 built-in primitives for AI workloads - usage tracking, token streaming, suspend/resume, budget caps, fallback chains, dual-axis rate limiting (RPM + TPM), and vector search. No plugins or middleware needed.
+2. **Streams-first**: PEL replaces active list + lock tokens. XAUTOCLAIM replaces stalled job checker scripts. Single function library (37+ functions vs 53 EVAL scripts).
+3. **Native NAPI performance**: speedkey's Rust core handles I/O, freeing Node.js event loop. No ioredis overhead.
+4. **Cluster-native**: Hash tags enforced at queue creation. No afterthought `{braces}` requirement.
+5. **Batch API**: Use speedkey's non-atomic Batch for pipelined multi-command operations (auto-splits across cluster nodes).
+6. **Built-in observability**: Events stream + OpenTelemetry via speedkey's native integration. AI usage telemetry per job and per flow.
+7. **Typed end-to-end**: Generics on Queue/Worker/Job for data and result types.
+8. **Simpler reliability model**: Consumer group semantics (XREADGROUP + XACK + XAUTOCLAIM) vs lock-renew-check-stall cycle.
+9. **Server Functions**: Single FUNCTION LOAD, persistent across restarts, no NOSCRIPT cache-miss errors, named calls via FCALL. BullMQ uses ephemeral EVAL/EVALSHA with 53 scripts that must be re-cached on every new connection.
+10. **Vector search**: Built-in Valkey Search integration for KNN similarity search over job hashes. No external vector database needed.
 
 ## Implementation Phases
 

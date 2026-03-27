@@ -13,6 +13,19 @@ npm install glide-mq
 
 Requires Node.js 20+ and a running [Valkey](https://valkey.io) 7.0+ or Redis 7.0+ instance.
 
+### Docker setup with valkey-bundle
+
+The fastest way to start locally. `valkey-bundle` includes the Search module needed for [vector search](./vector-search):
+
+```bash
+# Standalone with all modules
+docker run -p 6379:6379 valkey/valkey:8 \
+  --loadmodule /usr/lib/valkey/modules/search.so
+
+# Or use the official image without search (core features only)
+docker run -p 6379:6379 valkey/valkey:8
+```
+
 ## Quick Start
 
 ```typescript
@@ -42,11 +55,28 @@ worker.on('failed', (job, err) => console.error(`Job ${job.id} failed:`, err.mes
 - **Broadcast** - fan-out pub/sub. Each message is delivered to every subscriber group with independent retries and backpressure.
 - **QueueEvents** - real-time stream of job lifecycle events (completed, failed, delayed, waiting, etc.).
 
+## AI-Native Primitives
+
+glide-mq ships 7 built-in primitives for AI workloads - no plugins or middleware needed:
+
+| Primitive | API | Purpose |
+|-----------|-----|---------|
+| **Usage tracking** | `job.reportUsage()` | Record model, tokens, cost per job |
+| **Token streaming** | `job.stream()` / `queue.readStream()` | Stream LLM tokens to consumers |
+| **Suspend / resume** | `job.suspend()` / `queue.signal()` | Human-in-the-loop approval gates |
+| **Budget caps** | `FlowProducer.add(flow, { budget })` | Cap tokens/cost across a flow |
+| **Fallback chains** | `opts.fallbacks` / `job.currentFallback` | Ordered model alternatives on failure |
+| **Dual-axis rate limiting** | `tokenLimiter` + `limiter` | RPM + TPM for LLM API compliance |
+| **Vector search** | `queue.createJobIndex()` / `queue.vectorSearch()` | KNN search over job embeddings |
+
+See the [AI-Native Features guide](./ai-native) for comprehensive documentation.
+
 ## Requirements
 
 - **Node.js 20+**
 - **Valkey 7.0+** or **Redis 7.0+**
 - TypeScript 5+ recommended
+- **Valkey Search module** (optional, for vector search only)
 
 ## How It Works
 
@@ -109,6 +139,8 @@ Registers `SIGTERM`/`SIGINT` handlers and waits for all components to close befo
 
 ## Next Steps
 
+- [AI-Native Features](./ai-native) - Usage tracking, streaming, suspend/resume, budgets, fallbacks, rate limiting, vector search
+- [Vector Search](./vector-search) - Semantic search over jobs with Valkey Search
 - [Usage Guide](./usage) - Queue, Worker, and event listener details
 - [Advanced Features](./advanced) - Schedulers, rate limiting, deduplication, compression
 - [Workflows](./workflows) - FlowProducer, DAG, chain, group, chord

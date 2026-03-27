@@ -22,6 +22,10 @@ description: Job schedulers, rate limiting, deduplication, compression, retries,
 - [Transparent Compression](#transparent-compression)
 - [Retries and Backoff](#retries-and-backoff)
 - [Dead Letter Queues](#dead-letter-queues)
+- [Fallback Chains](#fallback-chains)
+- [Dual-Axis Rate Limiting (RPM + TPM)](#dual-axis-rate-limiting)
+- [Per-Job Lock Duration](#per-job-lock-duration)
+- [Vector Search](#vector-search)
 
 ---
 
@@ -792,3 +796,150 @@ const dlqJobs = await queue.getDeadLetterJobs(0, 49);
 ```
 
 Jobs in the DLQ are ordinary jobs - you can inspect, retry, or remove them like any other job.
+
+---
+
+## Fallback Chains
+
+Define an ordered list of model/provider alternatives tried automatically on retryable failure. When a job fails and has remaining attempts, the `fallbackIndex` increments and the processor reads `job.currentFallback` to determine which model to use.
+
+```typescript
+await queue.add('inference', {
+  prompt: 'Summarize this document.',
+  primaryModel: 'gpt-4o',
+}, {
+  attempts: 4,
+  backoff: { type: 'exponential', delay: 1000 },
+  fallbacks: [
+    { model: 'gpt-4.1-nano', provider: 'openai' },
+    { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
+    { model: 'gemini-2.5-pro', provider: 'google' },
+  ],
+});
+```
+
+In the processor:
+
+```typescript
+const worker = new Worker('inference', async (job) => {
+  const fallback = job.currentFallback;
+  const model = fallback ? fallback.model : job.data.primaryModel;
+
+  const result = await callLLM(model, job.data.prompt);
+  await job.reportUsage({ model, inputTokens: result.inTokens, outputTokens: result.outTokens });
+  return { content: result.text, model };
+}, { connection });
+```
+
+- `fallbackIndex=0`: original attempt (`currentFallback` is `undefined`)
+- `fallbackIndex=1`: first retry (`currentFallback` = `fallbacks[0]`)
+- `fallbackIndex=N`: Nth retry (`currentFallback` = `fallbacks[N-1]`)
+
+Each entry supports an optional `metadata` field for custom routing logic. See [AI-Native Features: Fallback Chains](./ai-native#fallback-chains) for the full guide.
+
+---
+
+## Dual-Axis Rate Limiting
+
+Enforce RPM (requests per minute) and TPM (tokens per minute) simultaneously to comply with LLM provider rate limits.
+
+### RPM limiting (existing `limiter`)
+
+```typescript
+const worker = new Worker('inference', processor, {
+  connection,
+  limiter: { max: 60, duration: 60_000 },  // 60 req/min
+});
+```
+
+### TPM limiting (`tokenLimiter`)
+
+```typescript
+const worker = new Worker('inference', processor, {
+  connection,
+  tokenLimiter: {
+    maxTokens: 100_000,   // 100K tokens per minute
+    duration: 60_000,
+    scope: 'both',        // 'queue' | 'worker' | 'both'
+  },
+});
+```
+
+### Combined
+
+```typescript
+const worker = new Worker('inference', processor, {
+  connection,
+  concurrency: 10,
+  limiter: { max: 60, duration: 60_000 },
+  tokenLimiter: { maxTokens: 100_000, duration: 60_000 },
+});
+```
+
+The processor must call `job.reportTokens(count)` for the TPM limiter to track consumption:
+
+```typescript
+const worker = new Worker('inference', async (job) => {
+  const result = await callLLM(job.data.prompt);
+  await job.reportTokens(result.totalTokens);
+  return result;
+}, { connection, tokenLimiter: { maxTokens: 50_000, duration: 60_000 } });
+```
+
+When either limit is exceeded, the worker pauses fetching new jobs until the window resets. Active jobs are not interrupted.
+
+**Scope options:**
+
+| Scope | Description |
+|-------|-------------|
+| `'queue'` | Shared Valkey counter across all workers |
+| `'worker'` | In-memory counter per worker instance |
+| `'both'` (default) | Local check first, Valkey check when near limit |
+
+See [AI-Native Features: Dual-Axis Rate Limiting](./ai-native#dual-axis-rate-limiting) for the full guide.
+
+---
+
+## Per-Job Lock Duration
+
+Override the worker-level `lockDuration` for individual jobs. Essential for AI workloads where inference latency varies widely.
+
+```typescript
+// Fast embedding - 5 second lock, fast stall detection
+await queue.add('embed', { text: 'hello' }, {
+  lockDuration: 5_000,
+});
+
+// Slow generation - 60 second lock to avoid false stalls
+await queue.add('generate', { prompt: 'Write an essay...' }, {
+  lockDuration: 60_000,
+});
+```
+
+The lock duration controls heartbeat frequency (`lockDuration / 2`) and the stall detection threshold. Without per-job lock, you must set the worker's `lockDuration` high enough for the slowest job, which degrades stall detection for fast jobs.
+
+---
+
+## Vector Search
+
+Create a Valkey Search index over job hashes and query by vector similarity (KNN). Requires the `valkey-search` module on the server.
+
+```typescript
+// Create index with vector field
+await queue.createJobIndex({
+  vectorField: { name: 'embedding', dimensions: 1536, distanceMetric: 'COSINE' },
+  fields: [{ type: 'TAG', name: 'category' }],
+});
+
+// Store vector on a job
+const job = await queue.add('doc', { title: 'Queue Basics', category: 'infra' });
+await job.storeVector('embedding', embeddingVector);
+
+// KNN search with pre-filter
+const results = await queue.vectorSearch(queryVector, {
+  k: 10,
+  filter: '@category:{infra}',
+});
+```
+
+See the dedicated [Vector Search guide](./vector-search) for full details.

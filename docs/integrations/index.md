@@ -61,3 +61,56 @@ export default app;
 ```
 
 See each integration's page for framework-specific setup, configuration options, and examples.
+
+## AI Framework Integrations
+
+glide-mq works with popular AI SDKs via its AI-native job primitives. No additional packages are required - use the standard `Queue` and `Worker` classes.
+
+| Framework | Pattern | Example |
+|-----------|---------|---------|
+| **Vercel AI SDK** | `generateText`/`streamText` inside a Worker, `job.stream()` for token output, `job.reportUsage()` for metrics | [with-vercel-ai-sdk](/examples/frameworks#vercel-ai-sdk) |
+| **LangChain** | LangChain chains inside a Worker, `job.reportUsage()` from response metadata | [with-langchain](/examples/frameworks#langchain) |
+
+### Vercel AI SDK
+
+```typescript
+import { generateText } from 'ai';
+import { Worker } from 'glide-mq';
+
+const worker = new Worker('inference', async (job) => {
+  const result = await generateText({
+    model: openai('gpt-4o'),
+    prompt: job.data.prompt,
+  });
+
+  await job.reportUsage({
+    model: 'gpt-4o',
+    inputTokens: result.usage.inputTokens,
+    outputTokens: result.usage.outputTokens,
+  });
+
+  return { content: result.text };
+}, { connection });
+```
+
+### LangChain
+
+```typescript
+import { ChatOpenAI } from '@langchain/openai';
+import { Worker } from 'glide-mq';
+
+const worker = new Worker('langchain', async (job) => {
+  const response = await llm.invoke(messages);
+  const usage = response.response_metadata?.tokenUsage;
+
+  await job.reportUsage({
+    model: 'gpt-4o',
+    inputTokens: usage?.promptTokens ?? 0,
+    outputTokens: usage?.completionTokens ?? 0,
+  });
+
+  return { output: String(response.content) };
+}, { connection });
+```
+
+See the [AI Pipeline Examples](/examples/ai-pipelines) for complete, runnable examples with both frameworks.

@@ -17,6 +17,7 @@ glide-mq ships a built-in in-memory backend so you can unit-test job processors 
 - [Batch Testing](#batch-testing)
 - [Deduplication Testing](#deduplication-testing)
 - [Step Jobs in Tests](#step-jobs-in-tests)
+- [AI-Native Methods in Tests](#ai-native-methods-in-tests)
 - [Tips](#tips)
 
 ---
@@ -304,6 +305,142 @@ const worker = new Worker('steps', async (job) => {
 ```
 
 For unit-testing the logic *around* steps (data transformations, branching decisions), you can still use `TestQueue` and `TestWorker` - just skip the `moveToDelayed` call in test mode or guard it behind an environment check.
+
+---
+
+## AI-Native Methods in Tests
+
+`TestJob` supports all AI-native methods in-memory, so you can test AI processors without Valkey.
+
+### Usage tracking
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  await job.reportUsage({
+    model: 'gpt-4o',
+    provider: 'openai',
+    inputTokens: 100,
+    outputTokens: 50,
+  });
+  return { ok: true };
+});
+
+await queue.add('inference', { prompt: 'Hello' });
+const job = (await queue.getJobs('completed'))[0];
+expect(job.usage?.model).toBe('gpt-4o');
+expect(job.usage?.totalTokens).toBe(150);
+```
+
+### Token reporting
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  await job.reportTokens(200);
+  return { ok: true };
+});
+
+await queue.add('task', {});
+const job = (await queue.getJobs('completed'))[0];
+expect(job.tpmTokens).toBe(200);
+```
+
+### Streaming
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  const id1 = await job.stream({ t: 'Hello' });
+  const id2 = await job.stream({ t: ' world', done: '1' });
+  return { chunks: 2 };
+});
+
+await queue.add('chat', { prompt: 'Hi' });
+const entries = await queue.readStream('1');
+expect(entries).toHaveLength(2);
+expect(entries[0].fields.t).toBe('Hello');
+```
+
+### Suspend / resume
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  if (job.signals.length > 0) {
+    return { approved: job.signals[0].data.action === 'approve' };
+  }
+  await job.suspend({ reason: 'needs-review' });
+});
+
+await queue.add('moderate', { content: 'test' });
+
+// Job is now suspended
+const info = await queue.getSuspendInfo('1');
+expect(info?.reason).toBe('needs-review');
+
+// Send a signal to resume
+await queue.signal('1', 'review', { action: 'approve' });
+
+const job = (await queue.getJobs('completed'))[0];
+expect(job.returnvalue).toEqual({ approved: true });
+```
+
+### Fallback chains
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  const model = job.currentFallback?.model ?? 'primary-model';
+  if (model === 'primary-model') throw new Error('model down');
+  return { model };
+});
+
+await queue.add('query', { prompt: 'Hi' }, {
+  attempts: 3,
+  backoff: { type: 'fixed', delay: 0 },
+  fallbacks: [
+    { model: 'fallback-1', provider: 'openai' },
+    { model: 'fallback-2', provider: 'anthropic' },
+  ],
+});
+
+const job = (await queue.getJobs('completed'))[0];
+expect(job.returnvalue?.model).toBe('fallback-1');
+```
+
+### Vector search
+
+```typescript
+const worker = new TestWorker(queue, async (job) => {
+  await job.storeVector('embedding', [0.1, 0.2, 0.3]);
+  return { indexed: true };
+});
+
+await queue.add('doc', { title: 'Test' });
+
+const results = await queue.vectorSearch([0.1, 0.2, 0.3], { k: 5 });
+expect(results.length).toBeGreaterThan(0);
+```
+
+### TestJob AI method summary
+
+| Method | Description |
+|--------|-------------|
+| `reportUsage(usage)` | Store AI usage metadata in-memory |
+| `reportTokens(count)` | Store TPM token count in-memory |
+| `stream(chunk)` | Append to in-memory per-job stream |
+| `suspend(opts?)` | Move job to suspended state |
+| `storeVector(field, embedding)` | Store vector embedding in-memory |
+| `currentFallback` | Read current fallback entry |
+| `signals` | Array of signals delivered while suspended |
+
+### TestQueue AI method summary
+
+| Method | Description |
+|--------|-------------|
+| `signal(jobId, name, data?)` | Send a signal to a suspended job |
+| `getSuspendInfo(jobId)` | Get suspension details |
+| `readStream(jobId, opts?)` | Read streaming chunks |
+| `createJobIndex(opts?)` | No-op in test mode (accepted silently) |
+| `vectorSearch(embedding, opts?)` | In-memory cosine similarity search |
+| `getFlowUsage(parentId)` | Aggregate usage across child jobs |
+| `getFlowBudget(flowId)` | Read budget state |
 
 ---
 

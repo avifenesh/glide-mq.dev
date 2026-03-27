@@ -9,6 +9,7 @@ description: Job logs, time-series metrics, OpenTelemetry integration, and the d
 
 - [Job Logs](#job-logs)
 - [Job Counts and Metrics](#job-counts-and-metrics)
+- [AI Usage Telemetry](#ai-usage-telemetry)
 - [OpenTelemetry Integration](#opentelemetry-integration)
 - [`@glidemq/dashboard`](#glidemqdashboard)
 
@@ -108,6 +109,79 @@ Returns the number of waiting jobs (stream length):
 ```typescript
 const waitingCount = await queue.count();
 ```
+
+---
+
+## AI Usage Telemetry
+
+glide-mq tracks AI-specific usage metadata per job - model, tokens, cost, and latency. This data powers cost dashboards, budget enforcement, and rate limiting.
+
+### Per-job usage
+
+Every AI job can report usage via `job.reportUsage()`. The data is stored in the job hash with `usage:*` prefixed fields and emitted as a `usage` event on the events stream.
+
+```typescript
+const worker = new Worker('inference', async (job) => {
+  const result = await callLLM(job.data.prompt);
+
+  await job.reportUsage({
+    model: 'gpt-4o',
+    provider: 'openai',
+    inputTokens: result.usage.prompt_tokens,
+    outputTokens: result.usage.completion_tokens,
+    costUsd: 0.003,
+    latencyMs: 1100,
+    cached: false,
+  });
+
+  return result;
+}, { connection });
+```
+
+### Reading usage from a completed job
+
+```typescript
+const job = await queue.getJob('42');
+if (job?.usage) {
+  console.log(`Model: ${job.usage.model}`);
+  console.log(`Input: ${job.usage.inputTokens}, Output: ${job.usage.outputTokens}`);
+  console.log(`Cost: $${job.usage.costUsd}, Latency: ${job.usage.latencyMs}ms`);
+}
+```
+
+### Flow-level aggregation
+
+Aggregate token counts and cost across all jobs in a parent-child flow:
+
+```typescript
+const usage = await queue.getFlowUsage(parentJobId);
+console.log(`Total tokens: ${usage.totalInputTokens + usage.totalOutputTokens}`);
+console.log(`Total cost: $${usage.totalCostUsd}`);
+console.log(`Jobs: ${usage.jobCount}`);
+console.log(`Models used: ${JSON.stringify(usage.models)}`);
+// models: { 'gpt-4o': 3, 'gpt-4.1-nano': 1 }
+```
+
+### Listening for usage events
+
+```typescript
+const events = new QueueEvents('inference', { connection });
+events.on('usage', ({ jobId, data }) => {
+  const usage = JSON.parse(data);
+  metrics.recordTokens(usage.model, usage.totalTokens);
+  metrics.recordCost(usage.costUsd);
+});
+```
+
+### TPM tracking
+
+For token-per-minute rate limiting, report tokens separately via `job.reportTokens()`:
+
+```typescript
+await job.reportTokens(result.totalTokens);
+```
+
+This value is read by the worker after job completion to increment the TPM counter when a `tokenLimiter` is configured.
 
 ---
 

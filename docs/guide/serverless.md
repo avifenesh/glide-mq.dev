@@ -209,6 +209,62 @@ pool.getProducer('queue', { connection });
 await pool.closeAll();
 ```
 
+## AI Primitives in Serverless
+
+### Enqueuing AI jobs from serverless functions
+
+The `Producer` class supports all `JobOptions` including AI-native options like `fallbacks`, `lockDuration`, and `ordering` for TPM rate limiting. AI-specific processing (streaming, usage tracking, budgets) happens on the worker side.
+
+```typescript
+import { serverlessPool } from 'glide-mq';
+
+export async function handler(event: any) {
+  const producer = serverlessPool.getProducer('inference', { connection: CONNECTION });
+
+  // Enqueue with fallback chain and per-job lock
+  const id = await producer.add('generate', {
+    prompt: event.prompt,
+    primaryModel: 'gpt-4o',
+  }, {
+    fallbacks: [
+      { model: 'gpt-4.1-nano', provider: 'openai' },
+      { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
+    ],
+    attempts: 3,
+    backoff: { type: 'exponential', delay: 2000 },
+    lockDuration: 60_000,
+  });
+
+  return { statusCode: 200, body: JSON.stringify({ jobId: id }) };
+}
+```
+
+### Reading streaming output from serverless
+
+Use `Queue.readStream()` to consume LLM token streams from a serverless API endpoint:
+
+```typescript
+import { Queue } from 'glide-mq';
+
+const queue = new Queue('inference', { connection: CONNECTION });
+
+export async function handler(req: Request) {
+  const { jobId } = await req.json();
+  const entries = await queue.readStream(jobId, { count: 100 });
+  return Response.json({ chunks: entries.map(e => e.fields) });
+}
+```
+
+For long-polling (blocking reads), pass `block`:
+
+```typescript
+const entries = await queue.readStream(jobId, {
+  lastId: req.headers.get('x-last-id') ?? undefined,
+  block: 5000,
+  count: 50,
+});
+```
+
 ## Connection Behavior
 
 - **Cold start**: `getClient()` creates a new GLIDE connection and loads the function library

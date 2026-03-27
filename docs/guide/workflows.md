@@ -352,6 +352,130 @@ const worker = new Worker('tasks', async (job) => {
 
 ---
 
+---
+
+## Budget Caps for Flows
+
+Cap total token usage or USD cost across all jobs in a flow. Pass a `budget` option to `FlowProducer.add()`.
+
+```typescript
+import { FlowProducer } from 'glide-mq';
+
+const flow = new FlowProducer({ connection });
+const node = await flow.add(
+  {
+    name: 'rag-pipeline',
+    queueName: 'ai',
+    data: { query: 'Explain message queues' },
+    children: [
+      { name: 'embed', queueName: 'ai', data: { step: 'embed' } },
+      { name: 'search', queueName: 'ai', data: { step: 'search' } },
+      { name: 'generate', queueName: 'ai', data: { step: 'generate' } },
+    ],
+  },
+  {
+    budget: {
+      maxTotalTokens: 5000,
+      maxCostUsd: 0.10,
+      onExceeded: 'fail',  // or 'pause'
+    },
+  },
+);
+```
+
+Each child job that calls `job.reportUsage()` increments the flow's budget counters. When the budget is exceeded, remaining jobs fail (or pause) based on the `onExceeded` policy.
+
+```typescript
+const budget = await queue.getFlowBudget(node.job.id);
+console.log(`Used: ${budget.usedTokens}/${budget.maxTotalTokens} tokens`);
+console.log(`Cost: $${budget.usedCost}/${budget.maxCostUsd}`);
+```
+
+See [AI-Native Features: Budget Caps](./ai-native#budget-caps) for details.
+
+---
+
+## Suspend / Resume in Workflows
+
+Suspend a job mid-pipeline for human-in-the-loop approval, then resume based on the signal.
+
+```typescript
+const worker = new Worker('ai', async (job) => {
+  if (job.data.step === 'moderate') {
+    // Check for resume signal
+    if (job.signals.length > 0) {
+      const decision = job.signals[0].data;
+      if (decision.action === 'approve') return { approved: true };
+      throw new Error('Content rejected');
+    }
+
+    // First run: classify and suspend for review
+    const result = await classifyContent(job.data.content);
+    if (result.category === 'borderline') {
+      await job.suspend({ reason: 'human-review-needed', timeout: 3600_000 });
+    }
+    return { classification: result.category };
+  }
+}, { connection });
+```
+
+Resume from an API endpoint:
+
+```typescript
+await queue.signal(jobId, 'moderation-decision', { action: 'approve' });
+```
+
+See [AI-Native Features: Suspend / Resume](./ai-native#suspend--resume) for details.
+
+---
+
+## AI Workflow Patterns
+
+### RAG pipeline
+
+Retrieval-augmented generation with embed, search, and generate steps:
+
+```typescript
+const node = await flow.add({
+  name: 'rag',
+  queueName: 'ai',
+  data: { step: 'aggregate', query },
+  children: [
+    { name: 'embed', queueName: 'ai', data: { step: 'embed', query },
+      opts: { lockDuration: 5_000 } },
+    { name: 'search', queueName: 'ai', data: { step: 'search', query },
+      opts: { lockDuration: 5_000 } },
+    { name: 'generate', queueName: 'ai',
+      data: { step: 'generate', query, context: docs },
+      opts: { lockDuration: 60_000, fallbacks: [
+        { model: 'gpt-4.1-nano' }, { model: 'claude-sonnet-4-20250514' },
+      ], attempts: 3 } },
+  ],
+}, { budget: { maxTotalTokens: 5000 } });
+```
+
+### Content moderation pipeline
+
+Classify, optionally suspend for human review, then polish:
+
+```typescript
+const node = await flow.add({
+  name: 'pipeline',
+  queueName: 'content',
+  data: { step: 'aggregate' },
+  children: [
+    { name: 'classify', queueName: 'content', data: { step: 'classify', content } },
+    { name: 'moderate', queueName: 'content', data: { step: 'moderate', content } },
+    { name: 'polish', queueName: 'content', data: { step: 'polish', content },
+      opts: { lockDuration: 30_000 } },
+  ],
+}, { budget: { maxTotalTokens: 3000, onExceeded: 'fail' } });
+```
+
+See [Examples: AI Pipelines](/examples/ai-pipelines) for complete runnable examples.
+
+---
+
 ## Broadcast
 
 The workflow patterns above (`FlowProducer`, DAG, `chain`, `group`, `chord`, `moveToWaitingChildren`) all model **dependency graphs** - jobs wait for other jobs to complete before running.

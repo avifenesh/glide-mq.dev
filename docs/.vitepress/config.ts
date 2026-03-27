@@ -3,14 +3,14 @@ import typedocSidebar from '../api/typedoc-sidebar.json'
 
 export default defineConfig({
   title: 'glide-mq',
-  description: 'High-performance message queue for Node.js on Valkey/Redis Streams',
+  description: 'AI-native message queue for Node.js on Valkey/Redis Streams',
   base: '/glide-mq.dev/',
 
   head: [
     ['meta', { name: 'theme-color', content: '#6366f1' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'glide-mq' }],
-    ['meta', { property: 'og:description', content: 'High-performance message queue for Node.js on Valkey/Redis Streams' }],
+    ['meta', { property: 'og:description', content: 'AI-native message queue for Node.js on Valkey/Redis Streams' }],
   ],
 
   lastUpdated: true,
@@ -37,6 +37,13 @@ export default defineConfig({
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'Usage', link: '/guide/usage' },
             { text: 'Agent Skills', link: '/guide/skills' },
+          ],
+        },
+        {
+          text: 'AI-Native Features',
+          items: [
+            { text: 'AI-Native Overview', link: '/guide/ai-native' },
+            { text: 'Vector Search', link: '/guide/vector-search' },
           ],
         },
         {
@@ -103,6 +110,7 @@ export default defineConfig({
             { text: 'Frameworks', link: '/examples/frameworks' },
             { text: 'Serverless', link: '/examples/serverless' },
             { text: 'Advanced', link: '/examples/advanced' },
+            { text: 'AI Pipelines', link: '/examples/ai-pipelines' },
           ],
         },
       ],

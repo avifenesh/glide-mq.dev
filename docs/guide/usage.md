@@ -9,6 +9,7 @@ description: Queue and Worker basics, graceful shutdown, cluster mode, serialize
 
 - [Queue](#queue)
 - [Worker](#worker)
+- [AI-Native Job Methods](#ai-native-job-methods)
 - [Graceful Shutdown](#graceful-shutdown)
 - [Cluster Mode](#cluster-mode)
 - [Pluggable Serializers](#pluggable-serializers)
@@ -611,3 +612,80 @@ const worker = new Worker(
 ```
 
 The job is marked as permanently failed regardless of the `attempts` configuration. This is equivalent to calling `job.discard()` and then throwing, but more explicit.
+
+---
+
+## AI-Native Job Methods
+
+glide-mq includes job-level methods for AI workloads. These are available on every `Job` instance inside a processor. For the full guide, see [AI-Native Features](./ai-native).
+
+### `job.reportUsage(usage)`
+
+Record model, tokens, cost, and latency metadata. Persists to the job hash and emits a `usage` event.
+
+```typescript
+await job.reportUsage({
+  model: 'gpt-4o',
+  provider: 'openai',
+  inputTokens: 150,
+  outputTokens: 45,
+  costUsd: 0.002,
+  latencyMs: 1200,
+});
+```
+
+### `job.reportTokens(count)`
+
+Report tokens consumed for TPM (tokens-per-minute) rate limiting. The worker reads this value after completion and increments the TPM counter.
+
+```typescript
+await job.reportTokens(195);
+```
+
+### `job.stream(chunk)`
+
+Append a chunk to a per-job streaming channel (Valkey stream). Returns the stream entry ID.
+
+```typescript
+await job.stream({ t: 'Hello' });
+await job.stream({ t: ' world' });
+await job.stream({ t: '', done: '1' });
+```
+
+### `job.suspend(opts?)`
+
+Pause the job for an external signal (human-in-the-loop). Throws `SuspendError` internally.
+
+```typescript
+await job.suspend({
+  reason: 'awaiting-review',
+  timeout: 3600_000,  // auto-fail after 1 hour
+});
+```
+
+### `job.storeVector(field, embedding)`
+
+Store a vector embedding on the job hash for Valkey Search indexing.
+
+```typescript
+await job.storeVector('embedding', [0.1, 0.2, 0.3, ...]);
+```
+
+### `job.currentFallback`
+
+Read-only property returning the current fallback entry during a retry, or `undefined` on the original attempt.
+
+```typescript
+const model = job.currentFallback?.model ?? job.data.primaryModel;
+```
+
+### `job.signals`
+
+Array of `SignalEntry` objects delivered while the job was suspended.
+
+```typescript
+if (job.signals.length > 0) {
+  const { name, data } = job.signals[0];
+  // Handle the signal
+}
+```
