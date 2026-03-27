@@ -1350,8 +1350,8 @@ const worker = new Worker('ai-tasks', async (job) => {
 }, { connection, concurrency: 1 });
 
 // Enqueue jobs
-await queue.add('generate', { prompt: 'Hello world', model: 'gpt-4.1-nano', mode: 'generate' });
-await queue.add('stream', { prompt: 'Write a haiku', model: 'gpt-4.1-nano', mode: 'stream' });
+await queue.add('generate', { prompt: 'Hello world', model: 'gpt-5.4-nano', mode: 'generate' });
+await queue.add('stream', { prompt: 'Write a haiku', model: 'gpt-5.4-nano', mode: 'stream' });
 ```
 
 [View full source](https://github.com/avifenesh/glide-mq/blob/main/examples/with-vercel-ai-sdk.ts)
@@ -1371,7 +1371,7 @@ import { Queue, Worker, FlowProducer } from 'glide-mq';
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
 const llm = new ChatOpenAI({
-  model: 'gpt-4.1-nano',
+  model: 'gpt-5.4-nano',
   configuration: { baseURL: 'https://openrouter.ai/api/v1' },
   apiKey: process.env.OPENROUTER_API_KEY,
   maxTokens: 150,
@@ -1404,7 +1404,7 @@ const worker = new Worker('langchain', async (job) => {
 
     if (usage) {
       await job.reportUsage({
-        model: 'gpt-4.1-nano',
+        model: 'gpt-5.4-nano',
         provider: 'openrouter',
         inputTokens: usage.promptTokens ?? 0,
         outputTokens: usage.completionTokens ?? 0,

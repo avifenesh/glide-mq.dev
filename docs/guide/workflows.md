@@ -448,7 +448,7 @@ const node = await flow.add({
     { name: 'generate', queueName: 'ai',
       data: { step: 'generate', query, context: docs },
       opts: { lockDuration: 60_000, fallbacks: [
-        { model: 'gpt-4.1-nano' }, { model: 'claude-sonnet-4-20250514' },
+        { model: 'gpt-5.4-nano' }, { model: 'claude-sonnet-4-20250514' },
       ], attempts: 3 } },
   ],
 }, { budget: { maxTotalTokens: 5000 } });

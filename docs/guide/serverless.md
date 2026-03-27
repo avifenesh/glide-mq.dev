@@ -227,7 +227,7 @@ export async function handler(event: any) {
     primaryModel: 'gpt-5.4',
   }, {
     fallbacks: [
-      { model: 'gpt-4.1-nano', provider: 'openai' },
+      { model: 'gpt-5.4-nano', provider: 'openai' },
       { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
     ],
     attempts: 3,

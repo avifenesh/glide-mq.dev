@@ -159,7 +159,7 @@ console.log(`Total tokens: ${usage.totalInputTokens + usage.totalOutputTokens}`)
 console.log(`Total cost: $${usage.totalCostUsd}`);
 console.log(`Jobs: ${usage.jobCount}`);
 console.log(`Models used: ${JSON.stringify(usage.models)}`);
-// models: { 'gpt-5.4': 3, 'gpt-4.1-nano': 1 }
+// models: { 'gpt-5.4': 3, 'gpt-5.4-nano': 1 }
 ```
 
 ### Listening for usage events

@@ -67,7 +67,7 @@ const usage = await queue.getFlowUsage(parentJobId);
 //   totalOutputTokens: 340,
 //   totalCostUsd: 0.012,
 //   jobCount: 4,
-//   models: { 'gpt-5.4': 3, 'gpt-4.1-nano': 1 }
+//   models: { 'gpt-5.4': 3, 'gpt-5.4-nano': 1 }
 // }
 ```
 
@@ -286,7 +286,7 @@ await queue.add('llm-query', {
   attempts: 4,  // 1 original + 3 fallbacks
   backoff: { type: 'fixed', delay: 1000 },
   fallbacks: [
-    { model: 'gpt-4.1-nano', provider: 'openai' },
+    { model: 'gpt-5.4-nano', provider: 'openai' },
     { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
     { model: 'gemini-2.5-pro', provider: 'google' },
   ],
@@ -464,7 +464,7 @@ const node = await flow.add({
       opts: {
         lockDuration: 60_000,
         fallbacks: [
-          { model: 'gpt-4.1-nano', provider: 'openai' },
+          { model: 'gpt-5.4-nano', provider: 'openai' },
           { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
         ],
         attempts: 3,

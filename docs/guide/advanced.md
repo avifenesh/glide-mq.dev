@@ -811,7 +811,7 @@ await queue.add('inference', {
   attempts: 4,
   backoff: { type: 'exponential', delay: 1000 },
   fallbacks: [
-    { model: 'gpt-4.1-nano', provider: 'openai' },
+    { model: 'gpt-5.4-nano', provider: 'openai' },
     { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
     { model: 'gemini-2.5-pro', provider: 'google' },
   ],
