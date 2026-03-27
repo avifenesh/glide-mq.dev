@@ -29,12 +29,12 @@ Track model, token counts, cost, and latency for every AI job. Data is persisted
 ```typescript
 const worker = new Worker('inference', async (job) => {
   const result = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     messages: [{ role: 'user', content: job.data.prompt }],
   });
 
   await job.reportUsage({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     provider: 'openai',
     inputTokens: result.usage.prompt_tokens,
     outputTokens: result.usage.completion_tokens,
@@ -67,7 +67,7 @@ const usage = await queue.getFlowUsage(parentJobId);
 //   totalOutputTokens: 340,
 //   totalCostUsd: 0.012,
 //   jobCount: 4,
-//   models: { 'gpt-4o': 3, 'gpt-4.1-nano': 1 }
+//   models: { 'gpt-5.4': 3, 'gpt-4.1-nano': 1 }
 // }
 ```
 
@@ -75,7 +75,7 @@ const usage = await queue.getFlowUsage(parentJobId);
 
 ```typescript
 interface JobUsage {
-  model?: string;        // e.g. 'gpt-4o', 'claude-sonnet-4-20250514'
+  model?: string;        // e.g. 'gpt-5.4', 'claude-sonnet-4-20250514'
   provider?: string;     // e.g. 'openai', 'anthropic'
   inputTokens?: number;
   outputTokens?: number;
@@ -99,7 +99,7 @@ Stream LLM output tokens to consumers in real time via per-job Valkey streams. E
 ```typescript
 const worker = new Worker('chat', async (job) => {
   const stream = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     messages: [{ role: 'user', content: job.data.prompt }],
     stream: true,
   });
@@ -281,7 +281,7 @@ Define an ordered list of model/provider alternatives that are tried automatical
 ```typescript
 await queue.add('llm-query', {
   prompt: 'Explain message queues.',
-  primaryModel: 'gpt-4o',
+  primaryModel: 'gpt-5.4',
 }, {
   attempts: 4,  // 1 original + 3 fallbacks
   backoff: { type: 'fixed', delay: 1000 },

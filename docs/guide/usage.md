@@ -625,7 +625,7 @@ Record model, tokens, cost, and latency metadata. Persists to the job hash and e
 
 ```typescript
 await job.reportUsage({
-  model: 'gpt-4o',
+  model: 'gpt-5.4',
   provider: 'openai',
   inputTokens: 150,
   outputTokens: 45,

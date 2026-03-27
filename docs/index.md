@@ -54,7 +54,7 @@ Every primitive AI orchestration needs - built into the queue, not a plugin or m
 ```typescript
 const worker = new Worker('ai', async (job) => {
   const result = await callLLM(job.data.prompt);
-  await job.reportUsage({ model: 'gpt-4o', inputTokens: 50, outputTokens: 200, costUsd: 0.003 });
+  await job.reportUsage({ model: 'gpt-5.4', inputTokens: 50, outputTokens: 200, costUsd: 0.003 });
   await job.stream({ type: 'token', content: result });
   return result;
 }, {

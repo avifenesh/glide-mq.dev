@@ -50,7 +50,7 @@ glide:{queueName}:parents:{id}        # Set - parent references for DAG multi-pa
 Jobs that use AI primitives store additional fields in the job hash (`glide:{queueName}:job:{id}`):
 
 ```
-usage:model           # String - model identifier (e.g. 'gpt-4o')
+usage:model           # String - model identifier (e.g. 'gpt-5.4')
 usage:provider        # String - provider identifier (e.g. 'openai')
 usage:inputTokens     # String(int) - input/prompt tokens
 usage:outputTokens    # String(int) - output/completion tokens

@@ -79,12 +79,12 @@ import { Worker } from 'glide-mq';
 
 const worker = new Worker('inference', async (job) => {
   const result = await generateText({
-    model: openai('gpt-4o'),
+    model: openai('gpt-5.4'),
     prompt: job.data.prompt,
   });
 
   await job.reportUsage({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     inputTokens: result.usage.inputTokens,
     outputTokens: result.usage.outputTokens,
   });
@@ -104,7 +104,7 @@ const worker = new Worker('langchain', async (job) => {
   const usage = response.response_metadata?.tokenUsage;
 
   await job.reportUsage({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     inputTokens: usage?.promptTokens ?? 0,
     outputTokens: usage?.completionTokens ?? 0,
   });

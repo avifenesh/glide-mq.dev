@@ -806,7 +806,7 @@ Define an ordered list of model/provider alternatives tried automatically on ret
 ```typescript
 await queue.add('inference', {
   prompt: 'Summarize this document.',
-  primaryModel: 'gpt-4o',
+  primaryModel: 'gpt-5.4',
 }, {
   attempts: 4,
   backoff: { type: 'exponential', delay: 1000 },

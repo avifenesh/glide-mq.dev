@@ -224,7 +224,7 @@ export async function handler(event: any) {
   // Enqueue with fallback chain and per-job lock
   const id = await producer.add('generate', {
     prompt: event.prompt,
-    primaryModel: 'gpt-4o',
+    primaryModel: 'gpt-5.4',
   }, {
     fallbacks: [
       { model: 'gpt-4.1-nano', provider: 'openai' },

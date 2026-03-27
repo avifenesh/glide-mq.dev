@@ -317,7 +317,7 @@ For unit-testing the logic *around* steps (data transformations, branching decis
 ```typescript
 const worker = new TestWorker(queue, async (job) => {
   await job.reportUsage({
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     provider: 'openai',
     inputTokens: 100,
     outputTokens: 50,
@@ -327,7 +327,7 @@ const worker = new TestWorker(queue, async (job) => {
 
 await queue.add('inference', { prompt: 'Hello' });
 const job = (await queue.getJobs('completed'))[0];
-expect(job.usage?.model).toBe('gpt-4o');
+expect(job.usage?.model).toBe('gpt-5.4');
 expect(job.usage?.totalTokens).toBe(150);
 ```
 
