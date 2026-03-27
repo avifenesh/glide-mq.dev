@@ -36,9 +36,9 @@ const worker = new Worker('inference', async (job) => {
   await job.reportUsage({
     model: 'gpt-5.4',
     provider: 'openai',
-    inputTokens: result.usage.prompt_tokens,
-    outputTokens: result.usage.completion_tokens,
-    costUsd: 0.0035,
+    tokens: { input: result.usage.prompt_tokens, output: result.usage.completion_tokens },
+    costs: { total: 0.0035 },
+    costUnit: 'usd',
     latencyMs: Date.now() - job.processedOn!,
     cached: false,
   });
@@ -53,8 +53,8 @@ const worker = new Worker('inference', async (job) => {
 const job = await queue.getJob('42');
 if (job?.usage) {
   console.log(`Model: ${job.usage.model}`);
-  console.log(`Tokens: ${job.usage.inputTokens} in, ${job.usage.outputTokens} out`);
-  console.log(`Cost: $${job.usage.costUsd}`);
+  console.log(`Tokens: ${job.usage.tokens?.input} in, ${job.usage.tokens?.output} out`);
+  console.log(`Cost: $${job.usage.totalCost}`);
 }
 ```
 
@@ -63,9 +63,11 @@ if (job?.usage) {
 ```typescript
 const usage = await queue.getFlowUsage(parentJobId);
 // {
-//   totalInputTokens: 1250,
-//   totalOutputTokens: 340,
-//   totalCostUsd: 0.012,
+//   tokens: { input: 1250, output: 340 },
+//   totalTokens: 1590,
+//   costs: { total: 0.012 },
+//   totalCost: 0.012,
+//   costUnit: 'usd',
 //   jobCount: 4,
 //   models: { 'gpt-5.4': 3, 'gpt-5.4-nano': 1 }
 // }
@@ -75,18 +77,21 @@ const usage = await queue.getFlowUsage(parentJobId);
 
 ```typescript
 interface JobUsage {
-  model?: string;        // e.g. 'gpt-5.4', 'claude-sonnet-4-20250514'
-  provider?: string;     // e.g. 'openai', 'anthropic'
-  inputTokens?: number;
-  outputTokens?: number;
-  totalTokens?: number;  // auto-computed if not provided
-  costUsd?: number;
+  model?: string;                  // e.g. 'gpt-5.4', 'claude-sonnet-4-20250514'
+  provider?: string;               // e.g. 'openai', 'anthropic'
+  tokens?: Record<string, number>; // e.g. { input: 100, output: 50, reasoning: 200 }
+  totalTokens?: number;            // auto-computed as sum of all tokens values
+  costs?: Record<string, number>;  // e.g. { total: 0.003 } or { input: 0.001, output: 0.002 }
+  totalCost?: number;              // auto-computed as sum of all costs values
+  costUnit?: string;               // e.g. 'usd', 'credits', 'ils'
   latencyMs?: number;
   cached?: boolean;
 }
 ```
 
-`totalTokens` is automatically computed as `inputTokens + outputTokens` when not explicitly provided.
+Well-known token keys: `input`, `output`, `reasoning`, `cachedInput`, `cachedOutput`. Any string key is accepted.
+
+`totalTokens` is automatically computed as the sum of all values in `tokens` when not explicitly provided. `totalCost` works the same way for `costs`.
 
 ---
 
@@ -147,6 +152,18 @@ Each chunk is a flat `Record<string, string>` appended via XADD. Common patterns
 - `{ t: 'token text' }` - a text token
 - `{ t: '', done: '1' }` - end-of-stream marker
 - `{ type: 'tool_call', name: 'search', args: '{"q":"valkey"}' }` - structured events
+
+### Convenience: `job.streamChunk(type, content?)`
+
+For typed LLM chunks (reasoning, content, tool calls), use the shorthand `streamChunk` method instead of building the record manually:
+
+```typescript
+await job.streamChunk('reasoning', 'Let me think about this...');
+await job.streamChunk('content', 'The answer is 42.');
+await job.streamChunk('done');
+```
+
+This is equivalent to `job.stream({ type, content })` but more readable for common streaming patterns.
 
 ---
 
@@ -240,7 +257,7 @@ const node = await flow.add(
       { name: 'generate', queueName: 'ai', data: { step: 'generate' } },
     ],
   },
-  { budget: { maxTotalTokens: 2000, maxCostUsd: 0.05, onExceeded: 'fail' } },
+  { budget: { maxTotalTokens: 2000, maxTotalCost: 0.05, costUnit: 'usd', onExceeded: 'fail' } },
 );
 ```
 
@@ -250,7 +267,8 @@ const node = await flow.add(
 const budget = await queue.getFlowBudget(parentJobId);
 // {
 //   maxTotalTokens: 2000,
-//   maxCostUsd: 0.05,
+//   maxTotalCost: 0.05,
+//   costUnit: 'usd',
 //   usedTokens: 1450,
 //   usedCost: 0.032,
 //   exceeded: false,
@@ -262,9 +280,13 @@ const budget = await queue.getFlowBudget(parentJobId);
 
 ```typescript
 interface BudgetOptions {
-  maxTotalTokens?: number;  // hard cap on total tokens
-  maxCostUsd?: number;      // hard cap on total USD cost
-  onExceeded?: 'pause' | 'fail';  // default: 'fail'
+  maxTotalTokens?: number;              // hard cap on weighted total tokens
+  maxTokens?: Record<string, number>;   // per-category caps (e.g. { input: 50000, reasoning: 5000 })
+  tokenWeights?: Record<string, number>;// weight multipliers (e.g. { reasoning: 4, cachedInput: 0.25 })
+  maxTotalCost?: number;                // hard cap on total cost
+  maxCosts?: Record<string, number>;    // per-category cost caps
+  costUnit?: string;                    // e.g. 'usd', 'credits', 'ils'
+  onExceeded?: 'pause' | 'fail';       // default: 'fail'
 }
 ```
 
@@ -307,8 +329,7 @@ const worker = new Worker('llm-query', async (job) => {
 
   await job.reportUsage({
     model: result.model,
-    inputTokens: result.inputTokens,
-    outputTokens: result.outputTokens,
+    tokens: { input: result.inputTokens, output: result.outputTokens },
   });
 
   return { content: result.text, model };

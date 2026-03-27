@@ -376,7 +376,7 @@ const node = await flow.add(
   {
     budget: {
       maxTotalTokens: 5000,
-      maxCostUsd: 0.10,
+      maxTotalCost: 0.10,
       onExceeded: 'fail',  // or 'pause'
     },
   },
@@ -388,7 +388,7 @@ Each child job that calls `job.reportUsage()` increments the flow's budget count
 ```typescript
 const budget = await queue.getFlowBudget(node.job.id);
 console.log(`Used: ${budget.usedTokens}/${budget.maxTotalTokens} tokens`);
-console.log(`Cost: $${budget.usedCost}/${budget.maxCostUsd}`);
+console.log(`Cost: $${budget.usedCost}/${budget.maxTotalCost}`);
 ```
 
 See [AI-Native Features: Budget Caps](./ai-native#budget-caps) for details.

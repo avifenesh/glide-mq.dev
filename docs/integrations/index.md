@@ -85,8 +85,10 @@ const worker = new Worker('inference', async (job) => {
 
   await job.reportUsage({
     model: 'gpt-5.4',
-    inputTokens: result.usage.inputTokens,
-    outputTokens: result.usage.outputTokens,
+    tokens: {
+      input: result.usage.inputTokens,
+      output: result.usage.outputTokens,
+    },
   });
 
   return { content: result.text };
@@ -105,8 +107,10 @@ const worker = new Worker('langchain', async (job) => {
 
   await job.reportUsage({
     model: 'gpt-5.4',
-    inputTokens: usage?.promptTokens ?? 0,
-    outputTokens: usage?.completionTokens ?? 0,
+    tokens: {
+      input: usage?.promptTokens ?? 0,
+      output: usage?.completionTokens ?? 0,
+    },
   });
 
   return { output: String(response.content) };

@@ -826,7 +826,7 @@ const worker = new Worker('inference', async (job) => {
   const model = fallback ? fallback.model : job.data.primaryModel;
 
   const result = await callLLM(model, job.data.prompt);
-  await job.reportUsage({ model, inputTokens: result.inTokens, outputTokens: result.outTokens });
+  await job.reportUsage({ model, tokens: { input: result.inTokens, output: result.outTokens } });
   return { content: result.text, model };
 }, { connection });
 ```

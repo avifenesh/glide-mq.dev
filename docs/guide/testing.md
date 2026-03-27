@@ -319,8 +319,7 @@ const worker = new TestWorker(queue, async (job) => {
   await job.reportUsage({
     model: 'gpt-5.4',
     provider: 'openai',
-    inputTokens: 100,
-    outputTokens: 50,
+    tokens: { input: 100, output: 50 },
   });
   return { ok: true };
 });

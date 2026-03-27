@@ -127,9 +127,11 @@ const worker = new Worker('inference', async (job) => {
   await job.reportUsage({
     model: 'gpt-5.4',
     provider: 'openai',
-    inputTokens: result.usage.prompt_tokens,
-    outputTokens: result.usage.completion_tokens,
-    costUsd: 0.003,
+    tokens: {
+      input: result.usage.prompt_tokens,
+      output: result.usage.completion_tokens,
+    },
+    costs: { total: 0.003 },
     latencyMs: 1100,
     cached: false,
   });
@@ -144,8 +146,8 @@ const worker = new Worker('inference', async (job) => {
 const job = await queue.getJob('42');
 if (job?.usage) {
   console.log(`Model: ${job.usage.model}`);
-  console.log(`Input: ${job.usage.inputTokens}, Output: ${job.usage.outputTokens}`);
-  console.log(`Cost: $${job.usage.costUsd}, Latency: ${job.usage.latencyMs}ms`);
+  console.log(`Input: ${job.usage.tokens?.input}, Output: ${job.usage.tokens?.output}`);
+  console.log(`Cost: $${job.usage.totalCost}, Latency: ${job.usage.latencyMs}ms`);
 }
 ```
 
@@ -155,8 +157,8 @@ Aggregate token counts and cost across all jobs in a parent-child flow:
 
 ```typescript
 const usage = await queue.getFlowUsage(parentJobId);
-console.log(`Total tokens: ${usage.totalInputTokens + usage.totalOutputTokens}`);
-console.log(`Total cost: $${usage.totalCostUsd}`);
+console.log(`Total tokens: ${usage.totalTokens}`);
+console.log(`Total cost: $${usage.totalCost}`);
 console.log(`Jobs: ${usage.jobCount}`);
 console.log(`Models used: ${JSON.stringify(usage.models)}`);
 // models: { 'gpt-5.4': 3, 'gpt-5.4-nano': 1 }
@@ -169,7 +171,7 @@ const events = new QueueEvents('inference', { connection });
 events.on('usage', ({ jobId, data }) => {
   const usage = JSON.parse(data);
   metrics.recordTokens(usage.model, usage.totalTokens);
-  metrics.recordCost(usage.costUsd);
+  metrics.recordCost(usage.totalCost);
 });
 ```
 

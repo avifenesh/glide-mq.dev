@@ -299,8 +299,7 @@ const worker = new Worker(QUEUE, async (job) => {
     await job.reportUsage({
       model,
       provider: 'openrouter',
-      inputTokens: usage.inputTokens ?? 0,
-      outputTokens: usage.outputTokens ?? 0,
+      tokens: { input: usage.inputTokens ?? 0, output: usage.outputTokens ?? 0 },
     });
     return { content: await result.text };
   }
@@ -314,8 +313,7 @@ const worker = new Worker(QUEUE, async (job) => {
   await job.reportUsage({
     model,
     provider: 'openrouter',
-    inputTokens: result.usage.inputTokens ?? 0,
-    outputTokens: result.usage.outputTokens ?? 0,
+    tokens: { input: result.usage.inputTokens ?? 0, output: result.usage.outputTokens ?? 0 },
   });
 
   return { content: result.text };
@@ -345,8 +343,7 @@ const worker = new Worker(QUEUE, async (job) => {
     await job.reportUsage({
       model: 'arcee-ai/trinity-large-preview:free',
       provider: 'openrouter',
-      inputTokens: result.usage.promptTokens ?? 0,
-      outputTokens: result.usage.completionTokens ?? 0,
+      tokens: { input: result.usage.promptTokens ?? 0, output: result.usage.completionTokens ?? 0 },
     });
     return { output: result.text };
   }

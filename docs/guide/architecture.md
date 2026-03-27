@@ -38,7 +38,7 @@ glide:{queueName}:groupq:{key}          # List - FIFO wait list for group-limite
 glide:{queueName}:ratelimited           # ZSet - scheduler-managed promotion queue for rate-limited jobs
                                 #        (score = earliest eligible timestamp)
 glide:{queueName}:jstream:{id}         # Stream - per-job streaming channel (LLM token streaming)
-glide:{queueName}:budget:{id}          # Hash - flow-level budget state (maxTotalTokens, maxCostUsd,
+glide:{queueName}:budget:{id}          # Hash - flow-level budget state (maxTotalTokens, maxTotalCost,
                                 #        usedTokens, usedCost, exceeded, onExceeded)
 glide:{queueName}:tpm                  # Hash - TPM (tokens-per-minute) rate limiter state
                                 #        (windowStart, tokenCount, maxTokens, duration)
@@ -52,10 +52,11 @@ Jobs that use AI primitives store additional fields in the job hash (`glide:{que
 ```
 usage:model           # String - model identifier (e.g. 'gpt-5.4')
 usage:provider        # String - provider identifier (e.g. 'openai')
-usage:inputTokens     # String(int) - input/prompt tokens
-usage:outputTokens    # String(int) - output/completion tokens
-usage:totalTokens     # String(int) - total tokens
-usage:costUsd         # String(float) - USD cost
+usage:tokens:*        # String(int) - token counts by category (e.g. usage:tokens:input, usage:tokens:output)
+usage:totalTokens     # String(int) - total tokens (sum of all categories)
+usage:costs:*         # String(float) - cost by category (e.g. usage:costs:total)
+usage:totalCost       # String(float) - total cost (sum of all categories)
+usage:costUnit        # String - unit for cost values (e.g. 'usd', 'credits')
 usage:latencyMs       # String(int) - inference latency in ms
 usage:cached          # String('0'|'1') - cache hit flag
 tpmTokens             # String(int) - tokens reported for TPM limiting
@@ -319,8 +320,8 @@ class Queue<D = any, R = any> extends EventEmitter {
   signal(jobId: string, signalName: string, data?: any): Promise<boolean>;
   getSuspendInfo(jobId: string): Promise<{ reason?: string; suspendedAt: number; timeout?: number; signals: SignalEntry[] } | null>;
   readStream(jobId: string, opts?: ReadStreamOptions): Promise<{ id: string; fields: Record<string, string> }[]>;
-  getFlowUsage(parentJobId: string): Promise<{ totalInputTokens: number; totalOutputTokens: number; totalCostUsd: number; jobCount: number; models: Record<string, number> }>;
-  getFlowBudget(flowId: string): Promise<{ maxTotalTokens?: number; maxCostUsd?: number; usedTokens: number; usedCost: number; exceeded: boolean; onExceeded: 'pause' | 'fail' } | null>;
+  getFlowUsage(parentJobId: string): Promise<{ tokens: Record<string, number>; totalTokens: number; costs: Record<string, number>; totalCost: number; jobCount: number; models: Record<string, number> }>;
+  getFlowBudget(flowId: string): Promise<{ maxTotalTokens?: number; maxTotalCost?: number; usedTokens: number; usedCost: number; exceeded: boolean; onExceeded: 'pause' | 'fail' } | null>;
 
   // Vector search
   createJobIndex(opts?: JobIndexOptions): Promise<void>;

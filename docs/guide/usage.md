@@ -627,9 +627,8 @@ Record model, tokens, cost, and latency metadata. Persists to the job hash and e
 await job.reportUsage({
   model: 'gpt-5.4',
   provider: 'openai',
-  inputTokens: 150,
-  outputTokens: 45,
-  costUsd: 0.002,
+  tokens: { input: 150, output: 45 },
+  costs: { total: 0.002 },
   latencyMs: 1200,
 });
 ```

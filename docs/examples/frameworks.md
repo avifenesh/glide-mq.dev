@@ -1322,8 +1322,7 @@ const worker = new Worker('ai-tasks', async (job) => {
     await job.reportUsage({
       model,
       provider: 'openrouter',
-      inputTokens: usage.inputTokens ?? 0,
-      outputTokens: usage.outputTokens ?? 0,
+      tokens: { input: usage.inputTokens ?? 0, output: usage.outputTokens ?? 0 },
     });
 
     return { content: await result.text };
@@ -1339,8 +1338,7 @@ const worker = new Worker('ai-tasks', async (job) => {
   await job.reportUsage({
     model,
     provider: 'openrouter',
-    inputTokens: result.usage.inputTokens ?? 0,
-    outputTokens: result.usage.outputTokens ?? 0,
+    tokens: { input: result.usage.inputTokens ?? 0, output: result.usage.outputTokens ?? 0 },
   });
 
   return {
@@ -1406,8 +1404,7 @@ const worker = new Worker('langchain', async (job) => {
       await job.reportUsage({
         model: 'gpt-5.4-nano',
         provider: 'openrouter',
-        inputTokens: usage.promptTokens ?? 0,
-        outputTokens: usage.completionTokens ?? 0,
+        tokens: { input: usage.promptTokens ?? 0, output: usage.completionTokens ?? 0 },
       });
     }
 
