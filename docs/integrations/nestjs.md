@@ -28,7 +28,7 @@ Register queues and processors with decorators, inject them through the standard
 npm install @glidemq/nestjs glide-mq @nestjs/common @nestjs/core
 ```
 
-Requires **glide-mq 0.9+** and **NestJS 10+**.
+Requires **glide-mq >= 0.14.0** and **NestJS 10+**.
 
 ## Quick Start
 
@@ -160,6 +160,10 @@ export class EventPublisher {
   }
 }
 ```
+
+## AI-Native Features
+
+All of glide-mq's AI primitives are accessible through injected Queue, Worker, and FlowProducer instances: usage tracking (`job.reportUsage()`), token streaming (`job.stream()`, `job.streamChunk()`), suspend/resume (`job.suspend()`, `queue.signal()`), budget caps, fallback chains, dual-axis rate limiting, and vector search. See the [AI-Native guide](/guide/ai-native) for the full API.
 
 ## Features
 

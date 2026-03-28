@@ -374,7 +374,7 @@ process.on('SIGTERM', async () => {
 
 ## Hapi API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. Features 21 REST endpoints, Server-Sent Events, Zod validation, custom routes with `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. Features 24 REST endpoints, Server-Sent Events, Zod validation, custom routes with `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
 
 ```typescript
 import Hapi from '@hapi/hapi';
@@ -412,7 +412,7 @@ await server.register({
   options: registry as any,
 });
 
-// Mount REST API (21 endpoints + SSE)
+// Mount REST API (24 endpoints + SSE)
 await server.register({
   plugin: glideMQRoutes,
   options: { prefix: '/api/queues' },

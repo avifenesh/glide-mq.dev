@@ -21,7 +21,7 @@ glide-mq ships official integration packages for popular Node.js frameworks. Eac
 
 All framework integrations share these capabilities:
 
-- **21 REST endpoints** for job management, queue control, and scheduler CRUD
+- **24 REST endpoints** for job management, queue control, and scheduler CRUD
 - **Server-Sent Events (SSE)** for real-time job lifecycle streaming
 - **Lightweight producers** for serverless environments (no Worker overhead)
 - **Testing mode** with in-memory queues (no Valkey required)

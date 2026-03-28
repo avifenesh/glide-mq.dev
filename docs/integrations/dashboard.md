@@ -25,7 +25,7 @@ Real-time web dashboard for [glide-mq](/guide/getting-started) queues. Drop-in E
 npm install @glidemq/dashboard glide-mq express
 ```
 
-Requires **glide-mq 0.9+** and **Express 4 or 5**.
+Requires **glide-mq >= 0.14.0** and **Express 4 or 5**.
 
 ## Quick Start
 
