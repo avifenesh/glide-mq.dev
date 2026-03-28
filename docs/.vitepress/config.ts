@@ -4,7 +4,7 @@ import typedocSidebar from '../api/typedoc-sidebar.json'
 export default defineConfig({
   title: 'glide-mq',
   description: 'AI-native message queue for Node.js on Valkey/Redis Streams',
-  base: '/glide-mq.dev/',
+  base: '/',
 
   head: [
     ['meta', { name: 'theme-color', content: '#6366f1' }],
