@@ -21,9 +21,9 @@ glide-mq ships official integration packages for popular Node.js frameworks. Tog
 
 The integrations share the same core queue model, but they expose it in different ways:
 
-- **Hono, Fastify, and Hapi** expose the full HTTP queue API with SSE, schedulers, flow usage and budget endpoints, queue-wide usage summaries, and broadcast publish/SSE routes.
-- **NestJS** exposes the same core APIs through decorators and DI instead of shipping an HTTP layer.
-- **Dashboard** focuses on monitoring and operations, including queue controls, flow usage and budget views, job streaming, and queue-wide usage summaries.
+- **Hono, Fastify, and Hapi** expose the full HTTP queue API with SSE, schedulers, flow create/read/tree/delete, flow usage and budget endpoints, queue-wide usage summaries, and broadcast publish/SSE routes.
+- **NestJS** exposes the same core APIs through decorators and DI instead of shipping an HTTP layer. For cross-language `/flows` access, use the core proxy or one of the HTTP wrappers.
+- **Dashboard** focuses on monitoring and operations, including queue controls, flow usage and budget views, job streaming, and queue-wide usage summaries. It does not act as a general flow-creation API.
 - **Testing mode** is available across the API wrappers and NestJS for in-memory development. Broadcast and summary routes still require a live connection.
 - **Graceful shutdown** is built into each integration using the framework's lifecycle hooks or registry helpers.
 
@@ -36,7 +36,7 @@ The integrations share the same core queue model, but they expose it in differen
 | **NestJS** (enterprise, decorators, DI) | `@glidemq/nestjs` - `@Processor`, `@InjectQueue`, full lifecycle |
 | **Hapi** (enterprise, Joi validation) | `@glidemq/hapi` - Joi schemas, access control, SSE |
 | **Express** (dashboard UI) | `@glidemq/dashboard` - drop-in web dashboard, no build step |
-| **Express/Koa/other** (API only) | Use the core [HTTP Proxy](/examples/serverless#http-proxy) - queue routes, queue events SSE, usage summary, and broadcast over HTTP |
+| **Express/Koa/other** (API only) | Use the core [HTTP Proxy](/examples/serverless#http-proxy) - queue routes, flow create/read/tree/delete, queue events SSE, usage summary, and broadcast over HTTP |
 
 ## Quick Start
 

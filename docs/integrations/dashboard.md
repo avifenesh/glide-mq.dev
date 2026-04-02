@@ -49,6 +49,7 @@ app.listen(3000);
 - **Real-time event stream** -- SSE pushes completed, failed, active, waiting, stalled, progress, and removed events to the browser as they happen.
 - **Job inspection** -- view payload, options, logs, progress, return value, and failure reason for any job.
 - **AI observability** -- inspect flow usage, budget state, streaming chunks, and rolling queue-wide usage summaries.
+- **Operational focus** -- inspect and operate on existing jobs and flows; for write-side flow orchestration over HTTP, use the core proxy or the Hono/Fastify/Hapi wrappers.
 - **Bulk actions** -- pause, resume, drain, retry all failed, and clean old jobs at the queue level.
 - **Per-job actions** -- retry a failed job, remove a job, or promote a delayed job to waiting.
 - **Workers panel** -- see connected workers and their current status.

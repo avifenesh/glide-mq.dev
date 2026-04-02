@@ -1,6 +1,6 @@
 ---
 title: Hapi Integration
-description: REST API and real-time SSE for glide-mq job queues, as a Hapi.js plugin. Joi-validated queue control, usage summaries, and broadcast SSE.
+description: REST API and real-time SSE for glide-mq job queues, as a Hapi.js plugin. Joi-validated queue control, flow orchestration, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hapi
@@ -87,6 +87,10 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 | PUT | `/{name}/schedulers/{schedulerName}` | Upsert a scheduler |
 | DELETE | `/{name}/schedulers/{schedulerName}` | Remove a scheduler |
 | GET | `/{name}/events` | SSE event stream |
+| POST | `/flows` | Create a tree flow or DAG over HTTP with `{ flow, budget? }` or `{ dag }` |
+| GET | `/flows/{id}` | Inspect a flow snapshot with nodes, roots, counts, usage, and budget |
+| GET | `/flows/{id}/tree` | Inspect the nested tree view for a submitted tree flow or DAG |
+| DELETE | `/flows/{id}` | Revoke or flag remaining jobs in a flow and delete the HTTP flow record |
 | GET | `/{name}/flows/{id}/usage` | Aggregated token/cost usage across a flow |
 | GET | `/{name}/flows/{id}/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/{name}/jobs/{id}/stream` | SSE stream of real-time chunks from a streaming job |
@@ -105,6 +109,7 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 - **Route prefix** -- set `prefix` in `GlideMQRoutesOptions` to mount the HTTP surface under a path like `/api/queues`.
 - **Automatic cleanup** -- the `onPostStop` lifecycle hook closes workers first (to drain in-progress jobs), then queues and producers, using `Promise.allSettled` for reliability.
 - **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters.
+- **Flow orchestration over HTTP** -- create tree flows or DAGs from any HTTP client, then inspect them as flat snapshots or nested trees.
 
 ## Configuration
 
@@ -176,7 +181,8 @@ server.route({
 - Requires a running Valkey or Redis instance for production use. Testing mode uses in-memory stubs only.
 - No built-in authentication or authorization. Add Hapi auth strategies or gateway-level controls separately.
 - `addAndWait` (the `POST /{name}/jobs/wait` endpoint) is not available in testing mode because `TestQueue` does not support it.
-- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode.
+- `POST /flows` accepts tree flow payloads with optional budgets and DAG payloads without budgets. HTTP-submitted budgets are currently supported for tree flows only.
+- `/flows*`, `/usage/summary`, and `/broadcast/*` require a live connection and are unavailable in testing mode.
 - Producers are not supported in testing mode. Use queue-based endpoints for test assertions.
 
 ## Ecosystem

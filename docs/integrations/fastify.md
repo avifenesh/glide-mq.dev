@@ -1,6 +1,6 @@
 ---
 title: Fastify Integration
-description: REST API and real-time SSE for glide-mq job queues, as a Fastify v5 plugin. Queue control, usage summaries, and broadcast SSE with Fastify lifecycle hooks.
+description: REST API and real-time SSE for glide-mq job queues, as a Fastify v5 plugin. Queue control, flow orchestration, usage summaries, and broadcast SSE with Fastify lifecycle hooks.
 ---
 
 # @glidemq/fastify
@@ -114,6 +114,10 @@ All queue routes use `:name` as the queue identifier.
 
 | Method | Path | Description |
 |--------|------|-------------|
+| POST | `/flows` | Create a tree flow or DAG over HTTP with `{ flow, budget? }` or `{ dag }` |
+| GET | `/flows/:id` | Inspect a flow snapshot with nodes, roots, counts, usage, and budget |
+| GET | `/flows/:id/tree` | Inspect the nested tree view for a submitted tree flow or DAG |
+| DELETE | `/flows/:id` | Revoke or flag remaining jobs in a flow and delete the HTTP flow record |
 | GET | `/:name/flows/:id/usage` | Aggregated token/cost usage across a flow |
 | GET | `/:name/flows/:id/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/:name/jobs/:id/stream` | SSE stream of real-time chunks from a streaming job |
@@ -137,6 +141,7 @@ All queue routes use `:name` as the queue identifier.
 - **Graceful shutdown** -- `onClose` hook calls `registry.closeAll()` using `Promise.allSettled` so one failing close does not block the rest.
 - **Serverless producers** -- lightweight `Producer` endpoints that return only `{ id }`, suitable for Lambda/edge functions that only enqueue work.
 - **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters.
+- **Flow orchestration over HTTP** -- create tree flows or DAGs from any HTTP client, then inspect them as flat snapshots or nested trees.
 
 ## Configuration
 
@@ -224,7 +229,8 @@ The registry exposes `get(name)`, `getProducer(name)`, `has(name)`, `names()`, `
 
 - SSE uses `reply.hijack()` to bypass Fastify's response pipeline. This means Fastify hooks like `onSend` do not run for SSE connections.
 - No built-in authentication or rate limiting. Use Fastify hooks or plugins (`@fastify/auth`, `@fastify/rate-limit`) in front of `glideMQRoutes`.
-- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode.
+- `POST /flows` accepts tree flow payloads with optional budgets and DAG payloads without budgets. HTTP-submitted budgets are currently supported for tree flows only.
+- `/flows*`, `/usage/summary`, and `/broadcast/*` require a live connection and are unavailable in testing mode.
 - Queue names are validated against `/^[a-zA-Z0-9_-]{1,128}$/`. Names outside this pattern are rejected with 400.
 - Scheduler names allow a wider character set (`/^[a-zA-Z0-9_:.-]{1,256}$/`) but are still length-limited.
 
