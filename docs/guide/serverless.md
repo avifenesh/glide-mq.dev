@@ -1,11 +1,11 @@
 ---
 title: Serverless / Edge Guide
-description: Lightweight enqueueing for AWS Lambda, Cloudflare Workers, Vercel Edge, and similar environments.
+description: Lightweight enqueueing for AWS Lambda and similar server-side runtimes, plus HTTP proxy patterns for edge platforms.
 ---
 
 # Serverless / Edge Guide
 
-Lightweight enqueueing for AWS Lambda, Cloudflare Workers, Vercel Edge Functions, and similar environments where persistent connections are expensive or impossible.
+Lightweight enqueueing for AWS Lambda and other server-side runtimes where persistent connections are expensive or impossible. For edge runtimes without NAPI support, use the HTTP proxy pattern instead of importing `glide-mq` directly.
 
 ## Why Producer over Queue
 
@@ -74,49 +74,45 @@ On cold starts, `getProducer` creates a new connection. On warm invocations, it 
 
 ## Cloudflare Workers
 
-For short-lived environments without connection reuse:
+Cloudflare Workers do not provide the server-side NAPI runtime that `glide-mq` requires. Use the HTTP proxy from a Worker instead:
 
 ```typescript
-import { Producer } from 'glide-mq';
-
 export default {
   async fetch(request: Request, env: any) {
-    const producer = new Producer('tasks', {
-      connection: {
-        addresses: [{ host: env.VALKEY_HOST, port: 6379 }],
-        useTLS: true,
-      },
+    const body = await request.json();
+    const res = await fetch(`${env.GLIDEMQ_PROXY_URL}/queues/tasks/jobs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.PROXY_TOKEN}` },
+      body: JSON.stringify({ name: 'process-webhook', data: body }),
     });
-
-    try {
-      const body = await request.json();
-      const id = await producer.add('process-webhook', body);
-      return new Response(JSON.stringify({ jobId: id }), { status: 200 });
-    } finally {
-      await producer.close();
-    }
+    return new Response(await res.text(), {
+      status: res.status,
+      headers: { 'content-type': res.headers.get('content-type') ?? 'application/json' },
+    });
   },
 };
 ```
 
 ## Vercel Edge Functions
 
+Vercel Edge has the same limitation. Use `fetch()` against the HTTP proxy or another server-side endpoint that owns the Valkey connection:
+
 ```typescript
-import { serverlessPool } from 'glide-mq';
-
-const CONNECTION = {
-  addresses: [{ host: process.env.VALKEY_HOST!, port: 6379 }],
-  useTLS: true,
-};
-
 export default async function handler(req: Request) {
-  const producer = serverlessPool.getProducer('analytics', {
-    connection: CONNECTION,
+  const body = await req.json();
+  const res = await fetch(`${process.env.GLIDEMQ_PROXY_URL}/queues/analytics/jobs`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.PROXY_TOKEN!}`,
+    },
+    body: JSON.stringify({ name: 'track-event', data: body }),
   });
 
-  const data = await req.json();
-  const id = await producer.add('track-event', data);
-  return Response.json({ jobId: id });
+  return new Response(await res.text(), {
+    status: res.status,
+    headers: { 'content-type': res.headers.get('content-type') ?? 'application/json' },
+  });
 }
 
 export const config = { runtime: 'edge' };
@@ -213,7 +209,7 @@ await pool.closeAll();
 
 ### Enqueuing AI jobs from serverless functions
 
-The `Producer` class supports all `JobOptions` including AI-native options like `fallbacks`, `lockDuration`, and `ordering` for TPM rate limiting. AI-specific processing (streaming, usage tracking, budgets) happens on the worker side.
+The `Producer` class supports all `JobOptions` including AI-native options like `fallbacks`, `lockDuration`, and `ordering`. Ordering is useful for per-key sequencing, per-group concurrency, and token-bucket rate limits. Worker-side TPM enforcement still comes from `tokenLimiter`. AI-specific processing (streaming, usage tracking, budgets) happens on the worker side.
 
 ```typescript
 import { serverlessPool } from 'glide-mq';

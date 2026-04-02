@@ -11,7 +11,7 @@ description: Install glide-mq, set up your first queue and worker, and learn the
 npm install glide-mq
 ```
 
-Requires Node.js 20+ and a running [Valkey](https://valkey.io) 7.0+ or Redis 7.0+ instance.
+Requires a server-side runtime with NAPI support, such as Node.js 20+, Bun, or Deno, plus a running [Valkey](https://valkey.io) 7.0+ or Redis 7.0+ instance.
 
 ### Docker setup with valkey-bundle
 
@@ -73,7 +73,7 @@ See the [AI-Native Features guide](./ai-native) for comprehensive documentation.
 
 ## Requirements
 
-- **Node.js 20+**
+- **A server-side runtime with NAPI support**: Node.js 20+, Bun, or Deno
 - **Valkey 7.0+** or **Redis 7.0+**
 - TypeScript 5+ recommended
 - **Valkey Search module** (optional, for vector search only)

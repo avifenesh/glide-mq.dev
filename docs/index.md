@@ -81,7 +81,7 @@ const worker = new Worker('ai', async (job) => {
 npm install glide-mq
 ```
 
-Requires Node.js 20+ (also works with Bun and Deno) and Valkey 7.0+ or Redis 7.0+. For vector search, use [valkey-bundle](https://hub.docker.com/r/valkey/valkey-bundle).
+Requires a server-side runtime with NAPI support: Node.js 20+, Bun, or Deno, plus Valkey 7.0+ or Redis 7.0+. For vector search, use [valkey-bundle](https://hub.docker.com/r/valkey/valkey-bundle).
 
 ## Ecosystem
 

@@ -5,7 +5,7 @@ description: Use glide-mq with Hono, Fastify, NestJS, Hapi, and Express
 
 # Framework Integrations
 
-glide-mq ships official integration packages for popular Node.js frameworks. Each provides REST API endpoints, real-time SSE event streaming, and framework-native patterns.
+glide-mq ships official integration packages for popular Node.js frameworks. Together they cover HTTP APIs, real-time SSE streaming, DI-first application wiring, and an operator-friendly dashboard.
 
 ## Available Integrations
 
@@ -19,13 +19,13 @@ glide-mq ships official integration packages for popular Node.js frameworks. Eac
 
 ## Common Features
 
-All framework integrations share these capabilities:
+The integrations share the same core queue model, but they expose it in different ways:
 
-- **24 REST endpoints** for job management, queue control, and scheduler CRUD
-- **Server-Sent Events (SSE)** for real-time job lifecycle streaming
-- **Lightweight producers** for serverless environments (no Worker overhead)
-- **Testing mode** with in-memory queues (no Valkey required)
-- **Graceful shutdown** with connection cleanup
+- **Hono, Fastify, and Hapi** expose the full HTTP queue API with SSE, schedulers, flow usage and budget endpoints, queue-wide usage summaries, and broadcast publish/SSE routes.
+- **NestJS** exposes the same core APIs through decorators and DI instead of shipping an HTTP layer.
+- **Dashboard** focuses on monitoring and operations, including queue controls, flow usage and budget views, job streaming, and queue-wide usage summaries.
+- **Testing mode** is available across the API wrappers and NestJS for in-memory development. Broadcast and summary routes still require a live connection.
+- **Graceful shutdown** is built into each integration using the framework's lifecycle hooks or registry helpers.
 
 ## Choosing an Integration
 
@@ -36,7 +36,7 @@ All framework integrations share these capabilities:
 | **NestJS** (enterprise, decorators, DI) | `@glidemq/nestjs` - `@Processor`, `@InjectQueue`, full lifecycle |
 | **Hapi** (enterprise, Joi validation) | `@glidemq/hapi` - Joi schemas, access control, SSE |
 | **Express** (dashboard UI) | `@glidemq/dashboard` - drop-in web dashboard, no build step |
-| **Express/Koa/other** (API only) | Use the core [HTTP Proxy](/guide/serverless#http-proxy) - no integration package needed |
+| **Express/Koa/other** (API only) | Use the core [HTTP Proxy](/examples/serverless#http-proxy) - queue routes, queue events SSE, usage summary, and broadcast over HTTP |
 
 ## Quick Start
 

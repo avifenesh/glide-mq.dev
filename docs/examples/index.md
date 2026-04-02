@@ -44,7 +44,7 @@ Parent-child flows, DAG dependencies, step jobs, and waiting-children patterns.
 |---------|-------------|
 | [core-workflows](./workflows#core-workflows) | FlowProducer trees, chain() pipelines, group() fan-out |
 | [dag-workflows](./workflows#dag-workflows) | Arbitrary DAG dependencies with diamond patterns and cycle detection |
-| [step-job-move-to-delayed](./workflows#step-job-move-to-delayed) | Multi-step resumable state machines using moveToDelayed |
+| [step-job-move-to-delayed](./workflows#step-job-movetodelayed) | Multi-step resumable state machines using moveToDelayed |
 | [move-to-waiting-children](./workflows#move-to-waiting-children) | Parent job suspends until all child jobs complete |
 
 [View all workflow examples &rarr;](./workflows)
@@ -88,7 +88,7 @@ Serverless producers, IAM authentication, HTTP proxy, and cluster mode.
 |---------|-------------|
 | [serverless-producer](./serverless#serverless-producer) | Lightweight Producer and ServerlessPool for Lambda/Edge |
 | [iam-auth](./serverless#iam-auth) | AWS IAM authentication for ElastiCache and MemoryDB |
-| [http-proxy](./serverless#http-proxy) | Cross-language job enqueuing via HTTP proxy |
+| [http-proxy](./serverless#http-proxy) | Cross-language queue access with queue events, usage summary, and broadcast over HTTP |
 | [valkey-cluster](./serverless#valkey-cluster) | Running glide-mq on a Valkey/Redis cluster |
 
 [View all serverless examples &rarr;](./serverless)
@@ -132,7 +132,6 @@ AI-native examples combining usage tracking, streaming, budgets, fallbacks, susp
 | [search-dashboard](./ai-pipelines#search-dashboard) | Valkey Search index with TAG, NUMERIC, and VECTOR fields |
 | [with-vercel-ai-sdk](./ai-pipelines#vercel-ai-sdk) | Vercel AI SDK (generateText/streamText) integration |
 | [with-langchain](./ai-pipelines#langchain) | LangChain chain execution with usage tracking |
-| [testing-mode](./ai-pipelines#testing) | In-memory testing of AI primitives without Valkey |
 | [vector-search](./ai-pipelines#agent-memory) | Semantic similarity search over jobs |
 | [llm](./ai-pipelines#rag-pipeline) | Shared LLM helper module used by all AI examples |
 

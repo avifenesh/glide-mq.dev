@@ -48,6 +48,7 @@ app.listen(3000);
 
 - **Real-time event stream** -- SSE pushes completed, failed, active, waiting, stalled, progress, and removed events to the browser as they happen.
 - **Job inspection** -- view payload, options, logs, progress, return value, and failure reason for any job.
+- **AI observability** -- inspect flow usage, budget state, streaming chunks, and rolling queue-wide usage summaries.
 - **Bulk actions** -- pause, resume, drain, retry all failed, and clean old jobs at the queue level.
 - **Per-job actions** -- retry a failed job, remove a job, or promote a delayed job to waiting.
 - **Workers panel** -- see connected workers and their current status.
@@ -106,6 +107,10 @@ app.use(
 | GET | `/api/queues/:name/dlq` | Dead letter queue jobs |
 | GET | `/api/queues/:name/metrics` | Completed/failed throughput counts |
 | GET | `/api/queues/:name/search` | Search jobs (`?name=`, `?state=`, `?data=`, `?limit=`) |
+| GET | `/api/usage/summary` | Rolling usage totals across all mounted queues or a `?queues=` subset |
+| GET | `/api/queues/:name/flows/:id/usage` | Aggregated token/cost usage across a flow |
+| GET | `/api/queues/:name/flows/:id/budget` | Budget state for a flow |
+| GET | `/api/queues/:name/jobs/:id/stream` | SSE stream of job output chunks |
 
 ### Mutations (guarded by `readOnly` / `authorize`)
 

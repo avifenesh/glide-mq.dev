@@ -1,11 +1,11 @@
 ---
 title: Hono Integration
-description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, edge/serverless producers, and 24 endpoints.
+description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, edge/serverless producers, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hono
 
-REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router -- declare queues, get 24 endpoints with type-safe RPC.
+REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router gives you the full queue management surface with type-safe RPC.
 
 ::: info Package Links
 - **npm:** [@glidemq/hono](https://www.npmjs.com/package/@glidemq/hono)
@@ -17,7 +17,7 @@ REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as
 - **Type-safe RPC client** -- export `GlideMQApiType` and use Hono's `hc<>` for end-to-end typed HTTP calls with zero codegen
 - **Edge and serverless ready** -- lightweight `Producer` re-exports let you enqueue jobs from Cloudflare Workers, Vercel Edge Functions, or Deno Deploy without pulling in full Queue/Worker machinery. Workers and SSE require a long-lived runtime (Node, Bun, Deno).
 - **Multi-runtime** -- Hono runs on Node, Deno, Bun, and edge runtimes; this middleware follows
-- **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you 24 endpoints, SSE events, and scheduler CRUD
+- **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you queue control, SSE events, scheduler CRUD, rolling usage summaries, and broadcast over HTTP
 - **Optional Zod validation** -- install `zod` + `@hono/zod-validator` for request validation; works fine without them
 
 ## Install
@@ -67,7 +67,7 @@ export default app;
 
 `glideMQ(config)` is a Hono middleware that creates a `QueueRegistry` and injects it into every request as `c.var.glideMQ`. Queues and workers are initialized lazily on first access; producers are created eagerly when requested.
 
-`glideMQApi(opts?)` returns a typed Hono sub-router with all 24 REST endpoints. Mount it at any path with `app.route()`. It reads the registry from `c.var.glideMQ` -- the middleware must be applied first.
+`glideMQApi(opts?)` returns a typed Hono sub-router with the full queue HTTP surface. Mount it at any path with `app.route()`. It reads the registry from `c.var.glideMQ` -- the middleware must be applied first.
 
 You can also pass a pre-built `QueueRegistryImpl` for graceful shutdown control:
 
@@ -140,16 +140,25 @@ const job = await res.json(); // typed as JobResponse
 | GET | `/:name/flows/:id/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/:name/jobs/:id/stream` | SSE stream of real-time chunks from a streaming job |
 
+### Global and Broadcast
+
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/usage/summary` | Rolling token/cost summary across one or more queues |
+| POST | `/broadcast/:name` | Publish a broadcast message with a `subject` and payload |
+| GET | `/broadcast/:name/events` | SSE stream for a durable broadcast subscription (`?subscription=` required) |
+
 ## Features
 
-- **24 REST endpoints** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, SSE events, schedulers, producers, and AI-native routes (flow usage, flow budget, job streaming)
+- **Full queue HTTP API** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, queue events, schedulers, producers, flow usage/budget, usage summary, and broadcast routes
 - **Type-safe RPC** -- `hc<GlideMQApiType>` gives end-to-end typed HTTP calls with no codegen
 - **Edge/serverless producers** -- re-exports `Producer`, `ServerlessPool`, and `serverlessPool` from glide-mq for lightweight job enqueuing without worker overhead
 - **Real-time SSE** -- streams `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events via Hono's `streamSSE`
-- **Queue access control** -- restrict which queues and producers are exposed via `GlideMQApiConfig`
+- **Queue access control** -- restrict which queues and producers are exposed via `GlideMQApiConfig`; the queue allowlist also governs broadcast names and `/usage/summary?queues=...`
 - **Optional Zod validation** -- auto-detected at startup; degrades gracefully to manual parsing when not installed
 - **Scheduler CRUD** -- create, read, update, and delete repeatable job schedulers (cron or interval)
 - **Testing mode** -- `createTestApp()` uses in-memory TestQueue/TestWorker, no Valkey required
+- **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters
 
 ## Configuration
 
@@ -227,6 +236,7 @@ app.post('/send-email', async (c) => {
 
 - Graceful shutdown is manual -- call `registry.closeAll()` yourself (Hono has no lifecycle hooks like Fastify's `onClose`)
 - SSE requires a long-lived connection; edge runtimes with short execution limits may not support it
+- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode
 - Producers are not available in testing mode; use queues instead
 - Queue names must match `/^[a-zA-Z0-9_-]{1,128}$/`
 

@@ -163,7 +163,7 @@ export class EventPublisher {
 
 ## AI-Native Features
 
-All of glide-mq's AI primitives are accessible through injected Queue, Worker, and FlowProducer instances: usage tracking (`job.reportUsage()`), token streaming (`job.stream()`, `job.streamChunk()`), suspend/resume (`job.suspend()`, `queue.signal()`), budget caps, fallback chains, dual-axis rate limiting, and vector search. See the [AI-Native guide](/guide/ai-native) for the full API.
+All of glide-mq's AI primitives are accessible through injected Queue, Worker, FlowProducer, Broadcast, and QueueEvents instances: usage tracking (`job.reportUsage()`), token streaming (`job.stream()`, `job.streamChunk()`), suspend/resume (`job.suspend()`, `queue.signal()`), budget caps, fallback chains, dual-axis rate limiting, vector search, and rolling usage summaries via `queue.getUsageSummary()` or `Queue.getUsageSummary(...)`. See the [AI-Native guide](/guide/ai-native) for the full API.
 
 ## Features
 

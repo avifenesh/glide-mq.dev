@@ -1,11 +1,11 @@
 ---
 title: Hapi Integration
-description: REST API and real-time SSE for glide-mq job queues, as a Hapi.js plugin. Two registrations -- declare queues, get 24 endpoints.
+description: REST API and real-time SSE for glide-mq job queues, as a Hapi.js plugin. Joi-validated queue control, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hapi
 
-REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as a Hapi.js plugin. Two registrations -- declare queues, get 24 endpoints.
+REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as a Hapi.js plugin. Two registrations give you the full queue HTTP surface with Joi validation and Hapi lifecycle hooks.
 
 Turns a Hapi v21 server into a queue management gateway. Built for teams that run Hapi in production and need to expose queue operations to dashboards, CLI tools, or other services.
 
@@ -60,7 +60,7 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 
 ## How It Works
 
-`glideMQPlugin` creates a `QueueRegistry`, decorates `server.glidemq` so every route handler can access it, eagerly initializes configured producers, and registers an `onPostStop` hook that closes all queues, workers, and producers on shutdown. `glideMQRoutes` depends on the core plugin and mounts 24 REST endpoints under an optional path prefix. Queue and worker instances are created lazily on first request; producers are created eagerly so connection errors surface at startup.
+`glideMQPlugin` creates a `QueueRegistry`, decorates `server.glidemq` so every route handler can access it, eagerly initializes configured producers, and registers an `onPostStop` hook that closes all queues, workers, and producers on shutdown. `glideMQRoutes` depends on the core plugin and mounts the full queue HTTP surface under an optional path prefix. Queue and worker instances are created lazily on first request; producers are created eagerly so connection errors surface at startup.
 
 ## Endpoints
 
@@ -90,6 +90,9 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 | GET | `/{name}/flows/{id}/usage` | Aggregated token/cost usage across a flow |
 | GET | `/{name}/flows/{id}/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/{name}/jobs/{id}/stream` | SSE stream of real-time chunks from a streaming job |
+| GET | `/usage/summary` | Rolling token/cost summary across one or more queues |
+| POST | `/broadcast/{name}` | Publish a broadcast message with a `subject` and payload |
+| GET | `/broadcast/{name}/events` | SSE stream for a durable broadcast subscription (`?subscription=` required) |
 
 ## Features
 
@@ -99,8 +102,9 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 - **Testing without Valkey** -- `createTestApp` from `@glidemq/hapi/testing` spins up an in-memory server backed by `TestQueue` and `TestWorker`. Use `server.inject()` for assertions with no external dependencies.
 - **Joi validation** -- all request bodies, query parameters, and plugin options are validated with Joi schemas and structured error messages.
 - **Queue access control** -- pass `allowedQueues` or `allowedProducers` arrays in `GlideMQRoutesOptions` to restrict which queues the API exposes. Requests to unlisted queues return 404.
-- **Route prefix** -- set `prefix` in `GlideMQRoutesOptions` to mount all 24 endpoints under a path like `/api/queues`.
+- **Route prefix** -- set `prefix` in `GlideMQRoutesOptions` to mount the HTTP surface under a path like `/api/queues`.
 - **Automatic cleanup** -- the `onPostStop` lifecycle hook closes workers first (to drain in-progress jobs), then queues and producers, using `Promise.allSettled` for reliability.
+- **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters.
 
 ## Configuration
 
@@ -172,6 +176,7 @@ server.route({
 - Requires a running Valkey or Redis instance for production use. Testing mode uses in-memory stubs only.
 - No built-in authentication or authorization. Add Hapi auth strategies or gateway-level controls separately.
 - `addAndWait` (the `POST /{name}/jobs/wait` endpoint) is not available in testing mode because `TestQueue` does not support it.
+- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode.
 - Producers are not supported in testing mode. Use queue-based endpoints for test assertions.
 
 ## Ecosystem

@@ -1,11 +1,11 @@
 ---
 title: Fastify Integration
-description: REST API and real-time SSE for glide-mq job queues, as a Fastify v5 plugin. Two registrations -- declare queues, get 24 endpoints.
+description: REST API and real-time SSE for glide-mq job queues, as a Fastify v5 plugin. Queue control, usage summaries, and broadcast SSE with Fastify lifecycle hooks.
 ---
 
 # @glidemq/fastify
 
-REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as a Fastify v5 plugin. Two registrations -- declare queues, get 24 endpoints.
+REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as a Fastify v5 plugin. Two registrations give you the full queue API plus Fastify-native lifecycle management.
 
 ::: info Package Links
 - **npm:** [@glidemq/fastify](https://www.npmjs.com/package/@glidemq/fastify)
@@ -60,7 +60,7 @@ await app.register(glideMQRoutes, { prefix: '/api/queues' });
 await app.listen({ port: 3000 });
 ```
 
-What happened: `glideMQPlugin` created a `QueueRegistry`, started a worker for `emails`, and decorated the Fastify instance with `app.glidemq`. `glideMQRoutes` mounted 24 REST + SSE endpoints under `/api/queues`. The `onClose` hook will shut down all queues and workers when the process exits.
+What happened: `glideMQPlugin` created a `QueueRegistry`, started a worker for `emails`, and decorated the Fastify instance with `app.glidemq`. `glideMQRoutes` mounted the queue HTTP API and SSE routes under `/api/queues`. The `onClose` hook will shut down all queues and workers when the process exits.
 
 ## How It Works
 
@@ -68,11 +68,11 @@ The package exposes two Fastify plugins that you register separately:
 
 **`glideMQPlugin`** -- Core plugin, wrapped with `fastify-plugin` so it shares the encapsulation context. It creates a `QueueRegistry` that lazily initializes queues and workers on first access, eagerly initializes producers so connection errors surface at startup, and decorates the Fastify instance with `app.glidemq`. An `onClose` hook calls `registry.closeAll()` for graceful shutdown.
 
-**`glideMQRoutes`** -- REST API plugin. Not wrapped with `fastify-plugin`, so it respects Fastify's encapsulation and supports `prefix`. It reads `app.glidemq` from the parent context and mounts all 24 endpoints. You can register it multiple times with different prefixes.
+**`glideMQRoutes`** -- REST API plugin. Not wrapped with `fastify-plugin`, so it respects Fastify's encapsulation and supports `prefix`. It reads `app.glidemq` from the parent context and mounts the full queue HTTP surface. You can register it multiple times with different prefixes.
 
 ## Endpoints
 
-24 endpoints total. All queue routes use `:name` as the queue identifier.
+All queue routes use `:name` as the queue identifier.
 
 ### Jobs
 
@@ -118,16 +118,25 @@ The package exposes two Fastify plugins that you register separately:
 | GET | `/:name/flows/:id/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/:name/jobs/:id/stream` | SSE stream of real-time chunks from a streaming job |
 
+### Global and Broadcast
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/usage/summary` | Rolling token/cost summary across one or more queues |
+| POST | `/broadcast/:name` | Publish a broadcast message with a `subject` and payload |
+| GET | `/broadcast/:name/events` | SSE stream for a durable broadcast subscription (`?subscription=` required) |
+
 ## Features
 
 - **Two-step registration** -- `glideMQPlugin` for state, `glideMQRoutes` for HTTP. Register routes multiple times under different prefixes.
 - **Lazy queue/worker init, eager producer init** -- queues and workers start on first request; producers connect at registration so errors fail fast.
 - **Optional Zod validation** -- install `zod` and all request bodies and query strings are validated with structured error responses. Without Zod, manual validation still rejects bad input.
 - **Real-time SSE** -- `/:name/events` uses `reply.hijack()` and streams `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events directly on `reply.raw`.
-- **Queue access control** -- pass `queues` and `producers` arrays to `glideMQRoutes` to restrict which names are accessible through the API.
+- **Queue access control** -- pass `queues` and `producers` arrays to `glideMQRoutes` to restrict which names are accessible through the API. The queue allowlist also governs broadcast names and `/usage/summary?queues=...`.
 - **Testing mode** -- `createTestApp` builds a Fastify instance with in-memory queues, no Valkey required. Test with `app.inject()`.
 - **Graceful shutdown** -- `onClose` hook calls `registry.closeAll()` using `Promise.allSettled` so one failing close does not block the rest.
 - **Serverless producers** -- lightweight `Producer` endpoints that return only `{ id }`, suitable for Lambda/edge functions that only enqueue work.
+- **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters.
 
 ## Configuration
 
@@ -215,6 +224,7 @@ The registry exposes `get(name)`, `getProducer(name)`, `has(name)`, `names()`, `
 
 - SSE uses `reply.hijack()` to bypass Fastify's response pipeline. This means Fastify hooks like `onSend` do not run for SSE connections.
 - No built-in authentication or rate limiting. Use Fastify hooks or plugins (`@fastify/auth`, `@fastify/rate-limit`) in front of `glideMQRoutes`.
+- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode.
 - Queue names are validated against `/^[a-zA-Z0-9_-]{1,128}$/`. Names outside this pattern are rejected with 400.
 - Scheduler names allow a wider character set (`/^[a-zA-Z0-9_:.-]{1,256}$/`) but are still length-limited.
 

@@ -165,7 +165,7 @@ redis.register_function('glidemq_complete', function(keys, args) ... end)
 ...
 ```
 
-### Functions (37+ in 1 library, not 53 scripts)
+### Functions (44 in 1 library, not 53 scripts)
 
 | Function                         | Keys | Purpose                                                                                 |
 | -------------------------------- | ---- | --------------------------------------------------------------------------------------- |
@@ -590,13 +590,15 @@ Complex workflows with arbitrary dependency graphs are submitted via `FlowProduc
 9. **Server Functions**: Single FUNCTION LOAD, persistent across restarts, no NOSCRIPT cache-miss errors, named calls via FCALL. BullMQ uses ephemeral EVAL/EVALSHA with 53 scripts that must be re-cached on every new connection.
 10. **Vector search**: Built-in Valkey Search integration for KNN similarity search over job hashes. No external vector database needed.
 
-## Implementation Phases
+## Implementation Phases (Historical)
+
+The plan below reflects the original implementation rollout. These phases are complete and kept here as design history.
 
 ### Phase 1: Core (Queue + Worker + Job)
 
 - Connection factory (blocking vs non-blocking clients)
 - Key builder utilities
-- Lua scripts: addJob, promote, complete, fail, reclaimStalled
+- Server Function bodies: addJob, promote, complete, fail, reclaimStalled
 - Queue: add, addBulk, pause, resume, close
 - Worker: XREADGROUP loop, processor, concurrency, stalled recovery
 - Job: data access, progress, state queries

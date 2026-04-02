@@ -56,7 +56,7 @@ serve({ fetch: app.fetch, port: 3000 }, () => {
 
 ## Hono API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. Features 11 REST endpoints, Server-Sent Events for real-time updates, type-safe RPC client, Zod validation, and custom routes with direct queue access via `c.var.glideMQ`.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, type-safe RPC, and direct queue access via `c.var.glideMQ`.
 
 ```typescript
 import { Hono } from 'hono';
@@ -93,7 +93,7 @@ const app = new Hono<GlideMQEnv>();
 // Mount middleware - injects registry into c.var.glideMQ
 app.use(glideMQ(registry));
 
-// Mount REST API (11 endpoints + SSE)
+// Mount queue HTTP API + SSE
 app.route('/api/queues', glideMQApi());
 
 // Custom route using the queue directly
@@ -130,7 +130,7 @@ process.on('SIGTERM', async () => {
 
 ## Fastify API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/fastify`. Features 11 REST endpoints, Server-Sent Events, Zod validation, custom routes with `app.glidemq`, and automatic graceful shutdown via Fastify's `onClose` hook.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/fastify`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `app.glidemq`, and automatic graceful shutdown via Fastify's `onClose` hook.
 
 ```typescript
 import Fastify from 'fastify';
@@ -165,7 +165,7 @@ const app = Fastify({ logger: true });
 // Register core plugin with pre-built registry
 await app.register(glideMQPlugin, registry as any);
 
-// Mount REST API (11 endpoints + SSE)
+// Mount queue HTTP API + SSE
 await app.register(glideMQRoutes, { prefix: '/api/queues' });
 
 // Custom route using the queue directly
@@ -374,7 +374,7 @@ process.on('SIGTERM', async () => {
 
 ## Hapi API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. Features 24 REST endpoints, Server-Sent Events, Zod validation, custom routes with `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
 
 ```typescript
 import Hapi from '@hapi/hapi';
@@ -412,7 +412,7 @@ await server.register({
   options: registry as any,
 });
 
-// Mount REST API (24 endpoints + SSE)
+// Mount queue HTTP API + SSE
 await server.register({
   plugin: glideMQRoutes,
   options: { prefix: '/api/queues' },
