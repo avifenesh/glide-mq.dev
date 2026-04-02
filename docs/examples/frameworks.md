@@ -56,7 +56,7 @@ serve({ fetch: app.fetch, port: 3000 }, () => {
 
 ## Hono API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, type-safe RPC, and direct queue access via `c.var.glideMQ`.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, type-safe RPC, and direct queue access via `c.var.glideMQ`.
 
 ```typescript
 import { Hono } from 'hono';
@@ -130,7 +130,7 @@ process.on('SIGTERM', async () => {
 
 ## Fastify API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/fastify`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `app.glidemq`, and automatic graceful shutdown via Fastify's `onClose` hook.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/fastify`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `app.glidemq`, and automatic graceful shutdown via Fastify's `onClose` hook.
 
 ```typescript
 import Fastify from 'fastify';
@@ -374,7 +374,7 @@ process.on('SIGTERM', async () => {
 
 ## Hapi API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. The wrapper exposes queue control, schedulers, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
 
 ```typescript
 import Hapi from '@hapi/hapi';

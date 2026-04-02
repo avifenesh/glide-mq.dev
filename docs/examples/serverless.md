@@ -236,7 +236,7 @@ console.log('Done.');
 
 ## HTTP Proxy
 
-Cross-language queue access via the glide-mq HTTP proxy. Any HTTP client (Python, Go, Ruby, curl) can enqueue jobs, subscribe to queue events, query rolling usage summaries, and publish or consume broadcasts through a simple REST API. The proxy is an Express app that maps HTTP requests to queue operations.
+Cross-language queue access via the glide-mq HTTP proxy. Any HTTP client (Python, Go, Ruby, curl) can enqueue jobs, create flows, subscribe to queue events, query rolling usage summaries, and publish or consume broadcasts through a simple REST API. The proxy is an Express app that maps HTTP requests to queue operations. Use `{ flow, budget? }` for tree flows or `{ dag }` for DAGs; HTTP-submitted budgets are currently supported for tree flows only.
 
 ```typescript
 import { createProxyServer } from 'glide-mq/proxy';
@@ -251,6 +251,12 @@ type SseEvent = {
   data: unknown;
   event: string;
   id?: string;
+};
+
+type FlowCreateResponse = {
+  flowId: string;
+  kind: 'dag' | 'tree';
+  nodeCount: number;
 };
 
 async function readFirstSseEvent(path: string, timeoutMs = 5_000): Promise<SseEvent> {
@@ -341,8 +347,8 @@ async function readFirstSseEvent(path: string, timeoutMs = 5_000): Promise<SseEv
 
 // --- 1. Start the HTTP proxy ---
 // createProxyServer returns an Express app that maps HTTP requests to queue ops.
-// Any language that can make HTTP calls can enqueue jobs, read usage summaries,
-// subscribe to queue events, and publish/consume broadcasts.
+// Any language that can make HTTP calls can enqueue jobs, create flows, read
+// usage summaries, subscribe to queue events, and publish/consume broadcasts.
 // NOTE: Add authentication middleware (API key, JWT) before production use.
 
 const proxy = createProxyServer({
@@ -357,6 +363,10 @@ const server = await new Promise<ReturnType<typeof proxy.app.listen>>((resolve) 
     console.log('  POST   /queues/:name/jobs        - add a job');
     console.log('  POST   /queues/:name/jobs/bulk   - add jobs in bulk');
     console.log('  GET    /queues/:name/events      - queue lifecycle SSE');
+    console.log('  POST   /flows                    - create a tree flow or DAG');
+    console.log('  GET    /flows/:id                - inspect a flow snapshot');
+    console.log('  GET    /flows/:id/tree           - inspect the nested flow tree');
+    console.log('  DELETE /flows/:id                - revoke remaining jobs in a flow');
     console.log('  GET    /usage/summary            - rolling usage summary');
     console.log('  POST   /broadcast/:name          - publish a broadcast message');
     console.log('  GET    /broadcast/:name/events   - durable broadcast SSE');
@@ -391,18 +401,25 @@ orderWorker.on('error', (err) => console.error('[order] Error:', err));
 
 // --- 3. Demo: enqueue via HTTP (simulating a Python/Go/Ruby client) ---
 
-async function httpPost(path: string, body: unknown): Promise<unknown> {
+async function httpPost<T = unknown>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`http://localhost:${PORT}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return res.json();
+  return res.json() as Promise<T>;
 }
 
-async function httpGet(path: string): Promise<unknown> {
+async function httpGet<T = unknown>(path: string): Promise<T> {
   const res = await fetch(`http://localhost:${PORT}${path}`);
-  return res.json();
+  return res.json() as Promise<T>;
+}
+
+async function httpDelete<T = unknown>(path: string): Promise<T> {
+  const res = await fetch(`http://localhost:${PORT}${path}`, {
+    method: 'DELETE',
+  });
+  return res.json() as Promise<T>;
 }
 
 const emailQueueEventPromise = readFirstSseEvent('/queues/emails/events');
@@ -425,8 +442,36 @@ const bulkResult = await httpPost('/queues/orders/jobs/bulk', {
 });
 console.log('POST /queues/orders/jobs/bulk:', bulkResult);
 
+const flowCreate = await httpPost<FlowCreateResponse>('/flows', {
+  budget: { maxTotalTokens: 500, onExceeded: 'pause' },
+  flow: {
+    children: [
+      {
+        data: { subject: 'Order received', to: 'alice@example.com' },
+        name: 'send-confirmation',
+        queueName: 'emails',
+      },
+      {
+        data: { subject: 'Invoice available', to: 'alice@example.com' },
+        name: 'send-invoice',
+        queueName: 'emails',
+      },
+    ],
+    data: { amount: 149.99, orderId: 'ORD-900' },
+    name: 'fulfill-order',
+    queueName: 'orders',
+  },
+});
+console.log('POST /flows:', flowCreate);
+
 // Wait for processing
 await setTimeout(500);
+
+const flowSnapshot = await httpGet(`/flows/${flowCreate.flowId}`);
+console.log(`GET /flows/${flowCreate.flowId}:`, flowSnapshot);
+
+const flowTree = await httpGet(`/flows/${flowCreate.flowId}/tree`);
+console.log(`GET /flows/${flowCreate.flowId}/tree:`, flowTree);
 
 const usageSummary = await httpGet('/usage/summary?queues=emails&windowMs=60000');
 console.log('\nGET /usage/summary?queues=emails&windowMs=60000:', usageSummary);
@@ -450,6 +495,9 @@ console.log('\nGET /queues/emails/counts:', emailCounts);
 
 const orderCounts = await httpGet('/queues/orders/counts');
 console.log('GET /queues/orders/counts:', orderCounts);
+
+const flowDelete = await httpDelete(`/flows/${flowCreate.flowId}`);
+console.log(`DELETE /flows/${flowCreate.flowId}:`, flowDelete);
 
 // Health check
 const health = await httpGet('/health');

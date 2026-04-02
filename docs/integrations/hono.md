@@ -1,6 +1,6 @@
 ---
 title: Hono Integration
-description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, edge/serverless producers, usage summaries, and broadcast SSE.
+description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, flow orchestration, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hono
@@ -17,7 +17,7 @@ REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as
 - **Type-safe RPC client** -- export `GlideMQApiType` and use Hono's `hc<>` for end-to-end typed HTTP calls with zero codegen
 - **Edge and serverless ready** -- lightweight `Producer` re-exports let you enqueue jobs from Cloudflare Workers, Vercel Edge Functions, or Deno Deploy without pulling in full Queue/Worker machinery. Workers and SSE require a long-lived runtime (Node, Bun, Deno).
 - **Multi-runtime** -- Hono runs on Node, Deno, Bun, and edge runtimes; this middleware follows
-- **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you queue control, SSE events, scheduler CRUD, rolling usage summaries, and broadcast over HTTP
+- **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you queue control, SSE events, scheduler CRUD, flow orchestration, rolling usage summaries, and broadcast over HTTP
 - **Optional Zod validation** -- install `zod` + `@hono/zod-validator` for request validation; works fine without them
 
 ## Install
@@ -136,6 +136,10 @@ const job = await res.json(); // typed as JobResponse
 
 | Method | Route | Description |
 |--------|-------|-------------|
+| POST | `/flows` | Create a tree flow or DAG over HTTP with `{ flow, budget? }` or `{ dag }` |
+| GET | `/flows/:id` | Inspect a flow snapshot with nodes, roots, counts, usage, and budget |
+| GET | `/flows/:id/tree` | Inspect the nested tree view for a submitted tree flow or DAG |
+| DELETE | `/flows/:id` | Revoke or flag remaining jobs in a flow and delete the HTTP flow record |
 | GET | `/:name/flows/:id/usage` | Aggregated token/cost usage across a flow |
 | GET | `/:name/flows/:id/budget` | Budget state (limits, spent, exceeded) for a flow |
 | GET | `/:name/jobs/:id/stream` | SSE stream of real-time chunks from a streaming job |
@@ -150,7 +154,7 @@ const job = await res.json(); // typed as JobResponse
 
 ## Features
 
-- **Full queue HTTP API** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, queue events, schedulers, producers, flow usage/budget, usage summary, and broadcast routes
+- **Full queue HTTP API** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, queue events, schedulers, producers, flow create/read/tree/delete, flow usage/budget, usage summary, and broadcast routes
 - **Type-safe RPC** -- `hc<GlideMQApiType>` gives end-to-end typed HTTP calls with no codegen
 - **Edge/serverless producers** -- re-exports `Producer`, `ServerlessPool`, and `serverlessPool` from glide-mq for lightweight job enqueuing without worker overhead
 - **Real-time SSE** -- streams `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events via Hono's `streamSSE`
@@ -159,6 +163,7 @@ const job = await res.json(); // typed as JobResponse
 - **Scheduler CRUD** -- create, read, update, and delete repeatable job schedulers (cron or interval)
 - **Testing mode** -- `createTestApp()` uses in-memory TestQueue/TestWorker, no Valkey required
 - **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters
+- **Flow orchestration over HTTP** -- create tree flows or DAGs from any HTTP client, then inspect them as flat snapshots or nested trees
 
 ## Configuration
 
@@ -236,7 +241,8 @@ app.post('/send-email', async (c) => {
 
 - Graceful shutdown is manual -- call `registry.closeAll()` yourself (Hono has no lifecycle hooks like Fastify's `onClose`)
 - SSE requires a long-lived connection; edge runtimes with short execution limits may not support it
-- `/usage/summary` and `/broadcast/*` require a live connection and are unavailable in testing mode
+- `POST /flows` accepts tree flow payloads with optional budgets and DAG payloads without budgets. HTTP-submitted budgets are currently supported for tree flows only.
+- `/flows*`, `/usage/summary`, and `/broadcast/*` require a live connection and are unavailable in testing mode
 - Producers are not available in testing mode; use queues instead
 - Queue names must match `/^[a-zA-Z0-9_-]{1,128}$/`
 

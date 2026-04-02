@@ -7,7 +7,7 @@ description: NestJS module for glide-mq -- decorators, dependency injection, and
 
 NestJS module for [glide-mq](/guide/getting-started) -- decorators, dependency injection, and lifecycle management for queues, workers, and broadcast.
 
-Register queues and processors with decorators, inject them through the standard NestJS DI container, and let the module handle worker creation, event wiring, and graceful shutdown automatically. Pure DI module -- no HTTP routes, just decorators and providers.
+Register queues and processors with decorators, inject them through the standard NestJS DI container, and let the module handle worker creation, event wiring, and graceful shutdown automatically. Pure DI module -- no HTTP routes, just decorators and providers. If you need `/flows` over HTTP for cross-language clients, use the core proxy or one of the HTTP wrappers.
 
 ::: info Package Links
 - **npm:** [@glidemq/nestjs](https://www.npmjs.com/package/@glidemq/nestjs)
@@ -164,6 +164,8 @@ export class EventPublisher {
 ## AI-Native Features
 
 All of glide-mq's AI primitives are accessible through injected Queue, Worker, FlowProducer, Broadcast, and QueueEvents instances: usage tracking (`job.reportUsage()`), token streaming (`job.stream()`, `job.streamChunk()`), suspend/resume (`job.suspend()`, `queue.signal()`), budget caps, fallback chains, dual-axis rate limiting, vector search, and rolling usage summaries via `queue.getUsageSummary()` or `Queue.getUsageSummary(...)`. See the [AI-Native guide](/guide/ai-native) for the full API.
+
+For cross-language flow orchestration over HTTP (`POST /flows`, `GET /flows/:id`, `GET /flows/:id/tree`, `DELETE /flows/:id`), use the core proxy or the Hono/Fastify/Hapi integrations. NestJS keeps flow orchestration programmatic through injected `FlowProducer` instances.
 
 ## Features
 
