@@ -631,6 +631,8 @@ await queue.add('search', { query: 'hello' }, {
 
 `queue.add()` returns `null` when a job is skipped by deduplication.
 
+`debounce` can be combined with `ordering.key`. When debounce cancels a pending ordered job, the replacement takes a fresh sequence position and is processed in the order it was re-added.
+
 ---
 
 ## Global Concurrency
