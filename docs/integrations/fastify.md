@@ -32,7 +32,7 @@ Optional -- install `zod` for request validation (falls back to manual checks ot
 npm install zod
 ```
 
-Requires **glide-mq >= 0.14.0**.
+Requires **glide-mq >= 0.15.2**.
 
 ## Quick Start
 
