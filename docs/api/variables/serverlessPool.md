@@ -4,6 +4,6 @@
 const serverlessPool: ServerlessPool;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:78](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/serverless-pool.ts#L78)
+Defined in: [glide-mq/src/serverless-pool.ts:122](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/serverless-pool.ts#L122)
 
 Module-level singleton for convenient use in serverless handlers.

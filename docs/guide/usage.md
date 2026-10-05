@@ -9,12 +9,21 @@ description: Queue and Worker basics, graceful shutdown, cluster mode, serialize
 
 - [Queue](#queue)
 - [Worker](#worker)
-- [AI-Native Job Methods](#ai-native-job-methods)
 - [Graceful Shutdown](#graceful-shutdown)
 - [Cluster Mode](#cluster-mode)
 - [Pluggable Serializers](#pluggable-serializers)
 - [Broadcast / BroadcastWorker](#broadcast--broadcastworker)
 - [Event Listeners](#event-listeners)
+- [AI-native Primitives](#ai-native-primitives)
+  - [Job Metadata (reportUsage / getFlowUsage / getUsageSummary)](#job-metadata-reportusage--getflowusage--getusagesummary)
+  - [Job Streaming Channel (stream / readStream)](#job-streaming-channel-stream--readstream)
+  - [Suspend/Resume with Signals](#suspendresume-with-signals)
+  - [Fallback Chains](#fallback-chains)
+  - [Budget Middleware](#budget-middleware-flow-level-tokencost-caps)
+  - [Dual-axis Rate Limiting (RPM + TPM)](#dual-axis-rate-limiting-rpm--tpm)
+  - [Per-job Lock Duration](#per-job-lock-duration)
+  - [Vector Search](#vector-search-createjobindex--storevector--vectorsearch)
+  - [Proxy Endpoints](#proxy-endpoints)
 
 ---
 
@@ -41,7 +50,7 @@ await queue.add(
   { to: 'user@example.com' },
   {
     delay: 5_000, // run after 5 s
-    priority: 1, // lower = higher priority (default: 0)
+    priority: 1, // 1 = highest, up to 2048; 0 (default) = no priority, runs after prioritized jobs
     attempts: 3, // run at most 3 times total (initial + 2 retries)
     backoff: { type: 'exponential', delay: 1_000 },
     timeout: 30_000, // fail job if processor exceeds 30 s
@@ -50,7 +59,7 @@ await queue.add(
   },
 );
 
-// Bulk add — 12.7× faster than serial via GLIDE Batch API
+// Bulk add  -  12.7× faster than serial via GLIDE Batch API
 await queue.addBulk([
   { name: 'job1', data: { a: 1 } },
   { name: 'job2', data: { a: 2 } },
@@ -65,7 +74,7 @@ Add `lifo: true` so the newest jobs are processed first. LIFO jobs are stored in
 await queue.add('urgent-report', data, { lifo: true });
 ```
 
-Processing order: **priority > LIFO > FIFO**. Priority jobs are always consumed first, then LIFO, then the normal FIFO stream. `lifo` cannot be combined with `ordering` keys - they are mutually exclusive.
+Processing order: **priority > LIFO > FIFO**. Priority jobs are always consumed first, then LIFO, then the normal FIFO stream. `lifo` cannot be combined with `ordering` keys  -  they are mutually exclusive.
 
 #### Job TTL
 
@@ -138,9 +147,11 @@ await queue.drain(); // remove waiting jobs only
 await queue.drain(true); // also remove delayed/scheduled jobs
 
 // Remove ALL queue data from Valkey
-await queue.obliterate(); // fails if there are active jobs
+await queue.obliterate(); // fails if there are active jobs (stream or priority/LIFO)
 await queue.obliterate({ force: true }); // unconditional wipe
 ```
+
+The active-job check counts both the stream's pending entries and active priority/LIFO claims.
 
 ### Cleaning old jobs
 
@@ -156,9 +167,9 @@ const removedFailedIds = await queue.clean(60_000 * 60 * 24, 500, 'failed');
 console.log(`Cleaned ${removedIds.length} completed jobs`);
 ```
 
-- `grace` - minimum age in milliseconds; jobs finished more recently are kept.
-- `limit` - maximum number of jobs to remove per call.
-- `type` - `'completed'` or `'failed'`.
+- `grace`  -  minimum age in milliseconds; jobs finished more recently are kept.
+- `limit`  -  maximum number of jobs to remove per call.
+- `type`  -  `'completed'` or `'failed'`.
 
 Returns an array of the removed job IDs.
 
@@ -203,10 +214,10 @@ const worker = new Worker(
     connection,
     concurrency: 10, // process up to 10 jobs in parallel (default: 1)
     blockTimeout: 5_000, // XREADGROUP BLOCK timeout in ms
-    stalledInterval: 30_000, // how often to check for stalled jobs
-    lockDuration: 30_000, // stall detection window per job
+    stalledInterval: 30_000, // how often the scheduler checks for stalled jobs (cadence)
+    lockDuration: 30_000, // stall detection window per job (threshold) - jobs idle this long are reclaimed
     limiter: { max: 100, duration: 60_000 }, // rate limit: 100 jobs / min
-    deadLetterQueue: { name: 'dlq' }, // route permanently-failed jobs here
+    deadLetterQueue: { name: 'dlq' }, // inherited from QueueOptions - can also set on Queue constructor
     backoffStrategies: {
       // custom strategy called as: custom(attemptsMade, err) => delayMs
       custom: (attemptsMade) => attemptsMade * 2_000,
@@ -234,12 +245,12 @@ worker.on('error', (err) => {
   console.error('Worker error', err);
 });
 
-worker.on('stalled', (jobId) => {
-  console.warn(`Job ${jobId} stalled and was re-queued`);
+worker.on('stalled', (jobId, prev) => {
+  console.warn(`Job ${jobId} stalled (was ${prev}) and was re-queued`);
 });
 
 worker.on('drained', () => {
-  console.log('Queue is empty — no more jobs waiting');
+  console.log('Queue is empty  -  no more jobs waiting');
 });
 ```
 
@@ -249,10 +260,12 @@ worker.on('drained', () => {
 | `completed` | `(job, result)` | Fired when a job finishes successfully          |
 | `failed`    | `(job, err)`    | Fired when a job throws or times out            |
 | `error`     | `(err)`         | Internal worker error (connection issues, etc.) |
-| `stalled`   | `(jobId)`       | Job exceeded lock duration and was re-queued    |
+| `stalled`   | `(jobId, prev)` | Job exceeded lock duration and was re-queued    |
 | `drained`   | `()`            | Queue transitioned from non-empty to empty      |
 | `closing`   | `()`            | Worker is beginning to close                    |
 | `closed`    | `()`            | Worker has fully closed                         |
+
+A worker emits `stalled` for each job its own stalled check returned to waiting (`prev` is `'active'`). A job past `maxStalledCount` is failed instead and gets no `stalled`. Every stalled recovery also writes a `stalled` event to the events stream, so `QueueEvents` (`events.on('stalled', ({ jobId }) => ...)`) sees stalls found by any worker.
 
 ### Pausing / closing a worker
 
@@ -261,15 +274,15 @@ await worker.pause(); // stop accepting new jobs (active ones finish)
 await worker.pause(true); // force-stop immediately
 await worker.resume();
 
-await worker.close(); // graceful: waits for active jobs to finish
-await worker.close(true); // force-close immediately
+await worker.close(); // graceful: waits for active jobs and the in-flight blocking read (up to blockTimeout)
+await worker.close(true); // force-close now: aborts job.abortSignal, running jobs are left for stalled recovery
 ```
 
 ---
 
 ## Graceful Shutdown
 
-`gracefulShutdown` registers `SIGTERM`/`SIGINT` handlers and resolves once all passed components have closed.
+`gracefulShutdown` registers `SIGTERM`/`SIGINT` handlers and resolves once all passed components have closed. A second signal while shutdown is still running removes the handlers and re-raises the signal, so a hung close cannot block exit.
 
 ```typescript
 import { Queue, Worker, QueueEvents, gracefulShutdown } from 'glide-mq';
@@ -288,7 +301,7 @@ Pass any mix of `Queue`, `Worker`, and `QueueEvents` instances. Each receives a 
 
 ## Cluster Mode
 
-Set `clusterMode: true` in the connection config. Everything else is the same - keys are hash-tagged automatically.
+Set `clusterMode: true` in the connection config. Everything else is the same  -  keys are hash-tagged automatically.
 
 ```typescript
 import { Queue, Worker } from 'glide-mq';
@@ -347,7 +360,7 @@ const queue = new Queue('tasks', { connection, serializer: base64Serializer });
 const worker = new Worker('tasks', processor, { connection, serializer: base64Serializer });
 ```
 
-Both `Queue` and `Worker` (and `FlowProducer`, if used) **must use the same serializer**. A mismatch causes silent data corruption - the consumer sees `{}` and the job's `deserializationFailed` flag is set to `true`.
+Both `Queue` and `Worker` (and `FlowProducer`, if used) **must use the same serializer**. A mismatch causes silent data corruption  -  the consumer sees `{}` and the job's `deserializationFailed` flag is set to `true`.
 
 `JSON_SERIALIZER` is the default and is exported for convenience (e.g., when you only need a custom serializer on a subset of queues).
 
@@ -382,18 +395,18 @@ const emailWorker = new BroadcastWorker(
   { connection, subscription: 'email-service' },
 );
 
-// Publish — every subscriber receives this message
-await broadcast.publish({ event: 'order.placed', orderId: 42 });
+// Publish  -  every subscriber receives this message
+await broadcast.publish('order.placed', { event: 'order.placed', orderId: 42 });
 ```
 
 ### BroadcastWorker options
 
 Each `BroadcastWorker` supports the same options as `Worker` (concurrency, limiter, backoff, etc.) plus:
 
-- `subscription` (required) - unique name for this subscriber. Becomes the consumer group.
-- `startFrom` - stream ID to start reading from when the subscription is first created:
-  - `'$'` (default) - only new messages published after subscription creation.
-  - `'0-0'` - replay all retained history (backfill).
+- `subscription` (required)  -  unique name for this subscriber. Becomes the consumer group.
+- `startFrom`  -  stream ID to start reading from when the subscription is first created:
+  - `'$'` (default)  -  only new messages published after subscription creation.
+  - `'0-0'`  -  replay all retained history (backfill).
 
 ```typescript
 const replayWorker = new BroadcastWorker('events', processor, {
@@ -406,14 +419,14 @@ const replayWorker = new BroadcastWorker('events', processor, {
 
 ### Queue vs Broadcast
 
-|                 | Queue                         | Broadcast                         |
-| --------------- | ----------------------------- | --------------------------------- |
-| Delivery        | Point-to-point (one consumer) | Fan-out (all subscribers)         |
-| Use case        | Task processing, job queues   | Event distribution, notifications |
-| Add / Publish   | `queue.add(name, data, opts)` | `broadcast.publish(data, opts?)`  |
-| Consumer        | `Worker`                      | `BroadcastWorker`                 |
-| Retry / backoff | Per job                       | Per subscriber, per message       |
-| Stream trimming | Auto (completion/removal)     | `maxMessages` option              |
+|                 | Queue                         | Broadcast                                 |
+| --------------- | ----------------------------- | ----------------------------------------- |
+| Delivery        | Point-to-point (one consumer) | Fan-out (all subscribers)                 |
+| Use case        | Task processing, job queues   | Event distribution, notifications         |
+| Add / Publish   | `queue.add(name, data, opts)` | `broadcast.publish(subject, data, opts?)` |
+| Consumer        | `Worker`                      | `BroadcastWorker`                         |
+| Retry / backoff | Per job                       | Per subscriber, per message               |
+| Stream trimming | Auto (completion/removal)     | `maxMessages` option                      |
 
 ---
 
@@ -430,13 +443,13 @@ const queue = new Queue('tasks', { connection, events: false });
 // Producer - same option
 const producer = new Producer('tasks', { connection, events: false });
 
-// Worker - skip XADD 'completed'/'failed' events on process
+// Worker - skip XADD 'completed'/'failed'/'retrying' events on process
 const worker = new Worker('tasks', handler, { connection, events: false });
 ```
 
-This only affects the Valkey events stream. TS-side `EventEmitter` events (`worker.on('completed', ...)`) are unaffected.
+With `metrics: false` a worker also skips the completed and failed metrics. Stalled recovery and delayed-job promotion still write their events (`stalled`, `promoted`). This only affects the Valkey events stream. TS-side `EventEmitter` events (`worker.on('completed', ...)`) are unaffected.
 
-### `QueueEvents` - stream-based lifecycle events
+### `QueueEvents`  -  stream-based lifecycle events
 
 `QueueEvents` subscribes to the queue's events stream via `XREAD BLOCK`, giving you real-time job lifecycle events without polling.
 
@@ -476,7 +489,7 @@ console.log(result);
 
 Notes:
 
-- `waitTimeout` is the producer-side wait budget. It is separate from the job's own `timeout`, which still controls processor execution time.
+- `waitTimeout` is the producer-side wait budget. It is separate from the job’s own `timeout`, which still controls processor execution time.
 - `addAndWait()` requires a real `connection` because it uses a dedicated blocking connection to wait on the queue events stream.
 - `addAndWait()` is a short-lived request-reply helper. Each in-flight call owns its own blocking wait connection.
 - If `add()` is deduplicated and returns `null`, `addAndWait()` rejects instead of hanging.
@@ -509,7 +522,7 @@ const worker = new Worker(
 Options:
 
 - `batch.size` - maximum number of jobs to collect before invoking the processor (1-1000).
-- `batch.timeout` - maximum time in ms to wait for additional jobs after a partial batch is received. When omitted, processes whatever is available immediately.
+- `batch.timeout` - maximum time in ms to wait for additional jobs after a partial batch is received. When omitted, processes whatever is available immediately. The wait never claims past the worker's budget: a batch holds at most `min(batch.size, prefetch - jobs in flight)` jobs, so at most `concurrency * batch.size` jobs run at once, and a `prefetch` below `batch.size` caps every batch at `prefetch`.
 
 **Partial failures** - throw `BatchError` to report per-job outcomes:
 
@@ -535,21 +548,25 @@ Each job is individually completed or failed based on its corresponding entry in
 Use `job.moveToDelayed(timestampMs, nextStep?)` inside a processor when the same logical job should sleep and resume later instead of completing.
 
 ```typescript
-const worker = new Worker('drip-campaign', async (job) => {
-  switch (job.data.step) {
-    case 'send':
-      await sendEmail(job.data);
-      return job.moveToDelayed(Date.now() + 24 * 3600_000, 'check');
-    case 'check':
-      if (!(await checkOpened(job.data))) {
-        return job.moveToDelayed(Date.now() + 3600_000, 'followup');
-      }
-      return 'done';
-    case 'followup':
-      await sendFollowUp(job.data);
-      return 'done';
-  }
-});
+const worker = new Worker(
+  'drip-campaign',
+  async (job) => {
+    switch (job.data.step) {
+      case 'send':
+        await sendEmail(job.data);
+        return job.moveToDelayed(Date.now() + 24 * 3600_000, 'check');
+      case 'check':
+        if (!(await checkOpened(job.data))) {
+          return job.moveToDelayed(Date.now() + 3600_000, 'followup');
+        }
+        return 'done';
+      case 'followup':
+        await sendFollowUp(job.data);
+        return 'done';
+    }
+  },
+  { connection },
+);
 ```
 
 Notes:
@@ -577,7 +594,10 @@ const parentWorker = new Worker(
       await childQueue.add('chunk-2', { chunk: 2 }, { parent: { queue: 'orchestrator', id: job.id } });
       await childQueue.close();
 
-      // Pause — throws WaitingChildrenError internally
+      // Advance the step first, or the re-run spawns the children again
+      await job.updateData({ ...job.data, step: 'collect' });
+
+      // Pause  -  throws WaitingChildrenError internally
       await job.moveToWaitingChildren();
     }
 
@@ -589,7 +609,7 @@ const parentWorker = new Worker(
 );
 ```
 
-`moveToWaitingChildren()` throws `WaitingChildrenError` to signal the worker. If all children have already completed by the time the call is made, the job transitions directly back to active.
+`moveToWaitingChildren()` throws `WaitingChildrenError` to signal the worker. The processor re-runs from the top when the children finish, with the data saved by `updateData()`. If all children have already completed by the time the call is made, the job goes straight back to waiting and runs again.
 
 ### UnrecoverableError
 
@@ -613,78 +633,307 @@ const worker = new Worker(
 
 The job is marked as permanently failed regardless of the `attempts` configuration. This is equivalent to calling `job.discard()` and then throwing, but more explicit.
 
----
+## AI-native Primitives
 
-## AI-Native Job Methods
+glide-mq ships 7 AI-native primitives plus vector search. They work in both production (Valkey) and testing mode (in-memory).
 
-glide-mq includes job-level methods for AI workloads. These are available on every `Job` instance inside a processor. For the full guide, see [AI-Native Features](./ai-native).
+### Job Metadata (reportUsage / getFlowUsage / getUsageSummary)
 
-### `job.reportUsage(usage)`
-
-Record model, tokens, cost, and latency metadata. Persists to the job hash and emits a `usage` event.
+Track token usage, cost, and latency per job for cost attribution and observability.
 
 ```typescript
-await job.reportUsage({
-  model: 'gpt-5.4',
-  provider: 'openai',
-  tokens: { input: 150, output: 45 },
-  costs: { total: 0.002 },
-  latencyMs: 1200,
-});
+import { Worker, Queue } from 'glide-mq';
+
+const worker = new Worker(
+  'llm-tasks',
+  async (job) => {
+    const result = await callLLM(job.data.prompt);
+
+    await job.reportUsage({
+      model: 'gpt-5.4',
+      provider: 'openai',
+      tokens: { input: result.usage.prompt_tokens, output: result.usage.completion_tokens },
+      costs: { total: result.usage.total_cost },
+      latencyMs: result.latencyMs,
+    });
+
+    return result.text;
+  },
+  { connection },
+);
+
+// Aggregate usage for a job flow (parent + all children)
+const usage = await queue.getFlowUsage(parentJobId);
+console.log(usage.totalTokens, usage.totalCost);
+
+// Aggregate rolling usage across queues for the last hour (default window)
+const summary = await queue.getUsageSummary({ queues: ['llm-tasks', 'embeddings'] });
+console.log(summary.totalTokens, summary.perQueue['llm-tasks']?.models);
 ```
 
-### `job.reportTokens(count)`
+`reportUsage()` persists usage to the job hash in Valkey. `job.usage` is populated when the job is fetched via `getJob()`. `getFlowUsage()` walks the job tree downward from the parent and sums all fields. `getUsageSummary()` reads rolling per-minute buckets, so it can summarize total tokens, cost, model counts, and per-queue breakdowns without scanning job hashes.
 
-Report tokens consumed for TPM (tokens-per-minute) rate limiting. The worker reads this value after completion and increments the TPM counter.
+### Job Streaming Channel (stream / readStream)
+
+Stream incremental output from a processor - useful for LLM token-by-token output or progress chunks.
 
 ```typescript
-await job.reportTokens(195);
+import { Worker, Queue } from 'glide-mq';
+
+// Producer side: emit chunks from inside the processor
+const worker = new Worker(
+  'llm-stream',
+  async (job) => {
+    for await (const chunk of callLLMStreaming(job.data.prompt)) {
+      await job.stream({ token: chunk.text });
+    }
+    return 'done';
+  },
+  { connection },
+);
+
+// Consumer side: read back all chunks after completion
+const entries = await queue.readStream(jobId);
+// entries: [{ id: '1-0', fields: { token: 'Hello' } }, ...]
+
+// Resume from a known position
+const more = await queue.readStream(jobId, { lastId: entries[entries.length - 1].id });
 ```
 
-### `job.stream(chunk)`
-
-Append a chunk to a per-job streaming channel (Valkey stream). Returns the stream entry ID.
+**Typed streaming convenience** - `job.streamChunk(type, content?)` wraps `stream()` with `{ type, content }` fields, matching the common pattern for LLM reasoning and content chunks:
 
 ```typescript
-await job.stream({ t: 'Hello' });
-await job.stream({ t: ' world' });
-await job.stream({ t: '', done: '1' });
+await job.streamChunk('reasoning', 'Let me think about this...');
+await job.streamChunk('content', 'The answer is 42.');
+await job.streamChunk('done');
 ```
 
-### `job.suspend(opts?)`
+**SSE endpoint** (proxy): `GET /queues/:name/jobs/:id/stream` streams chunks as Server-Sent Events while the job is active, then drains remaining chunks and closes. Supports the `Last-Event-ID` header and `?lastId` query param for resume.
 
-Pause the job for an external signal (human-in-the-loop). Throws `SuspendError` internally.
+Stream keys are automatically cleaned up when a job is removed via `job.remove()`, `queue.clean()`, or `queue.drain()`.
+
+**Testing mode**: `TestJob.stream()` and `TestQueue.readStream()` provide full parity with no Valkey dependency.
+
+### Suspend/Resume with Signals
+
+Suspend a job mid-processor and resume it later via an external signal. Designed for human-in-the-loop workflows: approval gates, webhook callbacks, or any pattern where a job must pause and wait for external input.
 
 ```typescript
-await job.suspend({
-  reason: 'awaiting-review',
-  timeout: 3600_000,  // auto-fail after 1 hour
-});
+import { Worker, Queue, SuspendError } from 'glide-mq';
+
+const worker = new Worker(
+  'approvals',
+  async (job) => {
+    if (job.data.step === 'process') {
+      // Start work...
+      const draft = await generateDraft(job.data);
+
+      // Suspend and wait for human approval
+      await job.suspend({
+        reason: 'awaiting-approval',
+        timeout: 86_400_000, // fail after 24 h if no signal arrives
+        onResume: async (signals) => {
+          // Called on the same worker instance when the job is re-queued (best-effort)
+          const approval = signals[0];
+          if (approval.name === 'approve') {
+            return await publishDraft(draft, approval.data);
+          }
+          throw new Error('Draft rejected');
+        },
+      });
+    }
+    // Fallback path if onResume is not used (job re-enters processor normally)
+    return await publishDraft(job.data);
+  },
+  { connection },
+);
+
+// From outside (e.g., a webhook handler) - send the signal:
+const resumed = await queue.signal(jobId, 'approve', { reviewer: 'alice' });
+// resumed: true if the job was in suspended state and has been re-queued
 ```
 
-### `job.storeVector(field, embedding)`
+#### How it works
 
-Store a vector embedding on the job hash for Valkey Search indexing.
+1. `job.suspend(opts?)` stores a suspend request and throws `SuspendError`. The worker catches it, calls `glidemq_suspend` (FCALL), and moves the job to the `suspended` sorted set.
+2. `queue.signal(jobId, name, data?)` calls `glidemq_signal` (FCALL). The signal is appended to the job and the job is re-queued into the stream with state `waiting`.
+3. When the job is re-dispatched, the worker checks for a registered `onResume` continuation. If present (same worker instance), it is called with `signals[]` instead of the main processor. Otherwise, the main processor runs and reads `job.signals`.
+4. If `timeout` is set, glide-mq stores the deadline in the `suspended` sorted set and a lightweight background sweep in any live `Queue` or `Worker` runtime fails expired suspended jobs with reason `'Suspend timeout exceeded'`. This no longer depends on a worker staying online, but it does require at least one glide-mq process to remain connected to the queue.
 
-```typescript
-await job.storeVector('embedding', [0.1, 0.2, 0.3, ...]);
-```
-
-### `job.currentFallback`
-
-Read-only property returning the current fallback entry during a retry, or `undefined` on the original attempt.
+#### Options
 
 ```typescript
-const model = job.currentFallback?.model ?? job.data.primaryModel;
-```
-
-### `job.signals`
-
-Array of `SignalEntry` objects delivered while the job was suspended.
-
-```typescript
-if (job.signals.length > 0) {
-  const { name, data } = job.signals[0];
-  // Handle the signal
+interface SuspendOptions {
+  reason?: string; // Human-readable label stored on the job hash
+  timeout?: number; // Milliseconds until auto-fail (0 = infinite, default)
 }
 ```
+
+The `onResume` callback on `job.suspend()` is separate from `SuspendOptions` - it is a best-effort in-process continuation, not persisted to Valkey.
+
+#### Reading suspension state
+
+```typescript
+const info = await queue.getSuspendInfo(jobId);
+// null if not suspended
+// { reason, suspendedAt, timeout?, signals: SignalEntry[] }
+```
+
+#### Proxy endpoints
+
+The proxy exposes REST endpoints for suspend/resume inspection and control:
+
+```
+GET  /queues/:name/suspended
+GET  /queues/:name/jobs/:id/suspend
+POST /queues/:name/jobs/:id/signal
+POST /queues/:name/jobs/:id/revoke
+{ "name": "approve", "data": { "reviewer": "alice" } }
+```
+
+- `GET /queues/:name/suspended` lists suspended jobs with their suspend metadata.
+- `GET /queues/:name/jobs/:id/suspend` returns `{ reason, suspendedAt, timeout?, signals }` for one suspended job.
+- `POST /queues/:name/jobs/:id/signal` returns `{ "resumed": true|false }`.
+- `POST /queues/:name/jobs/:id/revoke` returns `{ "status": "revoked" | "flagged" }`.
+
+#### Testing mode
+
+`TestJob.suspend()` and `TestQueue.signal()` provide full parity with no Valkey dependency:
+
+```typescript
+import { TestQueue, TestWorker } from 'glide-mq/testing';
+
+const queue = new TestQueue('approvals');
+const worker = new TestWorker(queue, async (job) => {
+  await job.suspend({ reason: 'needs-review' });
+});
+
+// Signal from outside
+const resumed = await queue.signal(jobId, 'approve');
+```
+
+### Fallback Chains
+
+Ordered list of model/provider alternatives tried on retryable failure. The worker auto-advances through the chain on each retry.
+
+Set fallbacks in JobOptions when adding a job. Inside the processor, read job.currentFallback to determine which model to use. job.fallbackIndex starts at 0 (original request). On each retry failure, glidemq_fail increments the index by 1. Each fallback entry can carry arbitrary metadata for provider-specific configuration.
+
+See [ADVANCED.md](./advanced#fallback-chains) for details on how the chain advances.
+
+### Budget Middleware (Flow-level Token/Cost Caps)
+
+Enforce hard caps on total tokens and/or cost across all jobs in a flow. Pass a budget option to FlowProducer.add() with maxTotalTokens, maxTotalCost, and onExceeded (fail or pause). Per-category limits are also supported via maxTokens (e.g. `{ input: 5000 }`), tokenWeights (e.g. `{ output: 4 }`), maxCosts, and costUnit. When an attempt of a job in a budgeted flow ends, whether it completes or fails, the worker charges the usage it reported with reportUsage() through glidemq_recordUsageAndCheckBudget, which atomically increments counters and checks limits. A retry that reports no new usage is not charged again. Batch workers charge and check budgets the same way, per job.
+
+Query budget state via queue.getFlowBudget(flowId). Change the limits of a running flow with queue.updateFlowBudget(flowId, limits): only the given fields change, null deletes a limit, and the exceeded flag is re-evaluated against the usage already charged. With onExceeded 'pause', paused jobs re-check the budget every 60 seconds (Worker.BUDGET_PAUSE_RECHECK_MS), so raising the limits resumes the flow within that interval; job.promote() re-checks at once. Budget state is stored in glide:{queueName}:budget:{flowId}.
+
+```typescript
+const flow = new FlowProducer({ connection });
+const node = await flow.add(
+  { name: 'parent', queueName: 'ai-tasks', data: {}, children: [...] },
+  { budget: { maxTotalTokens: 10000, maxTotalCost: 0.50, costUnit: 'usd', onExceeded: 'fail' } },
+);
+
+// Check budget state
+const budget = await queue.getFlowBudget(node.job.id);
+// { maxTotalTokens: 10000, maxTotalCost: 0.50, usedTokens: 0, usedCost: 0, exceeded: false, ... }
+
+// Raise the cost cap of a running flow; clears exceeded when usage fits the new limits
+await queue.updateFlowBudget(node.job.id, { maxTotalCost: 1.0 });
+```
+
+### Dual-axis Rate Limiting (RPM + TPM)
+
+The tokenLimiter on WorkerOptions adds token-per-minute (TPM) rate limiting alongside the existing RPM limiter. Both limits compose - the worker pauses fetching when either is exceeded.
+
+Jobs report token consumption via job.reportTokens(count) or automatically via job.reportUsage() (which extracts totalTokens). Supports three scopes: queue (shared Valkey counter), worker (in-memory), or both (default - local check first, then Valkey).
+
+### Per-job Lock Duration
+
+Override the worker-level lockDuration for individual jobs via opts.lockDuration. Useful for mixed workloads where some jobs are fast and others are long-running. The per-job lockDuration is read by glidemq_reclaimStalled and glidemq_reclaimStalledListJobs to set the stall threshold per job.
+
+The stall threshold resolution chain is: per-job `opts.lockDuration` (if set) > worker-level `lockDuration` > `stalledInterval`. The scheduler also checks only every `stalledInterval`, and stream entries are claimed only after they have been idle for `stalledInterval`. So a stalled job is recovered no sooner than `max(stalledInterval, threshold)` after its last heartbeat. To get fast stall recovery, lower both `stalledInterval` and `lockDuration`.
+
+### Vector Search (createJobIndex / storeVector / vectorSearch)
+
+Create a Valkey Search index over job hashes, store vector embeddings, and run KNN similarity search. Requires the Valkey Search module.
+
+Use queue.createJobIndex() to create an index with optional vector fields. Inside the processor, call job.storeVector(field, embedding) to store Float32 vectors. Query with queue.vectorSearch(embedding, opts) for KNN results.
+
+The index is built over job hashes using FT.CREATE. Base fields (name, state, timestamp, priority) are always included. Testing mode provides in-memory parity via TestJob.storeVector(), TestQueue.createJobIndex(), and TestQueue.vectorSearch().
+
+`vectorSearch` passes `opts.searchOptions` through to FT.SEARCH: `nocontent`, `dialect`, `verbatim`, `inorder`, `slop` and `sortby`. The `scorer` option was removed in 0.16: no released Valkey Search accepts SCORER and the client never sent it, so it had no effect. Unknown keys are still ignored at runtime.
+
+See [ADVANCED.md](./advanced#vector-search-index-management) for index management details.
+
+### Proxy Endpoints
+
+The proxy (`glide-mq/proxy`) exposes queue, scheduler, flow, and broadcast endpoints over HTTP:
+
+```typescript
+import { createProxyServer } from 'glide-mq/proxy';
+
+const proxy = createProxyServer({
+  connection,
+  queues: ['tasks', 'broadcast-events'], // optional allowlist
+});
+
+proxy.app.listen(3000);
+```
+
+- Add your own auth/rate-limit middleware before exposing the proxy to a network. The proxy does not ship built-in authentication.
+- Queue-wide SSE (`/queues/:name/events`) and broadcast SSE (`/broadcast/:name/events`) require `connection`, not just a shared `client`, because they allocate blocking readers internally.
+- 5xx responses return a generic message (`Internal server error`, `Service unavailable`, `Gateway timeout`) except for proxy-authored ones such as `Proxy is shutting down`. The underlying error goes to `onError`.
+- List and batch routes are bounded by `maxPageSize` (default `1000`). `GET /queues/:name/jobs`, `/dlq`, and `/suspended` return at most `maxPageSize` items from `start` when `end` is omitted or `-1`, and reject an explicit `start`/`end` span larger than the cap with `400`. `POST /queues/:name/dlq/replay-all` and `POST /queues/:name/retry` default `count` to the cap and `DELETE /queues/:name/clean` defaults `limit` to the cap; larger values (or `count=0`) return `400`. Page through larger sets with `start`/`end`, and repeat retry until `retried` is `0`.
+- `GET /queues/:name/metrics` returns the whole per-minute metrics hash and is not paged; `start`/`end` slice the returned data points only.
+- `POST /queues/:name/jobs/wait` holds one dedicated blocking connection per in-flight request. `opts.waitTimeout` above `maxWaitTimeout` (default `60000` ms) returns `400`; an omitted `waitTimeout` uses `30000` ms capped at `maxWaitTimeout`. If the HTTP client disconnects before the result, the proxy stops waiting and releases the connection; the job itself stays queued.
+
+| Method | Path                                 | Description                                                                                                                                              |
+| ------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | /queues/:name/jobs                   | Add a single job.                                                                                                                                        |
+| POST   | /queues/:name/jobs/bulk              | Add multiple jobs in one request.                                                                                                                        |
+| GET    | /queues/:name/jobs?state=waiting     | List jobs by state. Supports `start`, `end`, and `excludeData=true`.                                                                                     |
+| POST   | /queues/:name/jobs/wait              | Add a job and wait for the final worker result in the same request. `opts.waitTimeout` defaults to 30000 ms and may not exceed `maxWaitTimeout`.         |
+| GET    | /queues/:name/jobs/:id               | Fetch one job by ID.                                                                                                                                     |
+| POST   | /queues/:name/jobs/:id/priority      | Change a waiting/prioritized/delayed job's priority.                                                                                                     |
+| POST   | /queues/:name/jobs/:id/delay         | Change a job's delay or move it into delayed state.                                                                                                      |
+| POST   | /queues/:name/jobs/:id/promote       | Promote a delayed job immediately.                                                                                                                       |
+| GET    | /queues/:name/jobs/:id/stream        | SSE stream of job output chunks. Supports `Last-Event-ID` and `?lastId=`.                                                                                |
+| GET    | /queues/:name/jobs/:id/events        | SSE stream of lifecycle events for one job only. Supports `Last-Event-ID` and `?lastId=` replay.                                                         |
+| GET    | /queues/:name/jobs/:id/suspend       | Read suspend metadata for one suspended job.                                                                                                             |
+| POST   | /queues/:name/jobs/:id/signal        | Send a signal to a suspended job. Body: `{ "name": "...", "data": ... }`.                                                                                |
+| POST   | /queues/:name/jobs/:id/revoke        | Revoke a job. Returns `{ status: "revoked" }` or `{ status: "flagged" }`.                                                                                |
+| GET    | /queues/:name/dlq                    | List dead-letter jobs for the queue. Supports `start` and `end`.                                                                                         |
+| GET    | /queues/:name/dlq/:id                | Fetch one dead-letter job by DLQ job ID.                                                                                                                 |
+| POST   | /queues/:name/dlq/:id/replay         | Replay one dead-letter job back into its original queue.                                                                                                 |
+| POST   | /queues/:name/dlq/replay-all         | Replay multiple dead-letter jobs. Optional body/query `count`.                                                                                           |
+| DELETE | /queues/:name/dlq/:id                | Permanently remove one dead-letter job.                                                                                                                  |
+| GET    | /queues/:name/events                 | Queue-wide SSE stream of lifecycle events. Supports `Last-Event-ID` and `?lastId=` replay.                                                               |
+| POST   | /queues/:name/pause                  | Pause the queue.                                                                                                                                         |
+| POST   | /queues/:name/resume                 | Resume the queue.                                                                                                                                        |
+| GET    | /queues/:name/counts                 | Return waiting/active/delayed/completed/failed counts.                                                                                                   |
+| GET    | /queues/:name/metrics?type=completed | Return total count plus per-minute metrics data.                                                                                                         |
+| GET    | /queues/:name/workers                | List live workers for the queue.                                                                                                                         |
+| GET    | /queues/:name/suspended              | List jobs currently in the suspended state, including suspend metadata.                                                                                  |
+| GET    | /queues/:name/rate-limit             | Read the current queue-wide global rate limit.                                                                                                           |
+| PUT    | /queues/:name/rate-limit             | Set the queue-wide global rate limit. Body: `{ max, duration }`.                                                                                         |
+| DELETE | /queues/:name/rate-limit             | Remove the queue-wide global rate limit.                                                                                                                 |
+| POST   | /queues/:name/drain                  | Remove waiting jobs. Pass `?delayed=true` to also remove delayed jobs.                                                                                   |
+| POST   | /queues/:name/retry                  | Retry up to `count` failed jobs (body or query, default and max `maxPageSize`). Returns `{ retried }`.                                                   |
+| DELETE | /queues/:name/clean                  | Remove old completed/failed jobs. Requires `state` and `age` seconds; optional `limit`.                                                                  |
+| GET    | /queues/:name/schedulers             | List registered schedulers.                                                                                                                              |
+| GET    | /queues/:name/schedulers/:id         | Fetch one scheduler entry by name.                                                                                                                       |
+| PUT    | /queues/:name/schedulers/:id         | Upsert a scheduler. Body: `{ schedule, template? }`.                                                                                                     |
+| DELETE | /queues/:name/schedulers/:id         | Remove a scheduler by name.                                                                                                                              |
+| POST   | /flows                               | Create a tree flow or DAG over HTTP. Body: `{ flow, budget? }` or `{ dag }`. `budget` is currently supported for tree flows only.                        |
+| GET    | /flows/:id                           | Read the current flow snapshot: nodes, roots, counts, usage, and budget state.                                                                           |
+| GET    | /flows/:id/tree                      | Read the nested tree view for a tree flow or DAG.                                                                                                        |
+| DELETE | /flows/:id                           | Revoke or flag remaining jobs in the flow and remove the HTTP flow record.                                                                               |
+| GET    | /queues/:name/flows/:parentId/usage  | Aggregate AI usage across a flow.                                                                                                                        |
+| GET    | /queues/:name/flows/:flowId/budget   | Read current flow budget state.                                                                                                                          |
+| GET    | /usage/summary                       | Rolling AI usage summary. Supports `windowMs` (or legacy `window`) in ms, `start`/`end` as epoch ms, and `queues=a,b` (for example `?windowMs=3600000`). |
+| POST   | /broadcast/:name                     | Publish a broadcast message. Body: `{ subject, data, opts? }`.                                                                                           |
+| GET    | /broadcast/:name/events              | SSE broadcast stream. Requires `subscription`; optional `subjects=a.*,b.>` filter.                                                                       |
+| GET    | /health                              | Health check and proxy uptime.                                                                                                                           |
+
+- `POST /flows` supports both FlowProducer-style trees and DAG payloads. Queue names inside the submitted flow must pass the proxy allowlist. A flow may hold at most 1000 nodes (tree nodes counted across all levels, or `dag.nodes` entries); larger flows return `400`.
+- Flow budgets are persisted and returned through `/flows/:id` and `/queues/:name/flows/:id/budget`, but HTTP-submitted budgets are currently supported only for tree flows, not DAG payloads.

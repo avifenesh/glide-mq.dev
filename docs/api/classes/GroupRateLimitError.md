@@ -1,6 +1,8 @@
 # Class: GroupRateLimitError
 
-Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L61)
+Defined in: [glide-mq/src/errors.ts:77](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L77)
+
+Internal control-flow error thrown by `job.rateLimitGroup()`. Caught by the Worker.
 
 ## Extends
 
@@ -14,7 +16,7 @@ Defined in: [glide-mq/src/errors.ts:61](https://github.com/avifenesh/glide-mq/bl
 new GroupRateLimitError(delayMs, opts?): GroupRateLimitError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:65](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L65)
+Defined in: [glide-mq/src/errors.ts:81](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L81)
 
 #### Parameters
 
@@ -39,7 +41,7 @@ Defined in: [glide-mq/src/errors.ts:65](https://github.com/avifenesh/glide-mq/bl
 optional cause?: unknown;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
@@ -53,7 +55,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
 readonly delayMs: number;
 ```
 
-Defined in: [glide-mq/src/errors.ts:62](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L62)
+Defined in: [glide-mq/src/errors.ts:78](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L78)
 
 ***
 
@@ -63,7 +65,7 @@ Defined in: [glide-mq/src/errors.ts:62](https://github.com/avifenesh/glide-mq/bl
 message: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1077
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
@@ -77,7 +79,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1077
 name: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
@@ -91,7 +93,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 readonly opts: Required<GroupRateLimitOptions>;
 ```
 
-Defined in: [glide-mq/src/errors.ts:63](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L63)
+Defined in: [glide-mq/src/errors.ts:79](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L79)
 
 ***
 
@@ -101,7 +103,7 @@ Defined in: [glide-mq/src/errors.ts:63](https://github.com/avifenesh/glide-mq/bl
 optional stack?: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1078
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 

@@ -1,6 +1,8 @@
 # Interface: JobCounts
 
-Defined in: [glide-mq/src/types.ts:373](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L373)
+Defined in: [glide-mq/src/types.ts:578](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L578)
+
+Count of jobs in each state.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:373](https://github.com/avifenesh/glide-mq/bl
 active: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:375](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L375)
+Defined in: [glide-mq/src/types.ts:580](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L580)
 
 ***
 
@@ -20,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:375](https://github.com/avifenesh/glide-mq/bl
 completed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:377](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L377)
+Defined in: [glide-mq/src/types.ts:582](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L582)
 
 ***
 
@@ -30,7 +32,7 @@ Defined in: [glide-mq/src/types.ts:377](https://github.com/avifenesh/glide-mq/bl
 delayed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:376](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L376)
+Defined in: [glide-mq/src/types.ts:581](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L581)
 
 ***
 
@@ -40,7 +42,7 @@ Defined in: [glide-mq/src/types.ts:376](https://github.com/avifenesh/glide-mq/bl
 failed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:378](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L378)
+Defined in: [glide-mq/src/types.ts:583](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L583)
 
 ***
 
@@ -50,4 +52,4 @@ Defined in: [glide-mq/src/types.ts:378](https://github.com/avifenesh/glide-mq/bl
 waiting: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:374](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L374)
+Defined in: [glide-mq/src/types.ts:579](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L579)

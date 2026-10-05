@@ -9,8 +9,8 @@ description: Job logs, time-series metrics, OpenTelemetry integration, and the d
 
 - [Job Logs](#job-logs)
 - [Job Counts and Metrics](#job-counts-and-metrics)
-- [AI Usage Telemetry](#ai-usage-telemetry)
 - [OpenTelemetry Integration](#opentelemetry-integration)
+- [AI Usage Telemetry](#ai-usage-telemetry)
 - [`@glidemq/dashboard`](#glidemqdashboard)
 
 ---
@@ -112,81 +112,6 @@ const waitingCount = await queue.count();
 
 ---
 
-## AI Usage Telemetry
-
-glide-mq tracks AI-specific usage metadata per job - model, tokens, cost, and latency. This data powers cost dashboards, budget enforcement, and rate limiting.
-
-### Per-job usage
-
-Every AI job can report usage via `job.reportUsage()`. The data is stored in the job hash with `usage:*` prefixed fields and emitted as a `usage` event on the events stream.
-
-```typescript
-const worker = new Worker('inference', async (job) => {
-  const result = await callLLM(job.data.prompt);
-
-  await job.reportUsage({
-    model: 'gpt-5.4',
-    provider: 'openai',
-    tokens: {
-      input: result.usage.prompt_tokens,
-      output: result.usage.completion_tokens,
-    },
-    costs: { total: 0.003 },
-    latencyMs: 1100,
-    cached: false,
-  });
-
-  return result;
-}, { connection });
-```
-
-### Reading usage from a completed job
-
-```typescript
-const job = await queue.getJob('42');
-if (job?.usage) {
-  console.log(`Model: ${job.usage.model}`);
-  console.log(`Input: ${job.usage.tokens?.input}, Output: ${job.usage.tokens?.output}`);
-  console.log(`Cost: $${job.usage.totalCost}, Latency: ${job.usage.latencyMs}ms`);
-}
-```
-
-### Flow-level aggregation
-
-Aggregate token counts and cost across all jobs in a parent-child flow:
-
-```typescript
-const usage = await queue.getFlowUsage(parentJobId);
-console.log(`Total tokens: ${usage.totalTokens}`);
-console.log(`Total cost: $${usage.totalCost}`);
-console.log(`Jobs: ${usage.jobCount}`);
-console.log(`Models used: ${JSON.stringify(usage.models)}`);
-// models: { 'gpt-5.4': 3, 'gpt-5.4-nano': 1 }
-```
-
-### Listening for usage events
-
-```typescript
-const events = new QueueEvents('inference', { connection });
-events.on('usage', ({ jobId, data }) => {
-  const usage = JSON.parse(data);
-  metrics.recordTokens(usage.model, usage.totalTokens);
-  metrics.recordCost(usage.totalCost);
-});
-```
-
-### TPM tracking
-
-For token-per-minute rate limiting, report tokens separately via `job.reportTokens()`:
-
-```typescript
-await job.reportTokens(result.totalTokens);
-```
-
-This value is read by the worker after job completion to increment the TPM counter when a `tokenLimiter` is configured.
-
----
-
 ## OpenTelemetry Integration
 
 glide-mq emits OpenTelemetry spans automatically when `@opentelemetry/api` is installed. No code changes are required.
@@ -232,11 +157,82 @@ console.log('Tracing active:', isTracingEnabled());
 
 ---
 
+## AI Usage Telemetry
+
+### reportUsage and persisted usage fields
+
+When job.reportUsage() is called inside a processor, the usage metadata is persisted to the job hash. Usage data is stored as hash fields on the job key:
+
+| Hash field        | Type           | Description                                                    |
+| ----------------- | -------------- | -------------------------------------------------------------- |
+| usage:model       | string         | Model identifier (e.g. gpt-5.4)                                |
+| usage:provider    | string         | Provider identifier (e.g. openai)                              |
+| usage:tokens      | string (JSON)  | Token breakdown by category (e.g. `{"input":100,"output":50}`) |
+| usage:totalTokens | string (int)   | Total tokens (auto-computed if not set)                        |
+| usage:costs       | string (JSON)  | Cost breakdown (e.g. `{"total":0.003}`)                        |
+| usage:totalCost   | string (float) | Total cost                                                     |
+| usage:costUnit    | string         | Cost unit (e.g. `"usd"`)                                       |
+| usage:latencyMs   | string (int)   | Inference latency in ms                                        |
+| usage:cached      | string         | true if response was cached                                    |
+
+`reportUsage()` overwrites the previous usage payload for that job and updates the rolling per-minute usage buckets used by `getUsageSummary()`.
+
+### Flow-level usage aggregation
+
+`queue.getFlowUsage(parentJobId)` traverses the job tree and returns aggregated tokens and costs maps, `totalTokens`, `totalCost`, plus a models map (model name to job count), `costUnit`, and `jobCount`.
+
+### Rolling usage summary
+
+Use `queue.getUsageSummary()` (or `Queue.getUsageSummary()`) to aggregate usage across queues without scanning job hashes:
+
+```typescript
+const summary = await queue.getUsageSummary({
+  queues: ['llm-tasks', 'embeddings'],
+  windowMs: 3_600_000,
+});
+
+// {
+//   totalTokens,
+//   totalCost,
+//   jobCount,
+//   models: { 'gpt-5.4': 12 },
+//   perQueue: { 'llm-tasks': { ... } }
+// }
+```
+
+The proxy exposes the same rollup over HTTP at `GET /usage/summary`.
+
+### Budget exceeded events
+
+When a flow budget is exceeded (via glidemq_recordUsageAndCheckBudget), the budget hash exceeded field is set to 1. Subsequent jobs in the flow are either failed or paused depending on the onExceeded setting. queue.updateFlowBudget(flowId, limits) changes the limits and re-evaluates the flag; paused jobs re-check the budget every 60 seconds.
+
+Budget state can be queried via queue.getFlowBudget(flowId) which returns { maxTotalTokens, maxTokens, tokenWeights, maxTotalCost, maxCosts, costUnit, usedTokens, usedCost, exceeded, onExceeded }.
+
+### Token-per-minute (TPM) metrics
+
+When tokenLimiter is configured on a worker, token consumption is tracked either locally (in-memory), in Valkey (glide:{queueName}:tpm), or both (default). This enables dual-axis monitoring: RPM (jobs per window) and TPM (tokens per window).
+
+---
+
+## Proxy SSE Endpoints
+
+When you want live observability from another process or language, the HTTP proxy exposes three SSE surfaces:
+
+| Path                            | Description                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------- |
+| `/queues/:name/events`          | Queue-wide lifecycle events with `Last-Event-ID` / `?lastId=` replay             |
+| `/queues/:name/jobs/:id/stream` | Per-job output stream for `job.stream()` / `job.streamChunk()`                   |
+| `/broadcast/:name/events`       | Broadcast fan-out SSE stream with `subscription` and optional `subjects` filters |
+
+These endpoints require the proxy to be created with `connection`, because they allocate blocking readers internally.
+
+---
+
 ## `@glidemq/dashboard`
 
 The [`@glidemq/dashboard`](https://github.com/avifenesh/glidemq-dashboard) package provides a web UI for inspecting queues in real time.
 
-### Quick start - built-in demo server
+### Quick start  -  built-in demo server
 
 ```bash
 cd demo
@@ -267,7 +263,7 @@ const es = new EventSource('http://localhost:3000/api/events');
 es.onmessage = ({ data }) => {
   const { queue, event, jobId } = JSON.parse(data);
   // event: 'added' | 'completed' | 'failed' | 'progress' | 'stalled' | 'heartbeat'
-  console.log(`[${queue}] ${event} — job ${jobId}`);
+  console.log(`[${queue}] ${event}  -  job ${jobId}`);
 };
 ```
 

@@ -27,13 +27,13 @@ Turns a Hapi v21 server into a queue management gateway. Built for teams that ru
 npm install @glidemq/hapi glide-mq @hapi/hapi
 ```
 
-Requires **glide-mq >= 0.15.2**.
+This guide uses **@glidemq/hapi 0.4.2** with **glide-mq 0.17.0**.
 
 ## Quick Start
 
 ```ts
 import Hapi from "@hapi/hapi";
-import { glideMQPlugin, glideMQRoutes } from "@glidemq/hapi";
+import { glideMQPlugin } from "@glidemq/hapi";
 
 const server = Hapi.server({ port: 3000 });
 
@@ -49,10 +49,10 @@ await server.register({
         },
       },
     },
+    routes: true,
   },
 });
 
-await server.register({ plugin: glideMQRoutes });
 await server.start();
 ```
 
@@ -60,7 +60,7 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 
 ## How It Works
 
-`glideMQPlugin` creates a `QueueRegistry`, decorates `server.glidemq` so every route handler can access it, eagerly initializes configured producers, and registers an `onPostStop` hook that closes all queues, workers, and producers on shutdown. `glideMQRoutes` depends on the core plugin and mounts the full queue HTTP surface under an optional path prefix. Queue and worker instances are created lazily on first request; producers are created eagerly so connection errors surface at startup.
+`glideMQPlugin` creates a `QueueRegistry`, decorates `server.glidemq` so every route handler can access it, eagerly initializes configured producers, and registers an `onPostStop` hook that closes all queues, workers, and producers on shutdown. Set `routes: true` to mount the HTTP API or pass a `routes` object to restrict queue and producer names. Queue and worker instances are created lazily on first request; producers are created eagerly so connection errors surface at startup.
 
 ## Endpoints
 
@@ -101,12 +101,12 @@ The server now accepts `POST /emails/jobs` to enqueue jobs and `GET /emails/even
 ## Features
 
 - **SSE event streaming** -- subscribe to `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events on any queue via `GET /{name}/events`. Uses `PassThrough` streams with shared `QueueEvents` instances (ref-counted per queue).
-- **Lightweight producers** -- configure `producers` for serverless or edge environments that only need to enqueue jobs. The `POST /{name}/produce` endpoint returns a job ID without requiring a worker.
+- **Lightweight producers** - configure `producers` for server-side NAPI runtimes that only need to enqueue jobs. The `POST /{name}/produce` endpoint returns a job ID without requiring a worker.
 - **Scheduler CRUD** -- create, read, update, and delete repeatable jobs through four endpoints. Supports cron patterns, fixed intervals, and `repeatAfterComplete` mode.
 - **Testing without Valkey** -- `createTestApp` from `@glidemq/hapi/testing` spins up an in-memory server backed by `TestQueue` and `TestWorker`. Use `server.inject()` for assertions with no external dependencies.
 - **Joi validation** -- all request bodies, query parameters, and plugin options are validated with Joi schemas and structured error messages.
-- **Queue access control** -- pass `allowedQueues` or `allowedProducers` arrays in `GlideMQRoutesOptions` to restrict which queues the API exposes. Requests to unlisted queues return 404.
-- **Route prefix** -- set `prefix` in `GlideMQRoutesOptions` to mount the HTTP surface under a path like `/api/queues`.
+- **Queue access control** - pass `queues` or `producers` arrays in `GlideMQRoutesOptions` to restrict which queues the API exposes. Requests to unlisted queues return 404.
+- **Route prefix** - use Hapi's registration options, `{ routes: { prefix: '/api/queues' } }`, to mount the HTTP surface under a path prefix.
 - **Automatic cleanup** -- the `onPostStop` lifecycle hook closes workers first (to drain in-progress jobs), then queues and producers, using `Promise.allSettled` for reliability.
 - **Broadcast over HTTP** -- publish messages and stream them via SSE with durable subscriptions and optional subject filters.
 - **Flow orchestration over HTTP** -- create tree flows or DAGs from any HTTP client, then inspect them as flat snapshots or nested trees.
@@ -121,6 +121,7 @@ interface GlideMQPluginOptions {
   prefix?: string;       // Key prefix for Valkey keys (default: 'glide')
   testing?: boolean;     // Use TestQueue/TestWorker, no Valkey needed
   serializer?: Serializer;
+  routes?: boolean | GlideMQRoutesOptions;
 }
 
 interface QueueConfig {
@@ -139,7 +140,6 @@ interface ProducerConfig {
 interface GlideMQRoutesOptions {
   queues?: string[];     // Restrict API to these queue names
   producers?: string[];  // Restrict produce API to these producer names
-  prefix?: string;       // Route path prefix (e.g. '/api/queues')
 }
 ```
 

@@ -28,7 +28,7 @@ Register queues and processors with decorators, inject them through the standard
 npm install @glidemq/nestjs glide-mq @nestjs/common @nestjs/core
 ```
 
-Requires **glide-mq >= 0.15.2** and **NestJS 10+**.
+This guide uses **@glidemq/nestjs 0.2.3** with **glide-mq 0.17.0**. Requires **NestJS 10+**.
 
 ## Quick Start
 

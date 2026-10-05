@@ -18,6 +18,6 @@
     "vitepress": "^1.6.3"
   },
   "dependencies": {
-    "glide-mq": "file:../glide-mq"
+    "glide-mq": "^0.17.0"
   }
 }

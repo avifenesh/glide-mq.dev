@@ -1,6 +1,6 @@
 # Interface: DAGNode
 
-Defined in: [glide-mq/src/types.ts:408](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L408)
+Defined in: [glide-mq/src/types.ts:622](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L622)
 
 A node in a DAG flow. Each node is a job with optional dependencies on other nodes.
 The `deps` array lists the names of nodes that must complete before this node can run.
@@ -13,7 +13,7 @@ The `deps` array lists the names of nodes that must complete before this node ca
 data: any;
 ```
 
-Defined in: [glide-mq/src/types.ts:414](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L414)
+Defined in: [glide-mq/src/types.ts:628](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L628)
 
 Job data payload.
 
@@ -25,7 +25,7 @@ Job data payload.
 optional deps?: string[];
 ```
 
-Defined in: [glide-mq/src/types.ts:418](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L418)
+Defined in: [glide-mq/src/types.ts:632](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L632)
 
 Names of other nodes in this DAG that must complete before this node runs.
 
@@ -37,7 +37,7 @@ Names of other nodes in this DAG that must complete before this node runs.
 name: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:410](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L410)
+Defined in: [glide-mq/src/types.ts:624](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L624)
 
 Unique name within this DAG submission. Used as reference in `deps` arrays.
 
@@ -49,7 +49,7 @@ Unique name within this DAG submission. Used as reference in `deps` arrays.
 optional opts?: Omit<JobOptions, "parent" | "parents">;
 ```
 
-Defined in: [glide-mq/src/types.ts:416](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L416)
+Defined in: [glide-mq/src/types.ts:630](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L630)
 
 Job options (delay, priority, etc.). `parent` and `parents` are managed automatically.
 
@@ -61,6 +61,6 @@ Job options (delay, priority, etc.). `parent` and `parents` are managed automati
 queueName: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:412](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L412)
+Defined in: [glide-mq/src/types.ts:626](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L626)
 
 Queue to add this job to.

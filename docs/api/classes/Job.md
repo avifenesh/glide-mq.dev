@@ -1,6 +1,10 @@
 # Class: Job&lt;D, R&gt;
 
-Defined in: [glide-mq/src/job.ts:12](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L12)
+Defined in: [glide-mq/src/job.ts:181](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L181)
+
+Represents a single job in the queue.
+Provides methods for reporting usage, streaming chunks, managing state,
+and interacting with the job lifecycle (delay, suspend, retry, etc.).
 
 ## Type Parameters
 
@@ -17,7 +21,7 @@ Defined in: [glide-mq/src/job.ts:12](https://github.com/avifenesh/glide-mq/blob/
 optional abortSignal?: AbortSignal;
 ```
 
-Defined in: [glide-mq/src/job.ts:42](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L42)
+Defined in: [glide-mq/src/job.ts:230](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L230)
 
 AbortSignal that fires when this job is revoked during processing.
 The processor should check signal.aborted cooperatively.
@@ -31,7 +35,19 @@ Only set when the job is being processed by a Worker.
 attemptsMade: number;
 ```
 
-Defined in: [glide-mq/src/job.ts:17](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L17)
+Defined in: [glide-mq/src/job.ts:186](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L186)
+
+***
+
+### budgetKey?
+
+```ts
+optional budgetKey?: string;
+```
+
+Defined in: [glide-mq/src/job.ts:207](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L207)
+
+Budget key for flow-level budget enforcement. Set when the job belongs to a budgeted flow.
 
 ***
 
@@ -41,7 +57,7 @@ Defined in: [glide-mq/src/job.ts:17](https://github.com/avifenesh/glide-mq/blob/
 optional cost?: number;
 ```
 
-Defined in: [glide-mq/src/job.ts:33](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L33)
+Defined in: [glide-mq/src/job.ts:202](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L202)
 
 ***
 
@@ -51,7 +67,7 @@ Defined in: [glide-mq/src/job.ts:33](https://github.com/avifenesh/glide-mq/blob/
 data: D;
 ```
 
-Defined in: [glide-mq/src/job.ts:15](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L15)
+Defined in: [glide-mq/src/job.ts:184](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L184)
 
 ***
 
@@ -61,7 +77,7 @@ Defined in: [glide-mq/src/job.ts:15](https://github.com/avifenesh/glide-mq/blob/
 deserializationFailed: boolean = false;
 ```
 
-Defined in: [glide-mq/src/job.ts:61](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L61)
+Defined in: [glide-mq/src/job.ts:271](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L271)
 
 Set to true when data or returnvalue could not be deserialized from Valkey.
 This typically indicates a serializer mismatch between the producer and consumer.
@@ -75,7 +91,7 @@ When true, `data` is set to `{} as D` and `returnvalue` to `undefined`.
 discarded: boolean = false;
 ```
 
-Defined in: [glide-mq/src/job.ts:48](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L48)
+Defined in: [glide-mq/src/job.ts:239](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L239)
 
 When true, the job will not be retried on failure regardless of attempts config.
 Set by calling `discard()` inside the processor.
@@ -88,7 +104,7 @@ Set by calling `discard()` inside the processor.
 optional expireAt?: number;
 ```
 
-Defined in: [glide-mq/src/job.ts:34](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L34)
+Defined in: [glide-mq/src/job.ts:203](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L203)
 
 ***
 
@@ -98,7 +114,19 @@ Defined in: [glide-mq/src/job.ts:34](https://github.com/avifenesh/glide-mq/blob/
 failedReason: string | undefined;
 ```
 
-Defined in: [glide-mq/src/job.ts:19](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L19)
+Defined in: [glide-mq/src/job.ts:188](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L188)
+
+***
+
+### fallbackIndex
+
+```ts
+fallbackIndex: number = 0;
+```
+
+Defined in: [glide-mq/src/job.ts:210](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L210)
+
+Current position in the fallback chain. 0 = original request, 1+ = fallback entries.
 
 ***
 
@@ -108,7 +136,7 @@ Defined in: [glide-mq/src/job.ts:19](https://github.com/avifenesh/glide-mq/blob/
 finishedOn: number | undefined;
 ```
 
-Defined in: [glide-mq/src/job.ts:22](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L22)
+Defined in: [glide-mq/src/job.ts:191](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L191)
 
 ***
 
@@ -118,7 +146,7 @@ Defined in: [glide-mq/src/job.ts:22](https://github.com/avifenesh/glide-mq/blob/
 optional groupKey?: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:32](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L32)
+Defined in: [glide-mq/src/job.ts:201](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L201)
 
 ***
 
@@ -128,7 +156,7 @@ Defined in: [glide-mq/src/job.ts:32](https://github.com/avifenesh/glide-mq/blob/
 readonly id: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:13](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L13)
+Defined in: [glide-mq/src/job.ts:182](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L182)
 
 ***
 
@@ -138,7 +166,7 @@ Defined in: [glide-mq/src/job.ts:13](https://github.com/avifenesh/glide-mq/blob/
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:14](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L14)
+Defined in: [glide-mq/src/job.ts:183](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L183)
 
 ***
 
@@ -148,7 +176,7 @@ Defined in: [glide-mq/src/job.ts:14](https://github.com/avifenesh/glide-mq/blob/
 readonly opts: JobOptions;
 ```
 
-Defined in: [glide-mq/src/job.ts:16](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L16)
+Defined in: [glide-mq/src/job.ts:185](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L185)
 
 ***
 
@@ -158,7 +186,7 @@ Defined in: [glide-mq/src/job.ts:16](https://github.com/avifenesh/glide-mq/blob/
 optional orderingKey?: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:30](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L30)
+Defined in: [glide-mq/src/job.ts:199](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L199)
 
 ***
 
@@ -168,7 +196,7 @@ Defined in: [glide-mq/src/job.ts:30](https://github.com/avifenesh/glide-mq/blob/
 optional orderingSeq?: number;
 ```
 
-Defined in: [glide-mq/src/job.ts:31](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L31)
+Defined in: [glide-mq/src/job.ts:200](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L200)
 
 ***
 
@@ -178,7 +206,7 @@ Defined in: [glide-mq/src/job.ts:31](https://github.com/avifenesh/glide-mq/blob/
 optional parentId?: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:24](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L24)
+Defined in: [glide-mq/src/job.ts:193](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L193)
 
 ***
 
@@ -188,7 +216,7 @@ Defined in: [glide-mq/src/job.ts:24](https://github.com/avifenesh/glide-mq/blob/
 optional parentIds?: string[];
 ```
 
-Defined in: [glide-mq/src/job.ts:27](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L27)
+Defined in: [glide-mq/src/job.ts:196](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L196)
 
 Additional parent IDs for DAG multi-parent jobs.
 
@@ -200,7 +228,7 @@ Additional parent IDs for DAG multi-parent jobs.
 optional parentQueue?: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:25](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L25)
+Defined in: [glide-mq/src/job.ts:194](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L194)
 
 ***
 
@@ -210,7 +238,7 @@ Defined in: [glide-mq/src/job.ts:25](https://github.com/avifenesh/glide-mq/blob/
 optional parentQueues?: string[];
 ```
 
-Defined in: [glide-mq/src/job.ts:29](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L29)
+Defined in: [glide-mq/src/job.ts:198](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L198)
 
 Additional parent queues for DAG multi-parent jobs (parallel array to parentIds).
 
@@ -222,7 +250,7 @@ Additional parent queues for DAG multi-parent jobs (parallel array to parentIds)
 processedOn: number | undefined;
 ```
 
-Defined in: [glide-mq/src/job.ts:23](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L23)
+Defined in: [glide-mq/src/job.ts:192](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L192)
 
 ***
 
@@ -232,7 +260,7 @@ Defined in: [glide-mq/src/job.ts:23](https://github.com/avifenesh/glide-mq/blob/
 progress: number | object;
 ```
 
-Defined in: [glide-mq/src/job.ts:20](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L20)
+Defined in: [glide-mq/src/job.ts:189](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L189)
 
 ***
 
@@ -242,7 +270,7 @@ Defined in: [glide-mq/src/job.ts:20](https://github.com/avifenesh/glide-mq/blob/
 returnvalue: R | undefined;
 ```
 
-Defined in: [glide-mq/src/job.ts:18](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L18)
+Defined in: [glide-mq/src/job.ts:187](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L187)
 
 ***
 
@@ -252,7 +280,19 @@ Defined in: [glide-mq/src/job.ts:18](https://github.com/avifenesh/glide-mq/blob/
 optional schedulerName?: string;
 ```
 
-Defined in: [glide-mq/src/job.ts:35](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L35)
+Defined in: [glide-mq/src/job.ts:204](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L204)
+
+***
+
+### signals
+
+```ts
+signals: SignalEntry[] = [];
+```
+
+Defined in: [glide-mq/src/job.ts:233](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L233)
+
+Signals delivered to this job while it was suspended.
 
 ***
 
@@ -262,7 +302,62 @@ Defined in: [glide-mq/src/job.ts:35](https://github.com/avifenesh/glide-mq/blob/
 timestamp: number;
 ```
 
-Defined in: [glide-mq/src/job.ts:21](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L21)
+Defined in: [glide-mq/src/job.ts:190](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L190)
+
+***
+
+### tpmTokens?
+
+```ts
+optional tpmTokens?: number;
+```
+
+Defined in: [glide-mq/src/job.ts:216](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L216)
+
+Tokens reported via reportTokens() for TPM rate limiting.
+
+***
+
+### usage?
+
+```ts
+optional usage?: JobUsage;
+```
+
+Defined in: [glide-mq/src/job.ts:213](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L213)
+
+AI-specific usage metadata reported via reportUsage().
+
+## Accessors
+
+### currentFallback
+
+#### Get Signature
+
+```ts
+get currentFallback():
+  | {
+  metadata?: Record&lt;string, unknown>;
+  model: string;
+  provider?: string;
+}
+  | undefined;
+```
+
+Defined in: [glide-mq/src/job.ts:314](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L314)
+
+The current fallback entry, or undefined when running the original request.
+fallbackIndex=0 means original (no fallback). On first failure, fallbackIndex
+becomes 1 and currentFallback returns fallbacks[0], etc.
+
+##### Returns
+
+  \| \{
+  `metadata?`: `Record`&lt;`string`, `unknown`&gt;;
+  `model`: `string`;
+  `provider?`: `string`;
+\}
+  \| `undefined`
 
 ## Methods
 
@@ -272,7 +367,7 @@ Defined in: [glide-mq/src/job.ts:21](https://github.com/avifenesh/glide-mq/blob/
 changeDelay(newDelay): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:360](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L360)
+Defined in: [glide-mq/src/job.ts:726](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L726)
 
 Change the delay of this job. Supports delayed, waiting, and prioritized states.
 Setting delay to 0 promotes a delayed job immediately.
@@ -297,7 +392,7 @@ Throws if the job is in an invalid state (active, completed, failed).
 changePriority(newPriority): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:340](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L340)
+Defined in: [glide-mq/src/job.ts:706](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L706)
 
 Change the priority of this job. Supports waiting, prioritized, and delayed states.
 Setting priority to 0 moves a prioritized job back to the stream (waiting).
@@ -321,7 +416,7 @@ Throws if the job is in an invalid state (active, completed, failed).
 discard(): void;
 ```
 
-Defined in: [glide-mq/src/job.ts:155](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L155)
+Defined in: [glide-mq/src/job.ts:491](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L491)
 
 Mark this job so it will not be retried on failure.
 Call inside the processor before throwing to skip all remaining attempts.
@@ -338,7 +433,7 @@ Call inside the processor before throwing to skip all remaining attempts.
 getChildrenValues(): Promise<Record&lt;string, R>>;
 ```
 
-Defined in: [glide-mq/src/job.ts:207](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L207)
+Defined in: [glide-mq/src/job.ts:575](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L575)
 
 Read return values from all child jobs (for flow/parent-child patterns).
 
@@ -354,7 +449,7 @@ Read return values from all child jobs (for flow/parent-child patterns).
 getParents(): Promise&lt;object[]>;
 ```
 
-Defined in: [glide-mq/src/job.ts:254](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L254)
+Defined in: [glide-mq/src/job.ts:622](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L622)
 
 Read all parent references for this job (for DAG multi-parent patterns).
 Returns an array of { queue, id } for each parent.
@@ -373,7 +468,7 @@ For jobs with no parent, returns an empty array.
 getState(): Promise&lt;string>;
 ```
 
-Defined in: [glide-mq/src/job.ts:514](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L514)
+Defined in: [glide-mq/src/job.ts:863](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L863)
 
 Read the current state from the job hash.
 
@@ -389,7 +484,7 @@ Read the current state from the job hash.
 isActive(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:492](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L492)
+Defined in: [glide-mq/src/job.ts:841](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L841)
 
 Check if this job is in the active state.
 
@@ -405,7 +500,7 @@ Check if this job is in the active state.
 isCompleted(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:471](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L471)
+Defined in: [glide-mq/src/job.ts:820](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L820)
 
 Check if this job is in the completed state.
 
@@ -421,7 +516,7 @@ Check if this job is in the completed state.
 isDelayed(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:485](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L485)
+Defined in: [glide-mq/src/job.ts:834](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L834)
 
 Check if this job is in the delayed state.
 
@@ -437,7 +532,7 @@ Check if this job is in the delayed state.
 isFailed(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:478](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L478)
+Defined in: [glide-mq/src/job.ts:827](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L827)
 
 Check if this job is in the failed state.
 
@@ -453,7 +548,7 @@ Check if this job is in the failed state.
 isRevoked(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:506](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L506)
+Defined in: [glide-mq/src/job.ts:855](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L855)
 
 Check if this job has been revoked.
 
@@ -469,7 +564,7 @@ Check if this job has been revoked.
 isWaiting(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/job.ts:499](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L499)
+Defined in: [glide-mq/src/job.ts:848](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L848)
 
 Check if this job is in the waiting state.
 
@@ -485,7 +580,7 @@ Check if this job is in the waiting state.
 log(message): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:102](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L102)
+Defined in: [glide-mq/src/job.ts:322](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L322)
 
 Append a log line to this job's log list.
 
@@ -507,7 +602,7 @@ Append a log line to this job's log list.
 moveToDelayed(timestamp, nextStep?): Promise&lt;never>;
 ```
 
-Defined in: [glide-mq/src/job.ts:396](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L396)
+Defined in: [glide-mq/src/job.ts:762](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L762)
 
 Pause an active job and resume it after the given UNIX timestamp in ms.
 Optionally updates `job.data.step` before yielding back to the worker.
@@ -533,7 +628,7 @@ This method must be called from inside a Worker processor.
 moveToFailed(err): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:297](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L297)
+Defined in: [glide-mq/src/job.ts:658](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L658)
 
 Move this job to the failed state.
 If attempts remain and backoff is configured, retries via the scheduled ZSet.
@@ -557,7 +652,7 @@ Requires entryId to be set (set by Worker when processing).
 moveToWaitingChildren(): Promise&lt;never>;
 ```
 
-Defined in: [glide-mq/src/job.ts:189](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L189)
+Defined in: [glide-mq/src/job.ts:525](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L525)
 
 Pause an active job and wait for dynamically-added child jobs to complete.
 When all children finish, this job resumes and the processor is invoked again.
@@ -576,7 +671,7 @@ This method must be called from inside a Worker processor.
 promote(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:379](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L379)
+Defined in: [glide-mq/src/job.ts:745](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L745)
 
 Promote a delayed job to waiting immediately.
 Removes from the scheduled ZSet, adds to the stream, sets state to 'waiting'.
@@ -594,7 +689,7 @@ Throws if the job is not in the delayed state or does not exist.
 rateLimitGroup(duration, opts?): Promise&lt;never>;
 ```
 
-Defined in: [glide-mq/src/job.ts:424](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L424)
+Defined in: [glide-mq/src/job.ts:790](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L790)
 
 Rate-limit this job's ordering group for the given duration (milliseconds).
 The current job is re-parked in the group queue (by default at the front)
@@ -622,9 +717,63 @@ Throws GroupRateLimitError which the worker catches internally.
 remove(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:331](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L331)
+Defined in: [glide-mq/src/job.ts:697](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L697)
 
 Remove this job from all data structures.
+
+#### Returns
+
+`Promise`&lt;`void`&gt;
+
+***
+
+### reportTokens()
+
+```ts
+reportTokens(count): Promise&lt;void>;
+```
+
+Defined in: [glide-mq/src/job.ts:442](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L442)
+
+Report tokens consumed by this job for TPM (tokens-per-minute) tracking.
+The count is stored in the job hash field `tpmTokens`.
+After job completion, the Worker reads this value and increments the TPM counter
+if a tokenLimiter is configured.
+
+Calling multiple times overwrites the previous value.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `count` | `number` |
+
+#### Returns
+
+`Promise`&lt;`void`&gt;
+
+***
+
+### reportUsage()
+
+```ts
+reportUsage(usage): Promise&lt;void>;
+```
+
+Defined in: [glide-mq/src/job.ts:360](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L360)
+
+Report AI-specific usage metadata for this job. Persists to the job hash
+and emits a 'usage' event on the events stream.
+
+Callable from any context (inside a processor, externally via getJob(), etc.).
+If `totalTokens` is not provided, it is auto-computed as the sum of all values in `tokens`.
+Calling multiple times overwrites the previous usage data.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `usage` | [`JobUsage`](../interfaces/JobUsage.md) |
 
 #### Returns
 
@@ -638,15 +787,125 @@ Remove this job from all data structures.
 retry(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:439](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L439)
+Defined in: [glide-mq/src/job.ts:805](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L805)
 
-Retry this job by moving it back to the scheduled ZSet with a score of now
-(so it gets promoted immediately on the next promote cycle).
-Removes the job from the failed ZSet first to prevent dual membership.
+Retry this failed job by moving it back to the scheduled ZSet with a score
+of now (so it gets promoted immediately on the next promote cycle).
+Throws if the job does not exist or is not in the failed state.
 
 #### Returns
 
 `Promise`&lt;`void`&gt;
+
+***
+
+### storeVector()
+
+```ts
+storeVector(field, embedding): Promise&lt;void>;
+```
+
+Defined in: [glide-mq/src/job.ts:1015](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L1015)
+
+Store a vector embedding in this job's hash field.
+The vector is stored as a raw Float32Array buffer suitable for Valkey Search vector indexing.
+
+#### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `field` | `string` | Hash field name where the vector is stored (must match the index schema). |
+| `embedding` | `Float32Array`&lt;`ArrayBufferLike`&gt; \| `number`[] | The vector as a number[] or Float32Array. |
+
+#### Returns
+
+`Promise`&lt;`void`&gt;
+
+***
+
+### stream()
+
+```ts
+stream(chunk): Promise&lt;string>;
+```
+
+Defined in: [glide-mq/src/job.ts:453](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L453)
+
+Append a chunk to this job's streaming channel.
+Each chunk is a flat string-keyed object appended via XADD to a per-job stream.
+Returns the Valkey stream entry ID.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `chunk` | `Record`&lt;`string`, `string`&gt; |
+
+#### Returns
+
+`Promise`&lt;`string`&gt;
+
+***
+
+### streamChunk()
+
+```ts
+streamChunk(type, content?): Promise&lt;string>;
+```
+
+Defined in: [glide-mq/src/job.ts:481](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L481)
+
+Convenience method for streaming typed LLM chunks.
+Wraps `stream()` with `{ type, content }` fields.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `type` | `string` |
+| `content?` | `string` |
+
+#### Returns
+
+`Promise`&lt;`string`&gt;
+
+#### Example
+
+```ts
+await job.streamChunk('reasoning', 'Let me think about this...');
+  await job.streamChunk('content', 'The answer is 42.');
+  await job.streamChunk('done');
+```
+
+***
+
+### suspend()
+
+```ts
+suspend(opts?): Promise&lt;never>;
+```
+
+Defined in: [glide-mq/src/job.ts:551](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L551)
+
+Suspend this job to wait for an external signal (human-in-the-loop).
+The processor is interrupted and the job moves to 'suspended' state.
+When a signal arrives via Queue.signal(), the job re-enters the stream
+and the processor is re-invoked from scratch with job.signals populated.
+
+Optionally provide an onResume callback that runs instead of the main
+processor when the job resumes on the same worker (best-effort).
+
+This method must be called from inside a Worker processor.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts?` | [`SuspendOptions`](../interfaces/SuspendOptions.md) & `object` |
+
+#### Returns
+
+`Promise`&lt;`never`&gt;
 
 ***
 
@@ -656,7 +915,7 @@ Removes the job from the failed ZSet first to prevent dual membership.
 updateData(data): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:143](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L143)
+Defined in: [glide-mq/src/job.ts:346](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L346)
 
 Replace the data payload of this job.
 
@@ -678,7 +937,7 @@ Replace the data payload of this job.
 updateProgress(progress): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/job.ts:113](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L113)
+Defined in: [glide-mq/src/job.ts:333](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L333)
 
 Update the progress of this job. Persists to the job hash and emits a progress event.
 
@@ -700,7 +959,7 @@ Update the progress of this job. Persists to the job hash and emits a progress e
 waitUntilFinished(pollIntervalMs?, timeoutMs?): Promise<"completed" | "failed">;
 ```
 
-Defined in: [glide-mq/src/job.ts:524](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/job.ts#L524)
+Defined in: [glide-mq/src/job.ts:873](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/job.ts#L873)
 
 Wait until the job reaches a terminal state (completed or failed).
 Polls the job hash state at the given interval.

@@ -3,11 +3,11 @@ title: Architecture
 description: Key schema, job state machine, Valkey Server Functions, connection model, and internal design decisions.
 ---
 
-# glide-mq Architecture Plan
+# glide-mq Architecture
 
 ## Context
 
-Building a Node.js message queue library to replace BullMQ. Built exclusively on speedkey (valkey-glide with direct NAPI bindings). Streams-first architecture. Cluster-native from day one. Full feature parity with BullMQ plus differentiators. This is the winning horse.
+Building a Node.js message queue library to replace BullMQ. Built exclusively on speedkey (valkey-glide with direct NAPI bindings). Streams-first architecture. Cluster-native from day one. Full feature parity with BullMQ plus differentiators.
 
 ## Key Schema
 
@@ -24,8 +24,9 @@ glide:{queueName}:events                # Stream - lifecycle events (completed, 
 glide:{queueName}:meta                  # Hash - queue metadata (paused, concurrency, rate limiter state,
                                 #        rateLimitMax, rateLimitDuration for global rate limit)
 glide:{queueName}:deps:{id}             # Set - child job IDs for parent (flows)
+glide:{queueName}:parents:{id}          # Set - parent references for DAG multi-parent jobs
 glide:{queueName}:parent:{id}           # Hash - parent queue + job ID reference
-glide:{queueName}:dedup                 # Hash - field=dedup_id, value=job_id|timestamp
+glide:{queueName}:dedup                 # Hash - field=dedup_id, value=job_id:timestamp
 glide:{queueName}:rate                  # Hash - rate limiter counters (window start, count)
 glide:{queueName}:schedulers            # Hash - field=scheduler_name, value=next_run_ts
 glide:{queueName}:ordering              # Hash - per-key sequence counters (for concurrency=1)
@@ -34,48 +35,15 @@ glide:{queueName}:group:{key}           # Hash - group state (active count, maxC
                                 #        rateMax, rateDuration, rateWindowStart, rateCount,
                                 #        tbCapacity, tbTokens, tbRefillRate, tbLastRefill,
                                 #        tbRefillRemainder)
-glide:{queueName}:groupq:{key}          # List - FIFO wait list for group-limited jobs
+glide:{queueName}:groupq:{key}          # ZSet - ordered wait list for group-limited jobs (score = orderingSeq)
+glide:{queueName}:lifo                   # List - LIFO queue (jobs with lifo:true, consumed via RPOP)
+glide:{queueName}:jstream:{id}           # Stream - per-job streaming channel (LLM token output)
+glide:{queueName}:signals:{id}           # List - signals delivered to a suspended job
+glide:{queueName}:suspended              # ZSet - suspended jobs (score = timeout deadline)
+glide:{queueName}:budget:{flowId}        # Hash - flow-level budget state
+glide:{queueName}:tpm                    # Hash - token-per-minute rate limiter state
 glide:{queueName}:ratelimited           # ZSet - scheduler-managed promotion queue for rate-limited jobs
                                 #        (score = earliest eligible timestamp)
-glide:{queueName}:jstream:{id}         # Stream - per-job streaming channel (LLM token streaming)
-glide:{queueName}:budget:{id}          # Hash - flow-level budget state (maxTotalTokens, maxTotalCost,
-                                #        usedTokens, usedCost, exceeded, onExceeded)
-glide:{queueName}:tpm                  # Hash - TPM (tokens-per-minute) rate limiter state
-                                #        (windowStart, tokenCount, maxTokens, duration)
-glide:{queueName}:parents:{id}        # Set - parent references for DAG multi-parent jobs
-```
-
-### AI-specific job hash fields
-
-Jobs that use AI primitives store additional fields in the job hash (`glide:{queueName}:job:{id}`):
-
-```
-usage:model           # String - model identifier (e.g. 'gpt-5.4')
-usage:provider        # String - provider identifier (e.g. 'openai')
-usage:tokens:*        # String(int) - token counts by category (e.g. usage:tokens:input, usage:tokens:output)
-usage:totalTokens     # String(int) - total tokens (sum of all categories)
-usage:costs:*         # String(float) - cost by category (e.g. usage:costs:total)
-usage:totalCost       # String(float) - total cost (sum of all categories)
-usage:costUnit        # String - unit for cost values (e.g. 'usd', 'credits')
-usage:latencyMs       # String(int) - inference latency in ms
-usage:cached          # String('0'|'1') - cache hit flag
-tpmTokens             # String(int) - tokens reported for TPM limiting
-fallbackIndex         # String(int) - current position in fallback chain
-budgetKey             # String - reference to the flow's budget hash
-suspendReason         # String - why the job was suspended
-suspendedAt           # String(int) - epoch ms when suspended
-suspendTimeout        # String(int) - suspend timeout in ms
-signals               # String(JSON) - array of SignalEntry objects
-```
-
-### Valkey Search index
-
-When `queue.createJobIndex()` is called, a Valkey Search index is created over the job hashes:
-
-```
-{queueName}-idx       # FT index - auto-includes name (TAG), state (TAG),
-                      #   timestamp (NUMERIC), priority (NUMERIC), plus
-                      #   user-defined fields and an optional VECTOR field
 ```
 
 ## Job State Machine
@@ -107,11 +75,11 @@ added --> stream (ready) --> PEL (active) --> completed (ZSet)
                      stream (re-queued)
 ```
 
-`moveToActive` may return `GROUP_RATE_LIMITED` when a job's ordering-key sliding window rate limit is exceeded, or `GROUP_TOKEN_LIMITED` when the token bucket has insufficient tokens. In both cases, the job is parked in the `glide:{queueName}:ratelimited` ZSet with a score equal to the earliest eligible timestamp. The scheduler's promotion loop picks it up once capacity is available. If a job's `cost` exceeds the bucket's `tbCapacity`, `moveToActive` moves the job to the DLQ instead.
+`moveToActive` may return `GROUP_RATE_LIMITED` when a job's ordering-key sliding window rate limit is exceeded, or `GROUP_TOKEN_LIMITED` when the token bucket has insufficient tokens. In both cases, the job is parked in the `glide:{queueName}:ratelimited` ZSet with a score equal to the earliest eligible timestamp. The scheduler's promotion loop picks it up once capacity is available. If a job's `cost` exceeds the bucket's `tbCapacity`, the job is failed at activation: `moveToActive` returns `ERR:COST_EXCEEDS_CAPACITY`, and `completeAndFetchNext` / `failAndFetchNext` list the job in a trailing `__glidemq_failed_activations__` marker of their reply. In both cases a worker with `deadLetterQueue` adds the DLQ copy. A job failed this way by the scheduler tick's group promotion (`promoteRateLimited`) has no worker context and gets no DLQ copy.
 
 ### LIFO Mode
 
-Jobs with `lifo: true` are placed onto a dedicated Valkey LIST key `glide:{queueName}:list` via RPUSH, and consumed via RPOP. When the worker's `moveToActive` function checks for the next job, priority jobs in the scheduled ZSet are checked first, then the LIFO list, then the FIFO stream. A `list-active` counter in the queue metadata hash enforces global concurrency across both the LIFO list and the main stream.
+Jobs with `lifo: true` are placed onto a dedicated Valkey LIST key `glide:{queueName}:lifo` via RPUSH, and consumed via RPOP. When the worker's `moveToActive` function checks for the next job, priority jobs in the scheduled ZSet are checked first, then the LIFO list, then the FIFO stream. A `list-active` counter in the queue metadata hash enforces global concurrency across both the LIFO list and the main stream.
 
 States map to Valkey structures:
 
@@ -127,9 +95,10 @@ States map to Valkey structures:
 
 Score format: `(priority * 2^42) + timestamp_ms`
 
-- Priority 0 (highest) jobs always sort before priority 1, regardless of timestamp
+- Priority 1 is highest; lower numbers sort first, regardless of timestamp
+- Priority 0 means no priority: the job goes to the stream when due, and workers take any waiting priority > 0 job first
 - Within same priority, FIFO by timestamp
-- Max priority: 2^21 (matches BullMQ range)
+- Priority must be an integer from 0 to 2048; anything else throws at enqueue
 - Non-delayed priority jobs get score with timestamp = 0 so they promote immediately
 
 ## Server Functions (not EVAL scripts)
@@ -150,7 +119,7 @@ Use Valkey Functions (FUNCTION LOAD / FCALL) instead of EVAL/EVALSHA scripts.
 1. On Queue/Worker creation, check if library exists: `FUNCTION LIST LIBRARYNAME glidemq`
 2. If missing, load via `FUNCTION LOAD` with the full library source
 3. If version mismatch (we track a version field in the library via `LIBRARY_VERSION` in `src/functions/index.ts`), reload with `FUNCTION LOAD REPLACE`
-4. Library source is embedded in the npm package as a string constant (built from .lua source files at compile time)
+4. Library source lives in `src/functions/glidemq.lua` and is copied into `dist/functions/` on build. `scripts/embed-lua.cjs` also generates `glidemq.embedded.json` (gitignored) so serverless bundlers that omit the `.lua` file still have the source. Runtime prefers the sibling `.lua` (coverage instrumentation) and falls back to the embed.
 5. In cluster mode, `FUNCTION LOAD` must be sent to all nodes (use route: "allNodes")
 
 ### Function Library: `glidemq`
@@ -165,50 +134,65 @@ redis.register_function('glidemq_complete', function(keys, args) ... end)
 ...
 ```
 
-### Functions (44 in 1 library, not 53 scripts)
+### Functions (49 in 1 library, not 53 scripts)
 
-| Function                         | Keys | Purpose                                                                                 |
-| -------------------------------- | ---- | --------------------------------------------------------------------------------------- |
-| glidemq_version                  | 0    | Return library version                                                                  |
-| glidemq_addJob                   | 4    | INCR id, HSET job, XADD stream or ZADD scheduled, XADD event (skippable via skipEvents) |
-| glidemq_promote                  | 3    | ZRANGEBYSCORE scheduled, XADD to stream, ZREM from scheduled                            |
-| glidemq_nextDue                  | 2    | Return next due timestamp from scheduled and rate-limited ZSets                         |
-| glidemq_tryLock                  | 1    | Acquire a distributed lock (SET NX PX)                                                  |
-| glidemq_unlock                   | 1    | Release a distributed lock (compare-and-delete)                                         |
-| glidemq_renewLock                | 1    | Renew a distributed lock TTL (compare-and-expire)                                       |
-| glidemq_complete                 | 5    | XACK stream, ZADD completed, HSET job, XADD event, check parent deps                    |
-| glidemq_completeAndFetchNext     | 5    | Complete current + fetch next in single RTT                                             |
-| glidemq_fail                     | 6    | XACK stream, ZADD failed or ZADD scheduled (retry), HSET job, XADD event                |
-| glidemq_reclaimStalled           | 2    | XAUTOCLAIM on stream, HSET stalled count, move to failed if exceeded                    |
-| glidemq_reclaimStalledListJobs   | 2    | Stall detection for LIFO/priority list-sourced jobs via bounded SCAN                    |
-| glidemq_pause                    | 2    | HSET meta paused=1, XADD event                                                          |
-| glidemq_resume                   | 2    | HSET meta paused=0, XADD event                                                          |
-| glidemq_dedup                    | 5    | Check dedup hash, skip or add based on mode (simple/throttle/debounce)                  |
-| glidemq_rateLimit                | 2    | Check/increment rate counter, return delay if exceeded                                  |
-| glidemq_promoteRateLimited       | 2    | Move rate-limited jobs back to stream                                                   |
-| glidemq_checkConcurrency         | 3    | Check global concurrency limit before processing                                        |
-| glidemq_rpopAndReserve           | 4    | Atomic RPOP from LIFO/priority list with global concurrency enforcement                 |
-| glidemq_moveToActive             | 2    | Set job state to active, record processedOn timestamp                                   |
-| glidemq_deferActive              | 3    | Return active job to stream for reprocessing                                            |
-| glidemq_addFlow                  | N    | Atomic: create parent + children, set deps, add children to stream/scheduled            |
-| glidemq_completeChild            | 4    | Remove from parent deps set, if deps empty -> re-queue parent                           |
-| glidemq_registerParent           | 6    | Register additional parent for DAG multi-parent jobs                                    |
-| glidemq_removeJob                | 7    | Clean job hash, remove from all sets/streams                                            |
-| glidemq_clean                    | 3    | Bulk-remove old completed/failed jobs by age                                            |
-| glidemq_revoke                   | 5    | Revoke a job by ID                                                                      |
-| glidemq_changePriority           | 4    | Re-prioritize a waiting/delayed job                                                     |
-| glidemq_changeDelay              | 4    | Change delay of a delayed job                                                           |
-| glidemq_promoteJob               | 4    | Move a delayed job to waiting immediately                                               |
-| glidemq_moveActiveToDelayed      | 4    | Move active job to delayed state for step-job workflows                                 |
-| glidemq_moveToWaitingChildren    | 3    | Move active job to waiting-children state                                               |
-| glidemq_searchByName             | 1    | Search jobs by name pattern across state sets/streams                                   |
-| glidemq_drain                    | 6    | Remove all waiting (and optionally delayed) jobs                                        |
-| glidemq_retryJobs                | 4    | Bulk-retry failed jobs                                                                  |
-| glidemq_healListActive           | 1    | Self-heal list-active counter drift caused by worker crashes                            |
-| glidemq_popLists                 | 2    | Check priority + LIFO lists in a single FCALL instead of 2 separate RPOPs               |
-| glidemq_suspendJob               | 2    | Move active job to suspended state, store reason/timeout                                |
-| glidemq_signalJob                | 3    | Deliver signal to suspended job and re-queue to stream                                  |
-| glidemq_rateLimitGroupExternal   | 3    | Pause an ordering group from outside the processor                                      |
+| Function                          | Keys | Purpose                                                                                                      |
+| --------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------ |
+| glidemq_version                   | 1    | Return library version                                                                                       |
+| glidemq_addJob                    | 4    | INCR id, HSET job, XADD stream or ZADD scheduled, XADD event (skippable via skipEvents)                      |
+| glidemq_promote                   | 3    | ZRANGEBYSCORE scheduled, XADD to stream, ZREM from scheduled                                                 |
+| glidemq_nextDue                   | 2    | Return next due timestamp from scheduled and rate-limited ZSets                                              |
+| glidemq_tryLock                   | 1    | Acquire a distributed lock (SET NX PX)                                                                       |
+| glidemq_unlock                    | 1    | Release a distributed lock (compare-and-delete)                                                              |
+| glidemq_renewLock                 | 1    | Renew a distributed lock TTL (compare-and-expire)                                                            |
+| glidemq_complete                  | 5    | XACK stream, ZADD completed, HSET job, XADD event, check parent deps                                         |
+| glidemq_completeAndFetchNext      | 5    | Complete current + fetch next in single RTT; trailing markers list jobs failed at activation and empty lists |
+| glidemq_fail                      | 6    | XACK stream, ZADD failed or ZADD scheduled (retry), HSET job, XADD event                                     |
+| glidemq_failAndFetchNext          | 6    | glidemq_fail + the fetch phases of completeAndFetchNext in single RTT (non-broadcast)                        |
+| glidemq_updateFlowBudget          | 1    | HSET/HDEL budget limits, re-evaluate exceeded against charged usage                                          |
+| glidemq_reclaimStalled            | 2    | XAUTOCLAIM on stream, HSET stalled count, move to failed if exceeded                                         |
+| glidemq_reclaimStalledListJobs    | 2    | Stall detection for LIFO/priority list-sourced jobs via bounded SCAN                                         |
+| glidemq_removeIdleConsumer        | 1    | XGROUP DELCONSUMER for the calling consumer when it holds no pending entry                                   |
+| glidemq_recoverBroadcastClaims    | 1    | XCLAIM parked broadcast entries the consumer still owns                                                      |
+| glidemq_schedulerAwaitInflight    | 2    | Park a repeatAfterComplete entry while the old mode's job is still running                                   |
+| glidemq_healEarlyDeps             | 1    | Count parked early child completions registered later by a plain SADD, release parents                       |
+| glidemq_pause                     | 2    | HSET meta paused=1, XADD event                                                                               |
+| glidemq_resume                    | 2    | HSET meta paused=0, XADD event                                                                               |
+| glidemq_dedup                     | 5-6  | Check dedup hash, skip or add based on mode (simple/throttle/debounce)                                       |
+| glidemq_rateLimit                 | 2    | Check/increment rate counter, return delay if exceeded                                                       |
+| glidemq_promoteRateLimited        | 2    | Move rate-limited jobs back to stream                                                                        |
+| glidemq_checkConcurrency          | 3    | Check global concurrency limit before processing                                                             |
+| glidemq_rpopAndReserve            | 4    | Atomic RPOP from LIFO/priority list with global concurrency enforcement                                      |
+| glidemq_moveToActive              | 2    | Set job state to active, record processedOn timestamp; enforce globalConcurrency (GLOBAL_FULL)               |
+| glidemq_deferActive               | 3    | Return active job to stream for reprocessing                                                                 |
+| glidemq_addFlow                   | N    | Atomic: create parent + children, set deps, add children to stream/scheduled                                 |
+| glidemq_completeChild             | 4    | Remove from parent deps set, if deps empty -> re-queue parent                                                |
+| glidemq_registerParent            | 6    | Register additional parent for DAG multi-parent jobs                                                         |
+| glidemq_removeJob                 | 7    | Clean job hash, remove from all sets/streams                                                                 |
+| glidemq_clean                     | 3    | Bulk-remove old completed/failed jobs by age                                                                 |
+| glidemq_revoke                    | 5    | Revoke a job by ID                                                                                           |
+| glidemq_changePriority            | 4    | Re-prioritize a waiting/delayed job                                                                          |
+| glidemq_changeDelay               | 4    | Change delay of a delayed job                                                                                |
+| glidemq_promoteJob                | 4    | Move a delayed job to waiting immediately                                                                    |
+| glidemq_moveActiveToDelayed       | 4    | Move active job to delayed state for step-job workflows                                                      |
+| glidemq_moveToWaitingChildren     | 3    | Move active job to waiting-children state                                                                    |
+| glidemq_searchByName              | 1    | Search jobs by name pattern across state sets/streams                                                        |
+| glidemq_drain                     | 6    | Remove all waiting (and optionally delayed) jobs                                                             |
+| glidemq_retryJobs                 | 4    | Bulk-retry failed jobs                                                                                       |
+| glidemq_healListActive            | 1    | Self-heal list-active counter drift caused by worker crashes                                                 |
+| glidemq_suspend                   | 4    | Move active job to suspended state, release group slot                                                       |
+| glidemq_signal                    | 5    | Deliver a signal to a suspended job and re-queue it                                                          |
+| glidemq_sweepSuspended            | 4    | Fail suspended jobs whose timeout has passed                                                                 |
+| glidemq_checkBudget               | 1    | Check if a flow budget has been exceeded                                                                     |
+| glidemq_recordUsageAndCheckBudget | 1    | Atomically increment usage counters and check budget limits                                                  |
+| glidemq_rateLimitGroup            | N    | Per-group rate limiting for ordering keys                                                                    |
+| glidemq_rateLimitGroupExternal    | 2    | External rate limit trigger for groups                                                                       |
+| glidemq_popLists                  | 2    | Check priority + LIFO lists in a single FCALL instead of 2 separate RPOPs                                    |
+| glidemq_popListsReserve           | 3    | Like popLists, and also INCRBY list-active for the popped jobs (used by current workers)                     |
+| glidemq_getActiveListJobIds       | 1    | List active priority/LIFO job IDs via bounded SCAN (partial on very large keyspaces)                         |
+| glidemq_retryJob                  | 3    | Retry one failed job; errors unless the job is in the failed state                                           |
+| glidemq_updateJobFields           | 2    | HSET fields on an existing job hash (never recreates a removed job), optional event                          |
+| glidemq_casSchedulerEntry         | 1    | Write a scheduler entry only if it still holds the value the caller read                                     |
 
 ### speedkey API for Functions
 
@@ -221,16 +205,6 @@ await client.fcall('glidemq_addJob', [key1, key2, key3, key4], [arg1, arg2, ...]
 
 // In cluster mode, load to all nodes
 await clusterClient.functionLoad(librarySource, true, { route: 'allPrimaries' });
-```
-
-### Valkey Search Module
-
-Vector search (`queue.createJobIndex()`, `queue.vectorSearch()`) uses the Valkey Search module (`valkey-search`) via the speedkey `GlideFt` API. The search module is optional - core queue operations work without it. Index creation calls `FT.CREATE`, vector queries call `FT.SEARCH` with KNN syntax, and index removal calls `FT.DROPINDEX`.
-
-The module is auto-detected at runtime. If not loaded, `createJobIndex()` throws a clear error:
-
-```
-Error: Valkey Search module is not loaded. Vector search requires the valkey-search module.
 ```
 
 ## Connection Model
@@ -265,7 +239,7 @@ Workers share commandClient for all non-blocking ops. blockingClient is dedicate
 
 ## TypeScript API
 
-### Queue\<Data, Result\>
+### Queue<Data, Result>
 
 ```typescript
 class Queue<D = any, R = any> extends EventEmitter {
@@ -316,21 +290,22 @@ class Queue<D = any, R = any> extends EventEmitter {
   getRepeatableJobs(): Promise<{ name: string; entry: SchedulerEntry }[]>;
   removeJobScheduler(name: string): Promise<void>;
 
-  // AI-native
-  signal(jobId: string, signalName: string, data?: any): Promise<boolean>;
-  getSuspendInfo(jobId: string): Promise<{ reason?: string; suspendedAt: number; timeout?: number; signals: SignalEntry[] } | null>;
-  readStream(jobId: string, opts?: ReadStreamOptions): Promise<{ id: string; fields: Record<string, string> }[]>;
-  getFlowUsage(parentJobId: string): Promise<{ tokens: Record<string, number>; totalTokens: number; costs: Record<string, number>; totalCost: number; jobCount: number; models: Record<string, number> }>;
-  getFlowBudget(flowId: string): Promise<{ maxTotalTokens?: number; maxTotalCost?: number; usedTokens: number; usedCost: number; exceeded: boolean; onExceeded: 'pause' | 'fail' } | null>;
+  // AI primitives
+  getFlowUsage(parentJobId: string): Promise<FlowUsage>;
+  getFlowBudget(flowId: string): Promise<FlowBudget | null>;
+  updateFlowBudget(flowId: string, limits: Partial<BudgetLimits>): Promise<FlowBudget | null>;
+  readStream(jobId: string, opts?: ReadStreamOptions): Promise<StreamEntry[]>;
+  signal(jobId: string, name: string, data?: any): Promise<boolean>;
+  getSuspendInfo(jobId: string): Promise<SuspendInfo | null>;
+  rateLimitGroup(groupKey: string, duration: number, opts?: GroupRateLimitOptions): Promise<void>;
 
   // Vector search
   createJobIndex(opts?: JobIndexOptions): Promise<void>;
-  dropJobIndex(name?: string): Promise<void>;
-  vectorSearch(embedding: number[] | Float32Array, opts?: VectorSearchOptions): Promise<VectorSearchResult<D, R>[]>;
+  vectorSearch(embedding: number[] | Float32Array, opts?: VectorSearchOptions): Promise<VectorSearchResult[]>;
 }
 ```
 
-### Worker\<Data, Result\>
+### Worker<Data, Result>
 
 ```typescript
 class Worker<D = any, R = any> extends EventEmitter {
@@ -355,7 +330,7 @@ type WorkerEvent = 'completed' | 'failed' | 'error' | 'stalled' | 'closing' | 'c
 interface WorkerOptions {
   concurrency?: number; // per-worker, default 1
   globalConcurrency?: number; // across all workers
-  prefetch?: number; // XREADGROUP COUNT
+  prefetch?: number; // XREADGROUP COUNT, capped at concurrency (concurrency * batch.size in batch mode)
   blockTimeout?: number; // XREADGROUP BLOCK ms
   lockDuration?: number; // stall detection window
   stalledInterval?: number; // XAUTOCLAIM frequency
@@ -366,10 +341,12 @@ interface WorkerOptions {
   backoffStrategies?: Record<string, (attemptsMade: number, err: Error) => number>;
   sandbox?: SandboxOptions; // run processor in child process/thread
   batch?: { size: number; timeout?: number }; // batch processing mode
+  events?: boolean; // skip XADD event emission (default: true)
+  metrics?: boolean; // skip HINCRBY metrics recording (default: true)
 }
 ```
 
-### Job\<Data, Result\>
+### Job<Data, Result>
 
 ```typescript
 class Job<D = any, R = any> {
@@ -386,18 +363,21 @@ class Job<D = any, R = any> {
   processedOn: number | undefined;
   parentId?: string;
   parentQueue?: string;
+  parentIds?: string[];
+  parentQueues?: string[];
   orderingKey?: string;
   groupKey?: string;
   cost?: number;
-  abortSignal?: AbortSignal;
-  discarded: boolean;
-
-  // AI-native fields
+  expireAt?: number;
+  schedulerName?: string;
+  budgetKey?: string;
+  fallbackIndex: number;
   usage?: JobUsage;
   tpmTokens?: number;
+  abortSignal?: AbortSignal;
   signals: SignalEntry[];
-  fallbackIndex: number;
-  budgetKey?: string;
+  discarded: boolean;
+  deserializationFailed: boolean;
 
   // Lifecycle
   log(message: string): Promise<void>;
@@ -410,19 +390,25 @@ class Job<D = any, R = any> {
   changePriority(newPriority: number): Promise<void>;
   changeDelay(newDelay: number): Promise<void>;
   moveToDelayed(timestampMs: number, nextStep?: string): Promise<never>;
+  moveToWaitingChildren(): Promise<never>;
   promote(): Promise<void>;
   waitUntilFinished(pollIntervalMs?: number, timeoutMs?: number): Promise<'completed' | 'failed'>;
+  suspend(opts?: SuspendOptions & { onResume?: (signals: SignalEntry[]) => Promise<any> }): Promise<never>;
+  rateLimitGroup(duration: number, opts?: GroupRateLimitOptions): Promise<never>;
 
-  // AI-native
+  // AI primitives
   reportUsage(usage: JobUsage): Promise<void>;
   reportTokens(count: number): Promise<void>;
   stream(chunk: Record<string, string>): Promise<string>;
-  suspend(opts?: SuspendOptions): Promise<never>;
+  streamChunk(type: string, content?: string): Promise<string>;
   storeVector(field: string, embedding: number[] | Float32Array): Promise<void>;
-  readonly currentFallback: { model: string; provider?: string; metadata?: Record<string, unknown> } | undefined;
+
+  // Computed
+  get currentFallback(): { model: string; provider?: string; metadata?: Record<string, unknown> } | undefined;
 
   // Queries
   getChildrenValues(): Promise<Record<string, R>>;
+  getParents(): Promise<Array<{ queue: string; id: string }>>;
   getState(): Promise<string>;
   isCompleted(): Promise<boolean>;
   isFailed(): Promise<boolean>;
@@ -433,20 +419,27 @@ class Job<D = any, R = any> {
 }
 
 interface JobOptions {
+  jobId?: string;
   delay?: number;
-  priority?: number; // 0 (highest) to 2^21
+  priority?: number; // 1 (highest) to 2048; 0 = no priority (default)
+  lifo?: boolean;
+  ordering?: {
+    key: string;
+    concurrency?: number;
+    rateLimit?: RateLimitConfig;
+    tokenBucket?: TokenBucketConfig;
+  };
+  cost?: number;
   attempts?: number;
   backoff?: { type: 'fixed' | 'exponential' | string; delay: number; jitter?: number };
   timeout?: number;
+  lockDuration?: number;
   removeOnComplete?: boolean | number | { age: number; count: number };
   removeOnFail?: boolean | number | { age: number; count: number };
   deduplication?: { id: string; ttl?: number; mode?: 'simple' | 'throttle' | 'debounce' };
   parent?: { queue: string; id: string };
-  /** Override worker-level lockDuration for this specific job (ms). */
-  lockDuration?: number;
-  /** Time-to-live in milliseconds. Jobs not processed within this window are failed as 'expired'. */
+  parents?: Array<{ queue: string; id: string }>;
   ttl?: number;
-  /** Ordered list of fallback model/provider entries tried on retryable failure. */
   fallbacks?: Array<{ model: string; provider?: string; metadata?: Record<string, unknown> }>;
 }
 ```
@@ -469,8 +462,9 @@ class QueueEvents {
 ```typescript
 class FlowProducer {
   constructor(opts?: FlowProducerOptions);
-  add(flow: FlowJob): Promise<JobNode>;
+  add(flow: FlowJob, flowOpts?: { budget?: BudgetOptions }): Promise<JobNode>;
   addBulk(flows: FlowJob[]): Promise<JobNode[]>;
+  addDAG(dag: DAGFlow): Promise<Map<string, Job>>;
   close(): Promise<void>;
 }
 
@@ -482,6 +476,14 @@ interface FlowJob {
   children?: FlowJob[];
 }
 ```
+
+## Search Module Integration
+
+When the Valkey Search module is available, uses FT.CREATE to build a secondary index over job hashes. The index prefix is derived from the queue key prefix (e.g. `glide:{queueName}:`) and covers all job hashes.
+
+Base schema fields (`name` as TAG, `state` as TAG, `timestamp` as NUMERIC, `priority` as NUMERIC) are always included. Users can add custom fields and a vector field for KNN similarity search via `SearchIndex`.
+
+Vector embeddings are stored directly in the job hash via `job.storeVector()` as raw Float32 binary blobs. `queue.vectorSearch()` constructs a KNN query with optional pre-filter expressions.
 
 ## Project Structure
 
@@ -518,23 +520,11 @@ glide-mq/
 │   ├── errors.ts               # Error classes (UnrecoverableError, DelayedError, BatchError)
 │   ├── utils.ts                # Key builders, score encoding, backoff calc, subject matching
 │   ├── scheduler.ts            # Internal: promote delayed, reclaim stalled, job schedulers
-│   ├── testing.ts              # In-memory TestQueue, TestWorker, TestJob (with AI methods)
+│   ├── testing.ts              # In-memory TestQueue and TestWorker
 │   ├── workflows.ts            # chain, group, chord, dag helpers
-│   ├── telemetry.ts            # OpenTelemetry integration + AI usage spans
+│   ├── telemetry.ts            # OpenTelemetry integration
 │   └── graceful-shutdown.ts    # Process signal handling
-├── examples/                   # 18+ AI example files
-│   ├── rag-pipeline.ts         # RAG flow with embed/search/generate
-│   ├── ai-agent-loop.ts        # ReAct-style agent loop
-│   ├── content-pipeline.ts     # Content moderation pipeline
-│   ├── model-failover.ts       # Fallback chain demo
-│   ├── token-streaming.ts      # LLM token streaming
-│   ├── budget-cap.ts           # Flow-level budget caps
-│   ├── tpm-throttle.ts         # TPM rate limiting
-│   ├── human-approval.ts       # Suspend/resume for human review
-│   ├── with-vercel-ai-sdk.ts   # Vercel AI SDK integration
-│   ├── with-langchain.ts       # LangChain integration
-│   └── ...                     # More AI examples
-├── tests/                      # 82+ test files (vitest)
+├── tests/                      # 94 test files (vitest)
 │   ├── integration.test.ts     # Full integration tests
 │   ├── testing-mode.test.ts    # In-memory mode tests (no Valkey)
 │   ├── search.test.ts          # Search feature tests
@@ -559,7 +549,7 @@ glide-mq/
 ├── eslint.config.mjs
 ├── CHANGELOG.md
 ├── LICENSE
-├── CLAUDE.md
+├── AGENTS.md
 └── README.md
 ```
 
@@ -569,8 +559,8 @@ glide-mq/
 
 Key differences from the standard `Worker`:
 
-- **No XDEL after processing.** Stream entries are intentionally retained so that all consumer groups can read them. Trimming is handled by `maxMessages` via XTRIM.
-- **Per-subscription retry tracking.** Each subscription tracks its own retry state via `{jobKey}:sub:{group}` keys, so one subscriber's failure does not affect another's delivery.
+- **No XDEL after processing.** Stream entries are intentionally retained so that all consumer groups can read them. Trimming is handled by `maxMessages` (`glidemq_trimBroadcast`), a hard cap that also deletes the job data of trimmed messages once no subscription holds them.
+- **Per-subscription retry tracking.** Each subscription tracks its own retry state via `{jobKey}:sub:{group}` keys, so one subscriber's failure does not affect another's delivery. Stall counts are per subscription too, and a stalled entry is run again by the worker whose stalled reclaim took it.
 - **broadcastMode flag.** All Lua function calls from `BroadcastWorker` pass a `broadcastMode` flag, which alters completion and failure logic to skip stream entry deletion and use group-scoped state instead.
 
 ## DAG Dependency Resolution
@@ -579,32 +569,30 @@ Complex workflows with arbitrary dependency graphs are submitted via `FlowProduc
 
 ## Differentiators vs BullMQ
 
-1. **AI-native primitives**: 7 built-in primitives for AI workloads - usage tracking, token streaming, suspend/resume, budget caps, fallback chains, dual-axis rate limiting (RPM + TPM), and vector search. No plugins or middleware needed.
-2. **Streams-first**: PEL replaces active list + lock tokens. XAUTOCLAIM replaces stalled job checker scripts. Single function library (37+ functions vs 53 EVAL scripts).
-3. **Native NAPI performance**: speedkey's Rust core handles I/O, freeing Node.js event loop. No ioredis overhead.
-4. **Cluster-native**: Hash tags enforced at queue creation. No afterthought `{braces}` requirement.
-5. **Batch API**: Use speedkey's non-atomic Batch for pipelined multi-command operations (auto-splits across cluster nodes).
-6. **Built-in observability**: Events stream + OpenTelemetry via speedkey's native integration. AI usage telemetry per job and per flow.
-7. **Typed end-to-end**: Generics on Queue/Worker/Job for data and result types.
-8. **Simpler reliability model**: Consumer group semantics (XREADGROUP + XACK + XAUTOCLAIM) vs lock-renew-check-stall cycle.
-9. **Server Functions**: Single FUNCTION LOAD, persistent across restarts, no NOSCRIPT cache-miss errors, named calls via FCALL. BullMQ uses ephemeral EVAL/EVALSHA with 53 scripts that must be re-cached on every new connection.
-10. **Vector search**: Built-in Valkey Search integration for KNN similarity search over job hashes. No external vector database needed.
+1. **Streams-first**: PEL replaces active list + lock tokens. XAUTOCLAIM replaces stalled job checker scripts. Single function library (44 functions vs 53 EVAL scripts).
+2. **Native NAPI performance**: speedkey's Rust core handles I/O, freeing Node.js event loop. No ioredis overhead.
+3. **Cluster-native**: Hash tags enforced at queue creation. No afterthought `{braces}` requirement.
+4. **Batch API**: Use speedkey's non-atomic Batch for pipelined multi-command operations (auto-splits across cluster nodes).
+5. **Built-in observability**: Events stream + OpenTelemetry via speedkey's native integration.
+6. **Typed end-to-end**: Generics on Queue/Worker/Job for data and result types.
+7. **Simpler reliability model**: Consumer group semantics (XREADGROUP + XACK + XAUTOCLAIM) vs lock-renew-check-stall cycle.
+8. **Server Functions**: Single FUNCTION LOAD, persistent across restarts, no NOSCRIPT cache-miss errors, named calls via FCALL. BullMQ uses ephemeral EVAL/EVALSHA with 53 scripts that must be re-cached on every new connection.
 
-## Implementation Phases (Historical)
+## Implementation History
 
-The plan below reflects the original implementation rollout. These phases are complete and kept here as design history.
+All phases are complete as of v0.14.0.
 
-### Phase 1: Core (Queue + Worker + Job)
+### Phase 1: Core (Queue + Worker + Job) - Complete
 
 - Connection factory (blocking vs non-blocking clients)
 - Key builder utilities
-- Server Function bodies: addJob, promote, complete, fail, reclaimStalled
+- Server functions: addJob, promote, complete, fail, reclaimStalled
 - Queue: add, addBulk, pause, resume, close
 - Worker: XREADGROUP loop, processor, concurrency, stalled recovery
 - Job: data access, progress, state queries
 - Tests for all above
 
-### Phase 2: Advanced Features
+### Phase 2: Advanced Features - Complete
 
 - Delayed jobs (scheduled ZSet + promotion loop)
 - Priorities (encoded scores)
@@ -614,14 +602,14 @@ The plan below reflects the original implementation rollout. These phases are co
 - Rate limiting
 - Global concurrency
 
-### Phase 3: Flows + Events
+### Phase 3: Flows + Events - Complete
 
 - FlowProducer: parent-child job trees
 - QueueEvents: stream-based event subscription
 - Job schedulers (repeatable/cron jobs)
 - Metrics collection
 
-### Phase 4: Production Hardening
+### Phase 4: Production Hardening - Complete
 
 - Graceful shutdown
 - Connection error recovery
@@ -631,7 +619,7 @@ The plan below reflects the original implementation rollout. These phases are co
 
 ## Verification
 
-- Unit tests for each Lua script in isolation
+- Unit tests for each server function in isolation
 - Integration tests with real Valkey instance (standalone + cluster)
 - Benchmark against BullMQ (jobs/sec, latency p50/p99, memory)
 - Stalled job recovery test (kill worker mid-processing)

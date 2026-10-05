@@ -1,6 +1,8 @@
 # Interface: SearchJobsOptions
 
-Defined in: [glide-mq/src/types.ts:386](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L386)
+Defined in: [glide-mq/src/types.ts:593](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L593)
+
+Options for searchJobs() method.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:386](https://github.com/avifenesh/glide-mq/bl
 optional data?: Record&lt;string, unknown>;
 ```
 
-Defined in: [glide-mq/src/types.ts:389](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L389)
+Defined in: [glide-mq/src/types.ts:596](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L596)
 
 ***
 
@@ -20,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:389](https://github.com/avifenesh/glide-mq/bl
 optional excludeData?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:392](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L392)
+Defined in: [glide-mq/src/types.ts:599](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L599)
 
 When true, excludes `data` and `returnvalue` fields from returned jobs.
 
@@ -32,7 +34,7 @@ When true, excludes `data` and `returnvalue` fields from returned jobs.
 optional limit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:390](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L390)
+Defined in: [glide-mq/src/types.ts:597](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L597)
 
 ***
 
@@ -42,7 +44,7 @@ Defined in: [glide-mq/src/types.ts:390](https://github.com/avifenesh/glide-mq/bl
 optional name?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:388](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L388)
+Defined in: [glide-mq/src/types.ts:595](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L595)
 
 ***
 
@@ -52,4 +54,4 @@ Defined in: [glide-mq/src/types.ts:388](https://github.com/avifenesh/glide-mq/bl
 optional state?: "completed" | "failed" | "delayed" | "active" | "waiting";
 ```
 
-Defined in: [glide-mq/src/types.ts:387](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L387)
+Defined in: [glide-mq/src/types.ts:594](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L594)

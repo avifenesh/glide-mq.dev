@@ -2,37 +2,29 @@
 
 ```ts
 function dag(
-   nodes, 
-   connection, 
-prefix?): Promise<Map&lt;string, Job&lt;any, any>>>;
+   nodes,
+   connection,
+   prefix?
+): Promise<ClosableWorkflow<Map&lt;string, Job&lt;any, any>>>>;
 ```
 
-Defined in: [glide-mq/src/workflows.ts:165](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/workflows.ts#L165)
+Defined in: [glide-mq/src/workflows.ts:175](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/workflows.ts#L175)
 
 DAG: submit a directed acyclic graph of jobs where each job can depend on
 multiple other jobs. The graph is validated for cycles and submitted in
 topological order (leaves first).
 
 Returns a Map of node name to Job instance.
-
-Example - diamond dependency:
-```
-const jobs = await dag([
-  { name: 'A', queueName: 'q', data: {}, deps: [] },
-  { name: 'B', queueName: 'q', data: {}, deps: ['A'] },
-  { name: 'C', queueName: 'q', data: {}, deps: ['A'] },
-  { name: 'D', queueName: 'q', data: {}, deps: ['B', 'C'] },
-], connection);
-```
+Pass `{ client }` on the connection to keep returned jobs usable.
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `nodes` | [`DAGNode`](../interfaces/DAGNode.md)[] |
-| `connection` | [`ConnectionOptions`](../interfaces/ConnectionOptions.md) |
+| `connection` | [`WorkflowConnection`](../type-aliases/WorkflowConnection.md) |
 | `prefix?` | `string` |
 
 ## Returns
 
-`Promise`&lt;`Map`&lt;`string`, [`Job`](../classes/Job.md)&lt;`any`, `any`&gt;&gt;&gt;
+`Promise`&lt;[`ClosableWorkflow`](../type-aliases/ClosableWorkflow.md)&lt;`Map`&lt;`string`, [`Job`](../classes/Job.md)&lt;`any`, `any`&gt;&gt;&gt;&gt;

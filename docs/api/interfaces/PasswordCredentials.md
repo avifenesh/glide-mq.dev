@@ -1,6 +1,6 @@
 # Interface: PasswordCredentials
 
-Defined in: [glide-mq/src/types.ts:8](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L8)
+Defined in: [glide-mq/src/types.ts:8](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L8)
 
 Standard password-based credentials.
 
@@ -12,7 +12,7 @@ Standard password-based credentials.
 password: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:10](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L10)
+Defined in: [glide-mq/src/types.ts:10](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L10)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [glide-mq/src/types.ts:10](https://github.com/avifenesh/glide-mq/blo
 optional username?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:9](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L9)
+Defined in: [glide-mq/src/types.ts:9](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L9)

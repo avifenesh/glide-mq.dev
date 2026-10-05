@@ -1,6 +1,8 @@
 # Interface: MetricsOptions
 
-Defined in: [glide-mq/src/types.ts:357](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L357)
+Defined in: [glide-mq/src/types.ts:560](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L560)
+
+Options for querying metrics data points.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:357](https://github.com/avifenesh/glide-mq/bl
 optional end?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:361](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L361)
+Defined in: [glide-mq/src/types.ts:564](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L564)
 
 End index for data points (default -1 = all).
 
@@ -22,6 +24,6 @@ End index for data points (default -1 = all).
 optional start?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:359](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L359)
+Defined in: [glide-mq/src/types.ts:562](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L562)
 
 Start index for data points (default 0).
