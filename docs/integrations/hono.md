@@ -1,11 +1,11 @@
 ---
 title: Hono Integration
-description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, flow orchestration, usage summaries, and broadcast SSE.
+description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Typed registry access, flow orchestration, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hono
 
-REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router gives you the full queue management surface with type-safe RPC.
+REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router gives you the full queue management surface with typed context and registry access.
 
 ::: info Package Links
 - **npm:** [@glidemq/hono](https://www.npmjs.com/package/@glidemq/hono)
@@ -14,7 +14,7 @@ REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as
 
 ## Why @glidemq/hono
 
-- **Type-safe RPC client** -- export `GlideMQApiType` and use Hono's `hc<>` for end-to-end typed HTTP calls with zero codegen
+- **Typed registry access** - `GlideMQEnv` types the request context and supports typed queue access in custom routes
 - **Serverless producers** - lightweight `Producer` re-exports reduce queue overhead in server-side NAPI runtimes. Edge runtimes such as Cloudflare Workers should call the [HTTP proxy](/guide/serverless) instead of importing the native client.
 - **Multi-runtime** - run directly on Node.js, Bun, or Deno with NAPI support; edge callers use HTTP
 - **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you queue control, SSE events, scheduler CRUD, flow orchestration, rolling usage summaries, and broadcast over HTTP
@@ -102,22 +102,27 @@ app.use(glideMQ(registry));
 process.on('SIGTERM', () => registry.closeAll());
 ```
 
-## Type-Safe RPC Client
+## HTTP Client
 
-Hono's `hc` client infers route types from the router, giving you end-to-end typed HTTP calls with no codegen and no OpenAPI spec:
+Use an HTTP client with the same authentication header as other API callers:
 
 ```ts
-import { hc } from 'hono/client';
-import type { GlideMQApiType } from '@glidemq/hono';
-
-const client = hc<GlideMQApiType>('http://localhost:3000/api/queues');
-
-const res = await client[':name'].jobs.$post({
-  param: { name: 'emails' },
-  json: { name: 'welcome', data: { to: 'user@example.com' } },
+const apiToken = process.env.QUEUE_API_TOKEN;
+if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before calling the API');
+const res = await fetch('http://localhost:3000/api/queues/emails/jobs', {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${apiToken}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ name: 'welcome', data: { to: 'user@example.com' } }),
 });
-const job = await res.json(); // typed as JobResponse
+if (!res.ok) throw new Error(`Queue API returned ${res.status}`);
+const job: unknown = await res.json();
+// Validate the response shape before using it in application code.
 ```
+
+In 0.5.1, `GlideMQApiType` resolves to a router with Hono's `BlankSchema`. `hc<GlideMQApiType>` therefore does not infer the HTTP endpoint names or response types. Typed middleware context and registry access are available, but end-to-end RPC route inference is not supported by this release.
 
 ## Endpoints
 
@@ -180,7 +185,7 @@ const job = await res.json(); // typed as JobResponse
 ## Features
 
 - **Full queue HTTP API** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, queue events, schedulers, producers, flow create/read/tree/delete, flow usage/budget, usage summary, and broadcast routes
-- **Type-safe RPC** -- `hc<GlideMQApiType>` gives end-to-end typed HTTP calls with no codegen
+- **Typed middleware context** - application variables are available to `authorize` through the router's generic environment type
 - **Serverless producers** - re-exports `Producer`, `ServerlessPool`, and `serverlessPool` from glide-mq for server-side NAPI runtimes
 - **Real-time SSE** -- streams `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events via Hono's `streamSSE`
 - **Queue access control** -- restrict which queues and producers are exposed via `GlideMQApiConfig`; the queue allowlist also governs broadcast names and `/usage/summary?queues=...`

@@ -13,16 +13,15 @@ Simple Hono app using glide-mq directly (no `@glidemq/hono` package needed). Sho
 
 ```typescript
 import { Hono } from 'hono';
-import { bearerAuth } from 'hono/bearer-auth';
 import { serve } from '@hono/node-server';
-import { Queue, Worker } from 'glide-mq';
+import { Queue, Worker, type Job } from 'glide-mq';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
 const emailQueue = new Queue('emails', { connection });
 
 // Worker - processes jobs in background
-const worker = new Worker('emails', async (job) => {
+const worker = new Worker('emails', async (job: Job) => {
   console.log(`Sending email to ${job.data.to}: ${job.data.subject}`);
   // Simulate email sending
   await new Promise(r => setTimeout(r, 500));
@@ -57,10 +56,11 @@ serve({ fetch: app.fetch, port: 3000 }, () => {
 
 ## Hono API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, type-safe RPC, and direct queue access via `c.var.glideMQ`.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, and typed registry access via `c.var.glideMQ`.
 
 ```typescript
 import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
 import { serve } from '@hono/node-server';
 import { glideMQ, glideMQApi, QueueRegistryImpl } from '@glidemq/hono';
 import type { GlideMQEnv } from '@glidemq/hono';
@@ -92,6 +92,7 @@ const registry = new QueueRegistryImpl({
 const app = new Hono<GlideMQEnv>();
 const apiToken = process.env.QUEUE_API_TOKEN;
 if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before starting the API');
+
 app.use('*', bearerAuth({ token: apiToken }));
 
 // Mount middleware - injects registry into c.var.glideMQ
@@ -211,6 +212,181 @@ Basic Hapi.js server using glide-mq directly (no `@glidemq/hapi` plugin). Featur
 
 ```typescript
 import Hapi from '@hapi/hapi';
+import { Queue, Worker } from 'glide-mq';
+import type { Job } from 'glide-mq';
+
+const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
+
+// Processor functions
+async function processEmail(job: Job) {
+  console.log(`Sending email to ${job.data.to}`);
+  return { sent: true, to: job.data.to };
+}
+
+async function processOrder(job: Job) {
+  console.log(`Processing order ${job.data.orderId}`);
+  await job.updateProgress(50);
+  return { orderId: job.data.orderId, status: 'shipped' };
+}
+
+// Create queues and workers
+const emailQueue = new Queue('emails', { connection });
+const orderQueue = new Queue('orders', { connection });
+
+const emailWorker = new Worker('emails', processEmail, { connection, concurrency: 5 });
+const orderWorker = new Worker('orders', processOrder, { connection, concurrency: 3 });
+
+emailWorker.on('completed', (job) => console.log(`Email job ${job.id} done`));
+orderWorker.on('completed', (job) => console.log(`Order job ${job.id} done`));
+emailWorker.on('error', (err) => console.error('Email worker error:', err));
+orderWorker.on('error', (err) => console.error('Order worker error:', err));
+
+// Queue registry helper
+function getQueue(name: unknown): Queue | null {
+  if (name === 'emails') return emailQueue;
+  if (name === 'orders') return orderQueue;
+  return null;
+}
+
+// Hapi server
+const server = Hapi.server({ port: 3000, host: 'localhost' });
+
+// Add a job
+server.route({
+  method: 'POST',
+  path: '/api/queues/{name}/jobs',
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    const { name, data, opts } = request.payload as any;
+    if (!name || typeof name !== 'string') {
+      return h.response({ error: 'Validation failed', details: ['name is required'] }).code(400);
+    }
+
+    const job = await queue.add(name, data ?? {}, opts);
+    return h.response({ id: job?.id, name: job?.name, data: job?.data }).code(201);
+  },
+});
+
+// List jobs
+server.route({
+  method: 'GET',
+  path: '/api/queues/{name}/jobs',
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    const query = request.query as Record<string, string>;
+    const type = query.type ?? 'waiting';
+    const start = Number(query.start ?? 0);
+    const end = Math.min(Number(query.end ?? 99), 99);
+    const jobs = await queue.getJobs(type as any, start, end);
+    return h.response(jobs.map((j) => ({ id: j.id, name: j.name, data: j.data })));
+  },
+});
+
+// Get single job
+server.route({
+  method: 'GET',
+  path: '/api/queues/{name}/jobs/{id}',
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    const id = request.params.id;
+    if (typeof id !== 'string') return h.response({ error: 'Invalid job ID' }).code(400);
+    const job = await queue.getJob(id);
+    if (!job) return h.response({ error: 'Job not found' }).code(404);
+
+    return h.response({ id: job.id, name: job.name, data: job.data });
+  },
+});
+
+// Job counts
+server.route({
+  method: 'GET',
+  path: '/api/queues/{name}/counts',
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    return h.response(await queue.getJobCounts());
+  },
+});
+
+// Pause queue
+server.route({
+  method: 'POST',
+  path: '/api/queues/{name}/pause',
+  options: { payload: { failAction: 'ignore' as const } },
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    await queue.pause();
+    return h.response().code(204);
+  },
+});
+
+// Resume queue
+server.route({
+  method: 'POST',
+  path: '/api/queues/{name}/resume',
+  options: { payload: { failAction: 'ignore' as const } },
+  handler: async (request, h) => {
+    const queue = getQueue(request.params.name);
+    if (!queue) return h.response({ error: 'Queue not found' }).code(404);
+
+    await queue.resume();
+    return h.response().code(204);
+  },
+});
+
+// Convenience routes
+server.route({
+  method: 'POST',
+  path: '/send-email',
+  handler: async (request, h) => {
+    const { to, subject, body } = request.payload as any;
+    const job = await emailQueue.add('send', { to, subject, body });
+    return h.response({ jobId: job?.id ?? null });
+  },
+});
+
+server.route({
+  method: 'POST',
+  path: '/place-order',
+  handler: async (request, h) => {
+    const { items, total } = request.payload as any;
+    const job = await orderQueue.add('process', { orderId: `ORD-${Date.now()}`, items, total });
+    return h.response({ jobId: job?.id ?? null });
+  },
+});
+
+// Start server
+await server.start();
+console.log('Hapi server running at', server.info.uri);
+console.log('Queue API at http://localhost:3000/api/queues');
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  await server.stop();
+  await Promise.all([emailQueue.close(), orderQueue.close(), emailWorker.close(), orderWorker.close()]);
+  process.exit(0);
+});
+```
+
+[View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/hapi-basic)
+
+---
+
+## Hapi API
+
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
+
+```typescript
+import Hapi from '@hapi/hapi';
 import { glideMQPlugin } from '@glidemq/hapi';
 import type { Job } from 'glide-mq';
 
@@ -240,91 +416,6 @@ await server.register({
   plugin: glideMQPlugin,
   options: { connection, queues, routes: true },
 }, { routes: { prefix: '/api/queues' } });
-
-// Custom route using the queue directly
-server.route({
-  method: 'POST',
-  path: '/send-email',
-  handler: async (request, h) => {
-    const { to, subject, body } = request.payload as any;
-    const { queue } = request.server.glidemq.get('emails');
-    const job = await queue.add('send', { to, subject, body });
-    return h.response({ jobId: job?.id ?? null });
-  },
-});
-
-server.route({
-  method: 'POST',
-  path: '/place-order',
-  handler: async (request, h) => {
-    const { items, total } = request.payload as any;
-    const { queue } = request.server.glidemq.get('orders');
-    const job = await queue.add('process', { orderId: `ORD-${Date.now()}`, items, total });
-    return h.response({ jobId: job?.id ?? null });
-  },
-});
-
-// Start server
-await server.start();
-console.log('Hapi server running at', server.info.uri);
-console.log('Queue API at http://localhost:3000/api/queues');
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  await server.stop(); // triggers onPostStop hook -> registry.closeAll()
-  process.exit(0);
-});
-```
-
-[View full source](https://github.com/avifenesh/glidemq-examples/tree/main/examples/hapi-basic)
-
----
-
-## Hapi API
-
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, direct queue access via `request.server.glidemq`, and automatic graceful shutdown via Hapi's `onPostStop` hook.
-
-```typescript
-import Hapi from '@hapi/hapi';
-import { glideMQPlugin, glideMQRoutes, QueueRegistryImpl } from '@glidemq/hapi';
-import type { Job } from 'glide-mq';
-
-const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
-
-// Processor functions
-async function processEmail(job: Job) {
-  console.log(`Sending email to ${job.data.to}`);
-  return { sent: true, to: job.data.to };
-}
-
-async function processOrder(job: Job) {
-  console.log(`Processing order ${job.data.orderId}`);
-  await job.updateProgress(50);
-  return { orderId: job.data.orderId, status: 'shipped' };
-}
-
-// Create registry for graceful shutdown access
-const registry = new QueueRegistryImpl({
-  connection,
-  queues: {
-    emails: { processor: processEmail, concurrency: 5 },
-    orders: { processor: processOrder, concurrency: 3 },
-  },
-});
-
-const server = Hapi.server({ port: 3000, host: 'localhost' });
-
-// Register core plugin with pre-built registry
-await server.register({
-  plugin: glideMQPlugin,
-  options: registry as any,
-});
-
-// Mount queue HTTP API + SSE
-await server.register({
-  plugin: glideMQRoutes,
-  options: { prefix: '/api/queues' },
-});
 
 // Custom route using the queue directly
 server.route({
@@ -813,7 +904,7 @@ Web UI for monitoring and managing glide-mq queues using `@glidemq/dashboard`. F
 
 ```typescript
 import express from 'express';
-import { Queue, Worker } from 'glide-mq';
+import { Queue, Worker, type Job } from 'glide-mq';
 import { createDashboard } from '@glidemq/dashboard';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
@@ -824,17 +915,17 @@ const slow = new Queue('slow-queue', { connection });
 const flaky = new Queue('flaky-queue', { connection });
 
 // Workers
-const fastWorker = new Worker('fast-queue', async (job) => {
+const fastWorker = new Worker('fast-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 30 + Math.random() * 70));
   return { processed: job.name, seq: job.data.i };
 }, { connection, concurrency: 5, blockTimeout: 1000 });
 
-const slowWorker = new Worker('slow-queue', async (job) => {
+const slowWorker = new Worker('slow-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
   return { result: 'done', size: job.data.size };
 }, { connection, concurrency: 1, blockTimeout: 1000 });
 
-const flakyWorker = new Worker('flaky-queue', async (job) => {
+const flakyWorker = new Worker('flaky-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
   if (Math.random() < 0.3) throw new Error('Random failure on attempt ' + (job.attemptsMade + 1));
   return { ok: true };

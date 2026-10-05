@@ -31,7 +31,7 @@ The integrations share the same core queue model, but they expose it in differen
 
 | If you use... | Install |
 |---------------|---------|
-| **Hono** (Node.js, Bun, Deno with NAPI) | `@glidemq/hono` - type-safe RPC and authorization; edge callers use HTTP |
+| **Hono** (Node.js, Bun, Deno with NAPI) | `@glidemq/hono` - typed context and authorization; edge callers use HTTP |
 | **Fastify** (high-performance Node.js) | `@glidemq/fastify` - encapsulation-aware, Zod validation |
 | **NestJS** (enterprise, decorators, DI) | `@glidemq/nestjs` - `@Processor`, `@InjectQueue`, full lifecycle |
 | **Hapi** (enterprise, Joi validation) | `@glidemq/hapi` - Joi schemas, access control, SSE |

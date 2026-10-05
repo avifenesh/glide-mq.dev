@@ -30,6 +30,8 @@ npm run docs:preview
 
 The committed API reference is generated from `glide-mq` v0.17.0. To regenerate it, check out that exact core tag in a sibling `../glide-mq` directory, install the core's dependencies, then run `npm run docs:gen`. Building the committed site with `npm run docs:build` needs no sibling checkout.
 
+To compile the framework examples embedded in the site, install the dependencies in the sibling `glidemq-examples` repository, then run `npm run docs:check-examples`. Pass a different examples checkout with `npm run docs:check-examples -- /path/to/glidemq-examples`.
+
 ## License
 
 Apache-2.0 © glide-mq contributors
