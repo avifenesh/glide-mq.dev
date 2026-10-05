@@ -1,6 +1,6 @@
 # Class: Producer&lt;D&gt;
 
-Defined in: [glide-mq/src/producer.ts:73](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L73)
+Defined in: [glide-mq/src/producer.ts:74](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L74)
 
 ## Type Parameters
 
@@ -16,7 +16,7 @@ Defined in: [glide-mq/src/producer.ts:73](https://github.com/avifenesh/glide-mq/
 new Producer<D>(name, opts): Producer<D>;
 ```
 
-Defined in: [glide-mq/src/producer.ts:86](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L86)
+Defined in: [glide-mq/src/producer.ts:87](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L87)
 
 #### Parameters
 
@@ -37,7 +37,7 @@ Defined in: [glide-mq/src/producer.ts:86](https://github.com/avifenesh/glide-mq/
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/producer.ts:74](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L74)
+Defined in: [glide-mq/src/producer.ts:75](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L75)
 
 ## Accessors
 
@@ -49,7 +49,7 @@ Defined in: [glide-mq/src/producer.ts:74](https://github.com/avifenesh/glide-mq/
 get isClosed(): boolean;
 ```
 
-Defined in: [glide-mq/src/producer.ts:515](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L515)
+Defined in: [glide-mq/src/producer.ts:534](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L534)
 
 Returns true if close() has been called.
 
@@ -63,12 +63,13 @@ Returns true if close() has been called.
 
 ```ts
 add(
-   name, 
-   data, 
-opts?): Promise&lt;string | null>;
+   name,
+   data,
+   opts?
+): Promise&lt;string | null>;
 ```
 
-Defined in: [glide-mq/src/producer.ts:273](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L273)
+Defined in: [glide-mq/src/producer.ts:274](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L274)
 
 Add a single job to the queue.
 Returns the job ID (string) or null if deduplicated/collision.
@@ -93,7 +94,7 @@ Returns the job ID (string) or null if deduplicated/collision.
 addBulk(jobs): Promise<(string | null)[]>;
 ```
 
-Defined in: [glide-mq/src/producer.ts:374](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L374)
+Defined in: [glide-mq/src/producer.ts:375](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L375)
 
 Add multiple jobs in a single pipeline round trip.
 Returns an array of job IDs (string or null for dedup/collision).
@@ -116,7 +117,7 @@ Returns an array of job IDs (string or null for dedup/collision).
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/producer.ts:523](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L523)
+Defined in: [glide-mq/src/producer.ts:542](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L542)
 
 Close the producer. If the client was created by this producer, it is destroyed.
 If an external client was provided, it is not closed.

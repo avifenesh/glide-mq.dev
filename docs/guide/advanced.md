@@ -23,9 +23,10 @@ description: Job schedulers, rate limiting, deduplication, compression, retries,
 - [Retries and Backoff](#retries-and-backoff)
 - [Dead Letter Queues](#dead-letter-queues)
 - [Fallback Chains](#fallback-chains)
-- [Dual-Axis Rate Limiting (RPM + TPM)](#dual-axis-rate-limiting)
-- [Per-Job Lock Duration](#per-job-lock-duration)
-- [Vector Search](#vector-search)
+- [Dual-axis Rate Limiting (RPM + TPM)](#dual-axis-rate-limiting-rpm--tpm)
+- [Per-job Lock Duration](#per-job-lock-duration)
+- [Vector Search Index Management](#vector-search-index-management)
+- [Request Timeout](#request-timeout)
 
 ---
 
@@ -38,10 +39,10 @@ By default, each glide-mq component creates its own GLIDE client (one TCP connec
 ```typescript
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
-const queue  = new Queue('jobs', { connection });        // 1 connection
-const flow   = new FlowProducer({ connection });          // 1 connection
-const worker = new Worker('jobs', handler, { connection });// 2 connections (command + blocking)
-const events = new QueueEvents('jobs', { connection });   // 1 connection
+const queue = new Queue('jobs', { connection }); // 1 connection
+const flow = new FlowProducer({ connection }); // 1 connection
+const worker = new Worker('jobs', handler, { connection }); // 2 connections (command + blocking)
+const events = new QueueEvents('jobs', { connection }); // 1 connection
 // Total: 5 TCP connections
 ```
 
@@ -53,8 +54,8 @@ import { GlideClient } from '@glidemq/speedkey';
 const client = await GlideClient.createClient({ addresses: [{ host: 'localhost' }] });
 const connection = { addresses: [{ host: 'localhost' }] };
 
-const queue  = new Queue('jobs', { client });
-const flow   = new FlowProducer({ client });
+const queue = new Queue('jobs', { client });
+const flow = new FlowProducer({ client });
 const worker = new Worker('jobs', handler, { connection, commandClient: client });
 const events = new QueueEvents('jobs', { connection });
 // Total: 2 TCP connections (shared + Worker's blocking client)
@@ -77,16 +78,16 @@ new QueueEvents('jobs', { connection, client } as any);
 
 ### Tradeoffs
 
-| | Dedicated (default) | Shared |
-|---|---|---|
-| **Connections** | N+2 per setup (1 per Queue/FlowProducer + 2 per Worker + 1 per QueueEvents) | 2 (shared + blocking) |
-| **Throughput** | Baseline | Same or slightly better (fewer NAPI wake callbacks) |
-| **Latency** | Baseline | Same (p50/p95/p99 identical in benchmarks) |
-| **Isolation** | Each component has its own connection - failures are independent | All components sharing a client are affected by a disconnect |
-| **Reconnection** | Each component reconnects independently | Worker emits error if shared client is unreachable - you manage reconnection |
-| **Lifecycle** | Component creates and closes its own client | You create the client, you close it. `close()` on a component does not destroy the shared client. |
-| **Simplicity** | Pass `connection` - done | Must create client upfront, pass it around, close in correct order |
-| **Memory** | Slightly higher (N client objects + Rust state machines) | Lower (1 client object shared) |
+|                  | Dedicated (default)                                                         | Shared                                                                                            |
+| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Connections**  | N+2 per setup (1 per Queue/FlowProducer + 2 per Worker + 1 per QueueEvents) | 2 (shared + blocking)                                                                             |
+| **Throughput**   | Baseline                                                                    | Same or slightly better (fewer NAPI wake callbacks)                                               |
+| **Latency**      | Baseline                                                                    | Same (p50/p95/p99 identical in benchmarks)                                                        |
+| **Isolation**    | Each component has its own connection - failures are independent            | All components sharing a client are affected by a disconnect                                      |
+| **Reconnection** | Each component reconnects independently                                     | Worker emits error if shared client is unreachable - you manage reconnection                      |
+| **Lifecycle**    | Component creates and closes its own client                                 | You create the client, you close it. `close()` on a component does not destroy the shared client. |
+| **Simplicity**   | Pass `connection` - done                                                    | Must create client upfront, pass it around, close in correct order                                |
+| **Memory**       | Slightly higher (N client objects + Rust state machines)                    | Lower (1 client object shared)                                                                    |
 
 ### When to use shared
 
@@ -111,15 +112,15 @@ new QueueEvents('jobs', { connection, client } as any);
 
 ```typescript
 // Correct: close components first, then shared client
-await queue.close();    // detaches from shared client (does not close it)
-await worker.close();   // closes only the auto-created blocking client
-await flow.close();     // detaches from shared client
-client.close();         // now safe - no components using it
+await queue.close(); // detaches from shared client (does not close it)
+await worker.close(); // closes only the auto-created blocking client
+await flow.close(); // detaches from shared client
+client.close(); // now safe - no components using it
 ```
 
 ### Producer with an external client
 
-`Producer` also supports external client injection. When `opts.client` is provided the Producer borrows the connection without taking ownership - `close()` will not destroy it. This is the recommended pattern for serverless environments where the connection lifecycle must align with the request lifecycle:
+`Producer` also supports external client injection. When `opts.client` is provided the Producer borrows the connection without taking ownership  -  `close()` will not destroy it. This is the recommended pattern for serverless environments where the connection lifecycle must align with the request lifecycle:
 
 ```typescript
 import { GlideClient } from '@glidemq/speedkey';
@@ -139,7 +140,7 @@ export async function handler(event) {
 }
 ```
 
-For connection reuse across warm invocations, use `ServerlessPool` instead - see [Serverless](./serverless).
+For connection reuse across warm invocations, use `ServerlessPool` instead  -  see `docs/SERVERLESS.md`.
 
 ### `inflightRequestsLimit`
 
@@ -158,7 +159,7 @@ At Worker concurrency=50, peak inflight is ~55 commands. The 1000 default suppor
 
 ## Job Schedulers
 
-Use `upsertJobScheduler` to define repeatable jobs driven by a cron expression or a fixed interval. Schedulers survive worker restarts - the next run time is stored in Valkey.
+Use `upsertJobScheduler` to define repeatable jobs driven by a cron expression or a fixed interval. Schedulers survive worker restarts  -  the next run time is stored in Valkey.
 
 ```typescript
 const queue = new Queue('tasks', { connection });
@@ -185,7 +186,7 @@ await queue.upsertJobScheduler(
 // Interval: run "cleanup" every 5 minutes
 await queue.upsertJobScheduler(
   'cleanup',
-  { every: 5 * 60 * 1_000 },  // ms
+  { every: 5 * 60 * 1_000 }, // ms
   { name: 'cleanup-old-records', data: {} },
 );
 
@@ -196,22 +197,45 @@ const schedulers = await queue.getRepeatableJobs();
 await queue.removeJobScheduler('cleanup');
 ```
 
+### Cron syntax
+
+Patterns use the standard 5 fields, `minute hour day-of-month month day-of-week`, or 6 fields with a leading `second`. Each field accepts `*`, numbers, ranges (`1-5`), steps (`*/15`, `10-40/10`, `5/15` = from 5 to the end of the field) and lists (`1,15`). Patterns run in UTC unless `tz` is set. The syntax is a superset of cron-parser 4.9, the parser BullMQ uses; a test compares the two over 44 patterns in 4 timezones.
+
+- **Names**: `JAN`-`DEC` in the month field, `SUN`-`SAT` in the day-of-week field, case-insensitive, in values, ranges, steps and lists: `0 9 * * MON-FRI`, `0 0 1 JAN-MAR/2 *`.
+- **Day-of-week**: `0`-`7`, where both `0` and `7` are Sunday (`5-7` is Friday to Sunday).
+- **`?`**: in either day field, the same as `*`.
+- **`L`**: in day-of-month, `L` is the last day of the month and `LW` the last weekday (Mon-Fri). In day-of-week, `5L` or `FRIL` is the last Friday of the month.
+- **`W`**: in day-of-month, `15W` is the weekday nearest the 15th without leaving the month (Saturday moves to Friday, Sunday to Monday; `1W` on a Saturday runs Monday the 3rd; `31W` skips 30-day months). cron-parser does not accept `W`; Quartz does.
+- **`#`**: in day-of-week, `2#1` or `TUE#1` is the first Tuesday of the month, `n` from 1 to 5. Modifiers can be listed (`1#2,5L`), which cron-parser rejects.
+- **Seconds**: `*/10 * * * * *` matches every 10 seconds and `30 0 9 * * *` matches 09:00:30. `nextCronOccurrence` honors the field to the second, but the scheduler creates jobs on its promotion tick (`promotionInterval`, default 5000 ms), at most one per scheduler per tick: a job runs within one tick of its cron time, and a period shorter than the tick (`* * * * * *`) produces one job per tick, not one per second. Lower `promotionInterval` for finer granularity.
+- **Errors**: a malformed field throws at `upsertJobScheduler` (`Invalid cron token: 5foo`, `Cron value out of bounds: 60`, `Cron range reversed: 10-5`). A pattern that has no occurrence in the next 10 years (`0 0 30 2 *`) throws `No cron match found within 10 years`.
+- **Day-of-month and day-of-week**: when both fields are restricted, a day matches if either field matches. `0 0 1 * 1` fires on every 1st of the month and on every Monday. When one of them is unrestricted, only the other one decides. A field is unrestricted when it is `*`, `?` or `*/1` (day-of-month also when it covers `1-31`). An explicit `0-6` day-of-week counts as restricted. This matches cron-parser (BullMQ). Vixie cron differs only for stepped wildcards such as `*/2`, which it treats as unrestricted. Releases up to 0.15.5 required both fields to match.
+- **Daylight saving time** (with `tz`): follows vixie cron. A pattern whose minute or hour field contains `*` (`*/15 * * * *`, `0 * * * *`) is a wildcard pattern and runs on elapsed time: when clocks fall back it fires in both instances of the repeated hour. Any other pattern is fixed-time (`30 1 * * *`, `0,30 1-3 * * *`) and fires once: at the earlier instant when clocks fall back, and at the first instant after the gap when clocks spring forward (`30 2 * * *` in America/New_York runs at 03:00 EDT on the transition day; several skipped times coalesce into that one run). Wildcard patterns skip the missing times. Releases up to 0.15.5 lost part of the repeated hour and skipped fixed times inside the gap until the next day.
+
 ### Repeat-after-complete mode
 
 `repeatAfterComplete` schedules the next job only after the current one completes (or terminally fails). Unlike `every`, which fires at fixed intervals regardless of processing time, `repeatAfterComplete` ensures no overlap between successive runs.
 
 ```typescript
 // Poll a sensor every 5 seconds after the previous poll finishes
-await queue.upsertJobScheduler('sensor-poll', {
-  repeatAfterComplete: 5000, // 5s after previous job completes
-}, { name: 'poll', data: { sensor: 'temp-1' } });
+await queue.upsertJobScheduler(
+  'sensor-poll',
+  {
+    repeatAfterComplete: 5000, // 5s after previous job completes
+  },
+  { name: 'poll', data: { sensor: 'temp-1' } },
+);
 ```
 
 This mode is useful for:
 
-- **Polling** - avoid stacking requests when the upstream is slow.
-- **Sequential pipelines** - each step must finish before the next begins.
-- **Adaptive intervals** - combine with a custom processor that adjusts `repeatAfterComplete` via `upsertJobScheduler` based on results.
+- **Polling**  -  avoid stacking requests when the upstream is slow.
+- **Sequential pipelines**  -  each step must finish before the next begins.
+- **Adaptive intervals**  -  combine with a custom processor that adjusts `repeatAfterComplete` via `upsertJobScheduler` based on results.
+
+Upserting a `repeatAfterComplete` scheduler while its job is running (for example from inside the processor) keeps waiting for that job: the next run is scheduled when it completes, using the new interval, and `iterationCount` is kept unless `tz`, `startDate` or `endDate` changed. It never starts a second, overlapping chain. To force an immediate run, remove the scheduler and upsert it again.
+
+Switching an existing `every` or `pattern` scheduler to `repeatAfterComplete` does not fire at once: the first run stays at the old mode's `nextRun` (or a later `startDate`). Every scheduler entry records the job its last tick fired (`inflightJobId`). If that job is still running when the held `nextRun` passes, the tick parks the entry (`nextRun` 0) and the first `repeatAfterComplete` run is scheduled `repeatAfterComplete` ms after that job completes or fails terminally, so the two never overlap. Only the recorded job advances a parked entry; a job from an earlier chain that finishes late is ignored.
 
 `repeatAfterComplete` is mutually exclusive with `pattern` and `every`. Bounded options (`startDate`, `endDate`, `limit`) work normally with this mode.
 
@@ -219,11 +243,11 @@ This mode is useful for:
 
 All three scheduler modes (`pattern`, `every`, `repeatAfterComplete`) support bounding via `startDate`, `endDate`, and `limit`:
 
-| Option | Type | Effect |
-|--------|------|--------|
-| `startDate` | `Date \| number` | Defer the first eligible run until this time. |
-| `endDate` | `Date \| number` | Auto-remove the scheduler when the next scheduled time would exceed this date. |
-| `limit` | `number` | Auto-remove the scheduler after creating this many jobs. |
+| Option      | Type             | Effect                                                                         |
+| ----------- | ---------------- | ------------------------------------------------------------------------------ |
+| `startDate` | `Date \| number` | Defer the first eligible run until this time.                                  |
+| `endDate`   | `Date \| number` | Auto-remove the scheduler when the next scheduled time would exceed this date. |
+| `limit`     | `number`         | Auto-remove the scheduler after creating this many jobs.                       |
 
 ```typescript
 // Run a cron job during a specific campaign window, max 36 runs
@@ -243,9 +267,9 @@ await queue.upsertJobScheduler(
   'warmup-cache',
   {
     every: 30_000,
-    startDate: Date.now() + 60_000,  // first run delayed 1 minute
+    startDate: Date.now() + 60_000, // first run delayed 1 minute
     endDate: new Date('2026-12-31'), // stop scheduling after this date
-    limit: 100,                       // auto-remove after 100 runs
+    limit: 100, // auto-remove after 100 runs
   },
   { name: 'warmup', data: { region: 'us-east' } },
 );
@@ -254,6 +278,8 @@ await queue.upsertJobScheduler(
 `getJobScheduler()` / `getRepeatableJobs()` expose the stored bounds together with `iterationCount` so you can inspect how many runs have already fired.
 
 The internal `Scheduler` class fires a promotion loop that converts due scheduler entries into real jobs, then re-registers the next occurrence.
+
+The template `opts` accept the same job options as `Queue.add` except `delay`, `deduplication`, `parent` and `jobId`, and `upsertJobScheduler` validates them the same way, so an invalid template is rejected at upsert. Ordering keys, group concurrency and rate limits, token buckets and `cost` apply to every scheduled job. `jobId` is rejected: each run gets a generated id, and a fixed id would drop every run after the first as a duplicate. `delay`, `deduplication` and `parent` are rejected too, since the tick never applies them.
 
 ---
 
@@ -278,7 +304,7 @@ Workers check sources in this order: **priority > LIFO > FIFO**. Priority jobs (
   ```
   Error: lifo and ordering.key cannot be used together
   ```
-- LIFO jobs are stored in a dedicated Valkey LIST (`glide:{queueName}:lifo`), separate from the main stream. This means LIFO and FIFO jobs in the same queue coexist - LIFO jobs are drained first.
+- LIFO jobs are stored in a dedicated Valkey LIST (`glide:{queueName}:lifo`), separate from the main stream. This means LIFO and FIFO jobs in the same queue coexist  -  LIFO jobs are drained first.
 - Under `concurrency > 1`, multiple LIFO jobs may run in parallel; strict reverse ordering is only guaranteed with `concurrency: 1`.
 - Works with all job types: delayed jobs return to the LIFO list after their delay expires, and schedulers can produce LIFO jobs via the template `opts`.
 
@@ -292,15 +318,23 @@ Set `ttl` in `JobOptions` to auto-expire jobs that are not processed within a ti
 
 ```typescript
 // Expire if not processed within 30 seconds
-await queue.add('time-sensitive', { alert: 'server-down' }, {
-  ttl: 30_000,
-});
+await queue.add(
+  'time-sensitive',
+  { alert: 'server-down' },
+  {
+    ttl: 30_000,
+  },
+);
 
-// TTL works with delayed jobs — the clock starts at creation time
-await queue.add('offer', { code: 'FLASH50' }, {
-  delay: 5_000,
-  ttl: 60_000, // must be processed within 60s of creation, not of becoming active
-});
+// TTL works with delayed jobs  -  the clock starts at creation time
+await queue.add(
+  'offer',
+  { code: 'FLASH50' },
+  {
+    delay: 5_000,
+    ttl: 60_000, // must be processed within 60s of creation, not of becoming active
+  },
+);
 
 // TTL works with priority jobs
 await queue.add('urgent', data, {
@@ -309,7 +343,7 @@ await queue.add('urgent', data, {
 });
 ```
 
-When a job's TTL elapses, it is failed with the reason `'expired'` during the next activation check. Jobs that are already active are not interrupted - TTL is checked at fetch time, not mid-processing. Use `timeout` in `JobOptions` to limit active processing time.
+When a job's TTL elapses, it is failed with the reason `'expired'` during the next activation check. Jobs that are already active are not interrupted  -  TTL is checked at fetch time, not mid-processing. Use `timeout` in `JobOptions` to limit active processing time.
 
 See also: [Adding jobs](./usage#adding-jobs) for other per-job options.
 
@@ -332,7 +366,7 @@ interface Serializer {
 }
 ```
 
-Both methods must be synchronous. If `serialize` throws, the job is treated as a processor failure (in Worker) or skipped (in Scheduler).
+Both methods must be synchronous. If `serialize` throws, the job is treated as a processor failure (in Worker). A scheduler template whose data cannot be serialized, or exceeds the 1 MB limit, is rejected by `upsertJobScheduler`; a stored template that still fails at run time skips that run, reports the error through the worker `error` event and moves on to the next occurrence.
 
 ### Example: MessagePack serializer
 
@@ -360,13 +394,13 @@ const worker = new Worker('tasks', processor, {
 
 The serializer is applied to:
 
-- **`data`** - the job payload passed to `queue.add()`.
-- **`returnvalue`** - the value returned by the processor.
-- **`progress`** - the value passed to `job.updateProgress()`.
+- **`data`**  -  the job payload passed to `queue.add()`.
+- **`returnvalue`**  -  the value returned by the processor.
+- **`progress`**  -  the value passed to `job.updateProgress()`.
 
 ### Consistency requirement
 
-The same serializer must be configured on every Queue, Worker, and FlowProducer instance that operates on the same queue. A mismatch causes silent data corruption - the consumer will see `{}` and the job's `deserializationFailed` flag will be `true`.
+The same serializer must be configured on every Queue, Worker, and FlowProducer instance that operates on the same queue. A mismatch causes silent data corruption  -  the consumer will see `{}` and the job's `deserializationFailed` flag will be `true`.
 
 ### Default export
 
@@ -375,9 +409,7 @@ The built-in JSON serializer is exported for use in conditional logic or testing
 ```typescript
 import { JSON_SERIALIZER } from 'glide-mq';
 
-const serializer = process.env.USE_MSGPACK === '1'
-  ? msgpackSerializer
-  : JSON_SERIALIZER;
+const serializer = process.env.USE_MSGPACK === '1' ? msgpackSerializer : JSON_SERIALIZER;
 
 const queue = new Queue('tasks', { connection, serializer });
 ```
@@ -394,12 +426,20 @@ Add `ordering.key` to a job to guarantee that all jobs with the same key are pro
 
 ```typescript
 // All jobs with ordering.key = 'user:42' are processed sequentially
-await queue.add('process-payment', { userId: 42, amount: 100 }, {
-  ordering: { key: 'user:42' },
-});
-await queue.add('send-receipt', { userId: 42 }, {
-  ordering: { key: 'user:42' },
-});
+await queue.add(
+  'process-payment',
+  { userId: 42, amount: 100 },
+  {
+    ordering: { key: 'user:42' },
+  },
+);
+await queue.add(
+  'send-receipt',
+  { userId: 42 },
+  {
+    ordering: { key: 'user:42' },
+  },
+);
 ```
 
 ### Group concurrency (concurrency > 1)
@@ -439,7 +479,7 @@ await queue.add('sync', data, {
 });
 ```
 
-When both `concurrency` and `rateLimit` are set, both gates apply - a job must have a free concurrency slot *and* remaining rate capacity to start. Jobs that hit the rate limit are parked in a scheduler-managed promotion queue and released when the window resets.
+When both `concurrency` and `rateLimit` are set, both gates apply - a job must have a free concurrency slot _and_ remaining rate capacity to start. Jobs that hit the rate limit are parked in a scheduler-managed promotion queue and released when the window resets.
 
 - **Promotion latency**: rate-limited jobs are promoted by the scheduler loop. Worst-case latency is one `promotionInterval` (default 5 s). Lower `promotionInterval` on the worker if tighter latency is needed.
 - **Retried jobs consume rate slots** - a retried job counts against the rate window like any new job.
@@ -473,89 +513,20 @@ await queue.add('bulk-export', data, {
 
 **Check order**: when both concurrency, token bucket, and sliding window are configured, the gates are checked in order: concurrency -> token bucket -> sliding window. All applicable limits must pass. Strict FIFO is maintained - jobs never skip ahead of earlier jobs in the same group.
 
-**Cost validation**: a job with `cost` greater than `capacity` is rejected at enqueue time. If a previously valid job becomes invalid (e.g., capacity was lowered), it is moved to the DLQ at activation.
+**Cost validation**: a job with `cost` greater than `capacity` is rejected at enqueue time. If a previously valid job becomes invalid (e.g., capacity was lowered), it is failed at activation with `cost exceeds token bucket capacity`. A worker with `deadLetterQueue` adds a DLQ copy whether the failure happens in `moveToActive` or while `completeAndFetchNext` / `failAndFetchNext` fetch the next job or promote the group. A job failed by the scheduler tick's rate-limited group promotion gets no DLQ copy (no worker owns it).
 
 **Differences from sliding window** (`rateLimit`):
 
-| | Sliding window (`rateLimit`) | Token bucket (`tokenBucket`) |
-|---|---|---|
-| Unit | Job count | Weighted cost per job |
-| Config | `{ max, duration }` | `{ capacity, refillRate }` |
-| Default cost | 1 job | `cost: 1` token |
-| Refill | Window resets after `duration` ms | Continuous refill at `refillRate`/s |
-| Use case | "Max N jobs per window" | "Max N units of work per second" |
+|              | Sliding window (`rateLimit`)      | Token bucket (`tokenBucket`)        |
+| ------------ | --------------------------------- | ----------------------------------- |
+| Unit         | Job count                         | Weighted cost per job               |
+| Config       | `{ max, duration }`               | `{ capacity, refillRate }`          |
+| Default cost | 1 job                             | `cost: 1` token                     |
+| Refill       | Window resets after `duration` ms | Continuous refill at `refillRate`/s |
+| Use case     | "Max N jobs per window"           | "Max N units of work per second"    |
 
 - **Promotion latency**: same as sliding window - worst-case one `promotionInterval` (default 5 s).
 - **Composition**: token bucket composes with concurrency, sliding window, and global rate limits. All gates are enforced.
-
-### Runtime group rate limiting
-
-The static rate limits above (`rateLimit`, `tokenBucket`) are set at enqueue time. For dynamic scenarios - like a crawler hitting a 429 response - use runtime rate limiting to pause a specific group from inside or outside the processor.
-
-#### From inside the processor
-
-```typescript
-const worker = new Worker('crawl', async (job) => {
-  const res = await fetch(job.data.url);
-  if (res.status === 429) {
-    const retryAfter = parseInt(res.headers.get('retry-after') || '60') * 1000;
-    // Pause this domain group - other domains keep processing
-    await job.rateLimitGroup(retryAfter);
-  }
-  return { html: await res.text() };
-}, { connection });
-```
-
-`job.rateLimitGroup(duration, opts?)` re-parks the current job in the group queue and pauses the entire group for `duration` milliseconds. The job resumes automatically when the duration expires.
-
-#### Throw-style sugar
-
-```typescript
-import { GroupRateLimitError } from 'glide-mq';
-
-const worker = new Worker('crawl', async (job) => {
-  const res = await fetch(job.data.url);
-  if (res.status === 429) {
-    throw new GroupRateLimitError(60_000);
-  }
-  return res.text();
-}, { connection });
-```
-
-#### From outside the processor
-
-```typescript
-// From a webhook, health check, or admin API
-await queue.rateLimitGroup('example.com', 60_000);
-```
-
-`queue.rateLimitGroup(groupKey, duration, opts?)` registers the group as rate-limited. Jobs already in the group queue are held until the duration expires.
-
-#### Options
-
-All three APIs accept the same options:
-
-| Option | Values | Default | Description |
-|--------|--------|---------|-------------|
-| `currentJob` | `'requeue'` \| `'fail'` | `'requeue'` | Re-park the job (no retry consumed) or fail it |
-| `requeuePosition` | `'front'` \| `'back'` | `'front'` | Where to place the re-parked job in the group queue |
-| `extend` | `'max'` \| `'replace'` | `'max'` | Never shorten an existing pause, or overwrite it |
-
-```typescript
-await job.rateLimitGroup(30_000, {
-  currentJob: 'requeue',     // default: re-park without consuming retry
-  requeuePosition: 'front',  // default: this job resumes first
-  extend: 'max',             // default: if already paused for longer, keep the longer pause
-});
-```
-
-#### How it works
-
-1. The current job is atomically re-parked in the per-group ZSET queue
-2. The group is registered in the `ratelimited` sorted set with a resume timestamp
-3. The scheduler's promotion loop (`promoteRateLimited`) checks this set on every cycle
-4. When the resume timestamp passes, queued jobs are promoted back to the stream
-5. The re-parked job resumes as a "returning" activation - no ordering violations
 
 ### Notes
 
@@ -575,9 +546,13 @@ By default glide-mq assigns a monotonically increasing integer ID to each job. Y
 
 ```typescript
 // Deterministic job: safe to call multiple times
-const job = await queue.add('send-email', { to: 'user@example.com' }, {
-  jobId: 'email-user-42',
-});
+const job = await queue.add(
+  'send-email',
+  { to: 'user@example.com' },
+  {
+    jobId: 'email-user-42',
+  },
+);
 // job is null if a job with this ID already exists (silent skip)
 ```
 
@@ -589,12 +564,14 @@ const job = await queue.add('send-email', { to: 'user@example.com' }, {
 
 **Duplicate behaviour by surface**
 
-| Surface | Behaviour on duplicate ID |
-|---------|--------------------------|
-| `Queue.add` | Returns `null` (silent skip) |
-| `Queue.addBulk` | Silently omits the duplicate from the returned array |
-| `FlowProducer.add` | Throws - flows cannot be partially created |
-| `TestQueue.add` | Returns `null` (mirrors production) |
+| Surface            | Behaviour on duplicate ID                            |
+| ------------------ | ---------------------------------------------------- |
+| `Queue.add`        | Returns `null` (silent skip)                         |
+| `Queue.addBulk`    | Silently omits the duplicate from the returned array |
+| `FlowProducer.add` | Throws `Duplicate job ID in flow`                    |
+| `TestQueue.add`    | Returns `null` (mirrors production)                  |
+
+`FlowProducer.add` checks every custom ID in a level before writing it, so the level holding the duplicate is not created. Nested sub-flows are separate calls made first, so sub-flows created before the failing level stay in place.
 
 **Interaction with deduplication**
 
@@ -606,32 +583,45 @@ const job = await queue.add('send-email', { to: 'user@example.com' }, {
 
 Prevent duplicate jobs from entering the queue using `deduplication.id`. Three modes are supported:
 
-| Mode | Behaviour |
-|------|-----------|
-| `simple` | Skip the new job if any job with the same ID already exists (any state). |
-| `throttle` | Accept only the first job in a TTL window; later arrivals are dropped. |
-| `debounce` | Accept only the last job in a TTL window; earlier arrivals are cancelled. |
+| Mode       | Behaviour                                                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `simple`   | Skip the new job while the job holding the ID is not yet completed or failed. `ttl` is ignored.                              |
+| `throttle` | Skip the new job for `ttl` ms after the job that took the ID was added. Without `ttl`, nothing is skipped.                   |
+| `debounce` | Replace the job holding the ID if it is still `delayed` or `prioritized`; skip if it is waiting or active. `ttl` is ignored. |
 
 ```typescript
-// Simple: skip if a job with this ID is already queued / active / completed
-await queue.add('send-welcome', { userId: 99 }, {
-  deduplication: { id: 'welcome-99', mode: 'simple' },
-});
+// Simple: skip while a job with this ID is queued or active; the ID frees once it completes or fails
+await queue.add(
+  'send-welcome',
+  { userId: 99 },
+  {
+    deduplication: { id: 'welcome-99', mode: 'simple' },
+  },
+);
 
 // Throttle: at most one "sync" job per 10 s
-await queue.add('sync', { region: 'eu' }, {
-  deduplication: { id: 'sync-eu', mode: 'throttle', ttl: 10_000 },
-});
+await queue.add(
+  'sync',
+  { region: 'eu' },
+  {
+    deduplication: { id: 'sync-eu', mode: 'throttle', ttl: 10_000 },
+  },
+);
 
-// Debounce: only the last "search" job within 500 ms is actually queued
-await queue.add('search', { query: 'hello' }, {
-  deduplication: { id: 'search-user-1', mode: 'debounce', ttl: 500 },
-});
+// Debounce: each add within 500 ms replaces the pending delayed job, so only the last one runs
+await queue.add(
+  'search',
+  { query: 'hello' },
+  {
+    delay: 500,
+    deduplication: { id: 'search-user-1', mode: 'debounce' },
+  },
+);
 ```
 
-`queue.add()` returns `null` when a job is skipped by deduplication.
+Debounce needs a `delay` (or a priority job not yet promoted). Once the job is waiting or active, later adds with the same ID are skipped, and once it completes or fails the next add starts a new job.
 
-`debounce` can be combined with `ordering.key`. When debounce cancels a pending ordered job, the replacement takes a fresh sequence position and is processed in the order it was re-added.
+`queue.add()` returns `null` when a job is skipped by deduplication.
 
 ---
 
@@ -649,7 +639,7 @@ await queue.setGlobalConcurrency(20);
 await queue.setGlobalConcurrency(0);
 ```
 
-Workers check this limit atomically before picking up each job via the `checkConcurrency` server function.
+Workers read the limit from queue metadata on each scheduler tick. Priority and LIFO jobs are popped with an atomic check (`glidemq_rpopAndReserve`). Stream jobs are gated twice: `glidemq_checkConcurrency` before `XREADGROUP` keeps a worker from reading when the queue is full, and `glidemq_moveToActive` enforces the cap at activation. A stream claim counts in the consumer group's pending list as soon as `XREADGROUP` returns it, so activation ranks the pending claims by entry id: the oldest `globalConcurrency - listActive` claims keep their slots, a newer claim gets `GLOBAL_FULL`. The worker keeps that claim in the pending list (so it keeps its place in the order) and retries the activation with a capped backoff (20 ms doubling to 250 ms, woken early by a completion in the same worker) until it is admitted, for at most half the shorter of `lockDuration` and `stalledInterval`; only after that bound, or in batch mode, is the entry handed back (`glidemq_deferActive`: XACK, re-added to the stream as waiting, which costs it its position). `close()` and `pause()` hand a held claim back at once. `completeAndFetchNext` does not claim the next stream job while pending claims plus list claims already fill the cap, so a held claim is not overtaken by a chain. Workers polling at the same time therefore never run more than `globalConcurrency` jobs and drain a burst in FIFO order. The rank check runs only when the pending count exceeds the free slots.
 
 ---
 
@@ -671,7 +661,7 @@ const limit = await queue.getGlobalRateLimit();
 await queue.removeGlobalRateLimit();
 ```
 
-- Global rate limit takes precedence over `WorkerOptions.limiter`. When both are set, the stricter limit wins.
+- While a global rate limit is set, it replaces `WorkerOptions.limiter` on every worker, even if the worker limiter is stricter. Removing it restores the worker limiter.
 - Changes are picked up by workers within one scheduler tick (no restart needed).
 
 ---
@@ -685,23 +675,27 @@ const job = await queue.add('long-task', { input: 'data' });
 
 // Later...
 const result = await queue.revoke(job.id);
-// 'revoked'  — job was waiting/delayed and is now in the failed set
-// 'flagged'  — job is active; the worker will abort it cooperatively
-// 'not_found'— job does not exist
+// 'revoked'   -  job was waiting/delayed and is now in the failed set
+// 'flagged'   -  job is active; the worker will abort it cooperatively
+// 'not_found' -  job does not exist
 ```
 
 In your processor, use `job.abortSignal` to react to revocation:
 
 ```typescript
-const worker = new Worker('tasks', async (job) => {
-  for (const chunk of largeDataset) {
-    if (job.abortSignal?.aborted) {
-      throw new Error('Job revoked');
+const worker = new Worker(
+  'tasks',
+  async (job) => {
+    for (const chunk of largeDataset) {
+      if (job.abortSignal?.aborted) {
+        throw new Error('Job revoked');
+      }
+      await processChunk(chunk);
     }
-    await processChunk(chunk);
-  }
-  return { done: true };
-}, { connection });
+    return { done: true };
+  },
+  { connection },
+);
 ```
 
 `job.abortSignal` is an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). You can pass it directly to `fetch`, `axios`, or any `AbortSignal`-aware API.
@@ -710,7 +704,7 @@ const worker = new Worker('tasks', async (job) => {
 
 ## Transparent Compression
 
-Enable gzip compression at the queue level. Workers decompress automatically - no changes required in processors.
+Enable gzip compression at the queue level. Workers decompress automatically  -  no changes required in processors.
 
 ```typescript
 const queue = new Queue('tasks', {
@@ -723,7 +717,9 @@ await queue.add('process-large', { report: '... 15 KB of data ...' });
 // Stored size: ~300 bytes (98% savings on repetitive data)
 ```
 
-**Payload size limit:** job data must be ≤ 1 MB *after* serialisation but *before* compression. Larger payloads throw immediately:
+Job schedulers follow the Queue that upserts them: `upsertJobScheduler` on a gzip Queue records `compression: 'gzip'` on the entry, and every run stores its template data compressed.
+
+**Payload size limit:** job data must be ≤ 1 MB _after_ serialisation but _before_ compression. Larger payloads throw immediately:
 
 ```
 Error: Job data exceeds maximum size (1234567 bytes > 1MB).
@@ -757,7 +753,7 @@ await queue.add('poll', data, {
   backoff: { type: 'exponential', delay: 500, jitter: 0.1 },
 });
 
-// Custom strategy — register on the Worker
+// Custom strategy  -  register on the Worker
 const worker = new Worker('tasks', processor, {
   connection,
   backoffStrategies: {
@@ -775,13 +771,13 @@ await queue.add('api-call', data, {
 });
 ```
 
-When `attempts` is exhausted the job moves to the `failed` state (or the DLQ if configured).
+When `attempts` is exhausted the job moves to the `failed` state. If the worker has a DLQ configured, a copy also goes to the DLQ.
 
 ---
 
 ## Dead Letter Queues
 
-Route permanently failed jobs to a separate queue for later inspection or manual retry.
+Copy permanently failed jobs to a separate queue for later inspection. Configure it on the Worker; `deadLetterQueue` on a `Queue` only tells `getDeadLetterJobs()` which queue to read.
 
 ```typescript
 const worker = new Worker('tasks', processor, {
@@ -797,151 +793,84 @@ const failedJobs = await dlqQueue.getJobs('waiting');
 const dlqJobs = await queue.getDeadLetterJobs(0, 49);
 ```
 
-Jobs in the DLQ are ordinary jobs - you can inspect, retry, or remove them like any other job.
+A job is copied when it fails terminally, which the job's own `attempts` option decides; `deadLetterQueue.maxRetries` is not read (deprecated, removed in the next major version).
+
+The DLQ entry is a best-effort copy. The original job stays in the `failed` state of its own queue (subject to `removeOnFail`), and if writing the copy fails the worker emits `error` and moves on. The entry is added to the DLQ queue as a new waiting job named like the original, whose data is a JSON envelope: `{ originalQueue, originalJobId, data, failedReason, attemptsMade }`. A worker on the DLQ queue would process these entries.
+
+Because the entry is waiting, not failed, `Job.retry()` on it throws. To retry, call `retry()` on the original failed job (`queue.getJob(originalJobId)`), or re-add the envelope's `data` to the original queue.
 
 ---
 
 ## Fallback Chains
 
-Define an ordered list of model/provider alternatives tried automatically on retryable failure. When a job fails and has remaining attempts, the `fallbackIndex` increments and the processor reads `job.currentFallback` to determine which model to use.
+Configure ordered fallback models/providers on a per-job basis. On each retryable failure, the worker advances to the next entry in the chain.
 
-```typescript
-await queue.add('inference', {
-  prompt: 'Summarize this document.',
-  primaryModel: 'gpt-5.4',
-}, {
-  attempts: 4,
-  backoff: { type: 'exponential', delay: 1000 },
-  fallbacks: [
-    { model: 'gpt-5.4-nano', provider: 'openai' },
-    { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
-    { model: 'gemini-2.5-pro', provider: 'google' },
-  ],
-});
-```
+- job.fallbackIndex starts at 0. currentFallback returns undefined (use your default model).
+- On the first retry failure, glidemq_fail sets fallbackIndex to 1. currentFallback returns fallbacks[0].
+- Once fallbackIndex passes the end of the array, currentFallback returns undefined (back to your default model).
+- Each entry supports metadata for provider-specific parameters.
 
-In the processor:
-
-```typescript
-const worker = new Worker('inference', async (job) => {
-  const fallback = job.currentFallback;
-  const model = fallback ? fallback.model : job.data.primaryModel;
-
-  const result = await callLLM(model, job.data.prompt);
-  await job.reportUsage({ model, tokens: { input: result.inTokens, output: result.outTokens } });
-  return { content: result.text, model };
-}, { connection });
-```
-
-- `fallbackIndex=0`: original attempt (`currentFallback` is `undefined`)
-- `fallbackIndex=1`: first retry (`currentFallback` = `fallbacks[0]`)
-- `fallbackIndex=N`: Nth retry (`currentFallback` = `fallbacks[N-1]`)
-
-Each entry supports an optional `metadata` field for custom routing logic. See [AI-Native Features: Fallback Chains](./ai-native#fallback-chains) for the full guide.
+See [USAGE.md](./usage#fallback-chains) for usage examples.
 
 ---
 
-## Dual-Axis Rate Limiting
+## Dual-axis Rate Limiting (RPM + TPM)
 
-Enforce RPM (requests per minute) and TPM (tokens per minute) simultaneously to comply with LLM provider rate limits.
+The existing limiter option on WorkerOptions caps requests per time window (RPM). The tokenLimiter option adds a parallel token-per-minute (TPM) limit. Both compose - the worker pauses when either limit is hit.
 
-### RPM limiting (existing `limiter`)
+Jobs report tokens via job.reportTokens(count) or via job.reportUsage() (which auto-extracts totalTokens).
+
+### Scope options
+
+| Scope          | Where tracked              | When to use                                     |
+| -------------- | -------------------------- | ----------------------------------------------- |
+| queue          | glide:{queueName}:tpm hash | Multi-worker, strict global limit               |
+| worker         | In-memory counter          | Single worker, zero-latency checks              |
+| both (default) | Local first, then Valkey   | Fast local check avoids Valkey when under limit |
+
+See [USAGE.md](./usage#dual-axis-rate-limiting-rpm--tpm) for configuration examples.
+
+---
+
+## Per-job Lock Duration
+
+By default, all jobs share the worker-level lockDuration (default: 30000ms). Override per job via opts.lockDuration. The per-job value is stored in the job opts JSON field and read by glidemq_reclaimStalled and glidemq_reclaimStalledListJobs at stall-recovery time.
+
+Constraints: must be a positive integer; values below 5000ms risk false stall detection under load.
+
+See [USAGE.md](./usage#per-job-lock-duration) for examples.
+
+---
+
+## Vector Search Index Management
+
+queue.createJobIndex() creates a Valkey Search index over job hashes. The index enables both full-text search and vector similarity queries.
+
+Base fields (name, state, timestamp, priority) are always included. Users add custom fields and a vector field via the fields and vectorField options.
+
+### Distance metrics
+
+| Metric | Score interpretation                         | Use case                              |
+| ------ | -------------------------------------------- | ------------------------------------- |
+| COSINE | 0 = identical, 2 = opposite (lower = better) | Text embeddings, semantic similarity  |
+| L2     | 0 = identical (lower = better)               | Image features, spatial data          |
+| IP     | Higher = more similar                        | Normalized embeddings, recommendation |
+
+See [USAGE.md](./usage#vector-search-createjobindex--storevector--vectorsearch) for full API and examples.
+
+---
+
+## Request Timeout
+
+Override the default 500ms command timeout for operations that may take longer:
 
 ```typescript
-const worker = new Worker('inference', processor, {
-  connection,
-  limiter: { max: 60, duration: 60_000 },  // 60 req/min
-});
-```
-
-### TPM limiting (`tokenLimiter`)
-
-```typescript
-const worker = new Worker('inference', processor, {
-  connection,
-  tokenLimiter: {
-    maxTokens: 100_000,   // 100K tokens per minute
-    duration: 60_000,
-    scope: 'both',        // 'queue' | 'worker' | 'both'
+const queue = new Queue('my-queue', {
+  connection: {
+    addresses: [{ host: 'localhost', port: 6379 }],
+    requestTimeout: 5000, // 5 seconds for FT.CREATE, FUNCTION LOAD
   },
 });
 ```
 
-### Combined
-
-```typescript
-const worker = new Worker('inference', processor, {
-  connection,
-  concurrency: 10,
-  limiter: { max: 60, duration: 60_000 },
-  tokenLimiter: { maxTokens: 100_000, duration: 60_000 },
-});
-```
-
-The processor must call `job.reportTokens(count)` for the TPM limiter to track consumption:
-
-```typescript
-const worker = new Worker('inference', async (job) => {
-  const result = await callLLM(job.data.prompt);
-  await job.reportTokens(result.totalTokens);
-  return result;
-}, { connection, tokenLimiter: { maxTokens: 50_000, duration: 60_000 } });
-```
-
-When either limit is exceeded, the worker pauses fetching new jobs until the window resets. Active jobs are not interrupted.
-
-**Scope options:**
-
-| Scope | Description |
-|-------|-------------|
-| `'queue'` | Shared Valkey counter across all workers |
-| `'worker'` | In-memory counter per worker instance |
-| `'both'` (default) | Local check first, Valkey check when near limit |
-
-See [AI-Native Features: Dual-Axis Rate Limiting](./ai-native#dual-axis-rate-limiting) for the full guide.
-
----
-
-## Per-Job Lock Duration
-
-Override the worker-level `lockDuration` for individual jobs. Essential for AI workloads where inference latency varies widely.
-
-```typescript
-// Fast embedding - 5 second lock, fast stall detection
-await queue.add('embed', { text: 'hello' }, {
-  lockDuration: 5_000,
-});
-
-// Slow generation - 60 second lock to avoid false stalls
-await queue.add('generate', { prompt: 'Write an essay...' }, {
-  lockDuration: 60_000,
-});
-```
-
-The lock duration controls heartbeat frequency (`lockDuration / 2`) and the stall detection threshold. Without per-job lock, you must set the worker's `lockDuration` high enough for the slowest job, which degrades stall detection for fast jobs.
-
----
-
-## Vector Search
-
-Create a Valkey Search index over job hashes and query by vector similarity (KNN). Requires the `valkey-search` module on the server.
-
-```typescript
-// Create index with vector field
-await queue.createJobIndex({
-  vectorField: { name: 'embedding', dimensions: 1536, distanceMetric: 'COSINE' },
-  fields: [{ type: 'TAG', name: 'category' }],
-});
-
-// Store vector on a job
-const job = await queue.add('doc', { title: 'Queue Basics', category: 'infra' });
-await job.storeVector('embedding', embeddingVector);
-
-// KNN search with pre-filter
-const results = await queue.vectorSearch(queryVector, {
-  k: 10,
-  filter: '@category:{infra}',
-});
-```
-
-See the dedicated [Vector Search guide](./vector-search) for full details.
+The default (500ms) is sufficient for most operations. Increase for `createJobIndex()` on databases with many existing keys, or `FUNCTION LOAD` with large libraries.

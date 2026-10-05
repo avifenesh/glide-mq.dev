@@ -44,7 +44,8 @@ def fix_file(filepath):
             parts[i]
         )
 
-    content = ''.join(parts)
+    content = ''.join(parts).replace('—', ' - ')
+    content = re.sub(r'[ \t]+$', '', content, flags=re.MULTILINE)
 
     if content != original:
         with open(filepath, 'w', encoding='utf-8') as f:

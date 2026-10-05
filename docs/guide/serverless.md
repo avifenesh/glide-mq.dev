@@ -114,9 +114,9 @@ export default async function handler(req: Request) {
     headers: { 'content-type': res.headers.get('content-type') ?? 'application/json' },
   });
 }
-
-export const config = { runtime: 'edge' };
 ```
+
+If you control a Node.js serverless runtime instead of an edge runtime, `Producer` and `ServerlessPool` remain the preferred direct integration.
 
 ## Bulk Enqueueing
 
@@ -144,7 +144,7 @@ await producer.add('urgent', data, { priority: 1 });
 
 // Deduplication
 await producer.add('idempotent', data, {
-  deduplication: { id: 'unique-key', ttl: 60000 },
+  deduplication: { id: 'unique-key', ttl: 60000, mode: 'throttle' },
 });
 
 // Custom job ID
@@ -205,65 +205,67 @@ pool.getProducer('queue', { connection });
 await pool.closeAll();
 ```
 
-## AI Primitives in Serverless
-
-### Enqueuing AI jobs from serverless functions
-
-The `Producer` class supports all `JobOptions` including AI-native options like `fallbacks`, `lockDuration`, and `ordering`. Ordering is useful for per-key sequencing, per-group concurrency, and token-bucket rate limits. Worker-side TPM enforcement still comes from `tokenLimiter`. AI-specific processing (streaming, usage tracking, budgets) happens on the worker side.
-
-```typescript
-import { serverlessPool } from 'glide-mq';
-
-export async function handler(event: any) {
-  const producer = serverlessPool.getProducer('inference', { connection: CONNECTION });
-
-  // Enqueue with fallback chain and per-job lock
-  const id = await producer.add('generate', {
-    prompt: event.prompt,
-    primaryModel: 'gpt-5.4',
-  }, {
-    fallbacks: [
-      { model: 'gpt-5.4-nano', provider: 'openai' },
-      { model: 'claude-sonnet-4-20250514', provider: 'anthropic' },
-    ],
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 2000 },
-    lockDuration: 60_000,
-  });
-
-  return { statusCode: 200, body: JSON.stringify({ jobId: id }) };
-}
-```
-
-### Reading streaming output from serverless
-
-Use `Queue.readStream()` to consume LLM token streams from a serverless API endpoint:
-
-```typescript
-import { Queue } from 'glide-mq';
-
-const queue = new Queue('inference', { connection: CONNECTION });
-
-export async function handler(req: Request) {
-  const { jobId } = await req.json();
-  const entries = await queue.readStream(jobId, { count: 100 });
-  return Response.json({ chunks: entries.map(e => e.fields) });
-}
-```
-
-For long-polling (blocking reads), pass `block`:
-
-```typescript
-const entries = await queue.readStream(jobId, {
-  lastId: req.headers.get('x-last-id') ?? undefined,
-  block: 5000,
-  count: 50,
-});
-```
-
 ## Connection Behavior
 
 - **Cold start**: `getClient()` creates a new GLIDE connection and loads the function library
 - **Warm invocation**: Returns the cached client immediately
 - **Container freeze/thaw**: GLIDE auto-reconnects on next command
 - **SIGTERM**: Call `serverlessPool.closeAll()` or `producer.close()` for clean shutdown
+
+## HTTP Proxy
+
+Use `createProxyServer()` when you need cross-language producers, request-reply, or SSE consumers from environments that should not host long-lived queue objects.
+
+```typescript
+import { createProxyServer } from 'glide-mq/proxy';
+
+const proxy = createProxyServer({
+  connection: CONNECTION,
+  queues: ['emails', 'events'], // optional allowlist
+  compression: 'gzip',
+});
+
+proxy.app.listen(3000);
+```
+
+### Proxy Options
+
+| Option           | Type                       | Notes                                                                                                                                                                                                                                                |
+| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `connection`     | `ConnectionOptions`        | Required unless `client` is provided. Required for queue-wide/broadcast SSE routes.                                                                                                                                                                  |
+| `client`         | `Client`                   | Shared GLIDE client for non-blocking routes.                                                                                                                                                                                                         |
+| `prefix`         | `string`                   | Key prefix (default: `glide`).                                                                                                                                                                                                                       |
+| `queues`         | `string[]`                 | Optional allowlist. Unlisted queue names return `403`.                                                                                                                                                                                               |
+| `compression`    | `'none' \| 'gzip'`         | Transparent job payload compression.                                                                                                                                                                                                                 |
+| `maxPageSize`    | `number`                   | Max items per list/batch request (default `1000`). Caps `start`/`end` spans on job, DLQ, and suspended listings, `count` on DLQ replay-all and retry, and `limit` on clean.                                                                          |
+| `maxWaitTimeout` | `number`                   | Upper bound in ms for `opts.waitTimeout` on `POST /queues/:name/jobs/wait` (default `60000`). Larger values return `400`; an omitted `waitTimeout` uses `30000` capped at this value. A disconnected HTTP client releases the wait connection early. |
+| `onError`        | `(err, queueName) => void` | Queue-level error hook. Also receives the real error behind any 5xx response, which returns a generic message.                                                                                                                                       |
+
+### Route Surface
+
+The proxy now covers the main queue-management surface:
+
+- Queue writes: add, bulk add, add-and-wait, pause/resume, drain, retry, clean
+- Job operations: fetch job, list jobs by state, change priority, change delay, promote delayed jobs, stream job output over SSE, send suspend/resume signals
+- Queue telemetry: counts, metrics, live workers, queue-wide events over SSE
+- Scheduler APIs: list, fetch, upsert, remove
+- Flow APIs: create tree flows or DAGs, inspect flow snapshots, read nested tree views, revoke outstanding flow jobs
+- AI APIs: flow usage, flow budget, rolling usage summary
+- Broadcast APIs: publish plus SSE fan-out with `subscription` and `subjects` filters
+- Health: `/health`
+
+See [Usage - Proxy Endpoints](./usage#proxy-endpoints) for the exact method/path table.
+
+- Add your own auth and rate limiting middleware before exposing the proxy publicly. `glide-mq/proxy` does not ship built-in auth.
+- Queue-wide SSE (`/queues/:name/events`) and broadcast SSE (`/broadcast/:name/events`) need `connection`, not only a shared `client`, because they allocate blocking readers.
+
+## AI Primitives in Serverless
+
+The Producer class supports all job options including fallbacks and lockDuration. However, AI-specific runtime operations (reportUsage, stream, suspend) are only available inside a Worker processor.
+
+For serverless AI patterns:
+
+- **Enqueue with fallbacks**: Set fallbacks in JobOptions when adding jobs from Lambda/Edge.
+- **Budget on flows**: Create flows via FlowProducer with budget options from any environment.
+- **Cross-language flow orchestration**: Use `POST /flows` to create tree flows or DAGs over HTTP. Flow budgets in the HTTP API are currently supported on tree flows only.
+- **Read results**: Use `queue.getFlowUsage()`, `queue.getUsageSummary()`, or `queue.readStream()` from a serverless function to read back AI usage or streaming output after the worker processes the job.

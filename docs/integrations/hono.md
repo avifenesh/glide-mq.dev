@@ -1,11 +1,11 @@
 ---
 title: Hono Integration
-description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Type-safe RPC, flow orchestration, usage summaries, and broadcast SSE.
+description: REST API and real-time SSE for glide-mq job queues, as Hono middleware. Typed registry access, flow orchestration, usage summaries, and broadcast SSE.
 ---
 
 # @glidemq/hono
 
-REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router gives you the full queue management surface with type-safe RPC.
+REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as Hono middleware. One middleware + one router gives you the full queue management surface with typed context and registry access.
 
 ::: info Package Links
 - **npm:** [@glidemq/hono](https://www.npmjs.com/package/@glidemq/hono)
@@ -14,9 +14,9 @@ REST API and real-time SSE for [glide-mq](/guide/getting-started) job queues, as
 
 ## Why @glidemq/hono
 
-- **Type-safe RPC client** -- export `GlideMQApiType` and use Hono's `hc<>` for end-to-end typed HTTP calls with zero codegen
-- **Edge and serverless ready** -- lightweight `Producer` re-exports let you enqueue jobs from Cloudflare Workers, Vercel Edge Functions, or Deno Deploy without pulling in full Queue/Worker machinery. Workers and SSE require a long-lived runtime (Node, Bun, Deno).
-- **Multi-runtime** -- Hono runs on Node, Deno, Bun, and edge runtimes; this middleware follows
+- **Typed registry access** - `GlideMQEnv` types the request context and supports typed queue access in custom routes
+- **Serverless producers** - lightweight `Producer` re-exports reduce queue overhead in server-side NAPI runtimes. Edge runtimes such as Cloudflare Workers should call the [HTTP proxy](/guide/serverless) instead of importing the native client.
+- **Multi-runtime** - run directly on Node.js, Bun, or Deno with NAPI support; edge callers use HTTP
 - **Two imports, full API** -- `glideMQ()` middleware + `glideMQApi()` router gives you queue control, SSE events, scheduler CRUD, flow orchestration, rolling usage summaries, and broadcast over HTTP
 - **Optional Zod validation** -- install `zod` + `@hono/zod-validator` for request validation; works fine without them
 
@@ -32,15 +32,20 @@ Optional Zod validation:
 npm install zod @hono/zod-validator
 ```
 
-Requires **glide-mq >= 0.15.2**.
+This guide uses **@glidemq/hono 0.5.1** with **glide-mq >= 0.17.0**. Direct use requires a server-side runtime with NAPI support.
 
 ## Quick Start
 
 ```ts
 import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
 import { glideMQ, glideMQApi } from '@glidemq/hono';
+import type { GlideMQEnv } from '@glidemq/hono';
 
-const app = new Hono();
+const apiToken = process.env.QUEUE_API_TOKEN;
+if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before starting the API');
+const app = new Hono<GlideMQEnv>();
+app.use('*', bearerAuth({ token: apiToken }));
 
 app.use(
   glideMQ({
@@ -48,8 +53,7 @@ app.use(
     queues: {
       emails: {
         processor: async (job) => {
-          await sendEmail(job.data.to, job.data.subject);
-          return { sent: true };
+          return { sent: true, to: job.data.to };
         },
         concurrency: 5,
       },
@@ -58,16 +62,37 @@ app.use(
   }),
 );
 
-app.route('/api/queues', glideMQApi());
+app.route('/api/queues', glideMQApi({
+  authorize: (c) => c.req.header('Authorization') === `Bearer ${apiToken}`,
+}));
 
 export default app;
+```
+
+Send `Authorization: Bearer <QUEUE_API_TOKEN>` on API and SSE requests. Install authentication middleware before mounting the queue router. The `authorize` callback decides whether the authenticated caller may manage queues.
+
+Only a literal `true` grants access. A missing callback, any other result, or a thrown/rejected error returns `403 { "error": "Forbidden" }` before route validation, request parsing, queue access, or SSE subscriptions. Queue and producer allowlists restrict authorized requests; they do not grant access. Calls to `glideMQApi()` without options still compile for migration compatibility, but deny every request.
+
+For typed authentication state, pass your application's environment to the router:
+
+```ts
+import type { Env } from 'hono';
+
+interface AuthEnv extends Env {
+  Variables: { canManageQueues: boolean };
+}
+
+// Your authentication middleware sets canManageQueues on the request context.
+const router = glideMQApi<AuthEnv>({
+  authorize: (c) => c.get('canManageQueues') === true,
+});
 ```
 
 ## How It Works
 
 `glideMQ(config)` is a Hono middleware that creates a `QueueRegistry` and injects it into every request as `c.var.glideMQ`. Queues and workers are initialized lazily on first access; producers are created eagerly when requested.
 
-`glideMQApi(opts?)` returns a typed Hono sub-router with the full queue HTTP surface. Mount it at any path with `app.route()`. It reads the registry from `c.var.glideMQ` -- the middleware must be applied first.
+`glideMQApi({ authorize, ...opts })` returns a typed Hono sub-router with the full queue HTTP surface. Mount it at any path with `app.route()`. It reads the registry from `c.var.glideMQ` - the middleware must be applied first.
 
 You can also pass a pre-built `QueueRegistryImpl` for graceful shutdown control:
 
@@ -77,22 +102,27 @@ app.use(glideMQ(registry));
 process.on('SIGTERM', () => registry.closeAll());
 ```
 
-## Type-Safe RPC Client
+## HTTP Client
 
-Hono's `hc` client infers route types from the router, giving you end-to-end typed HTTP calls with no codegen and no OpenAPI spec:
+Use an HTTP client with the same authentication header as other API callers:
 
 ```ts
-import { hc } from 'hono/client';
-import type { GlideMQApiType } from '@glidemq/hono';
-
-const client = hc<GlideMQApiType>('http://localhost:3000/api/queues');
-
-const res = await client[':name'].jobs.$post({
-  param: { name: 'emails' },
-  json: { name: 'welcome', data: { to: 'user@example.com' } },
+const apiToken = process.env.QUEUE_API_TOKEN;
+if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before calling the API');
+const res = await fetch('http://localhost:3000/api/queues/emails/jobs', {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${apiToken}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ name: 'welcome', data: { to: 'user@example.com' } }),
 });
-const job = await res.json(); // typed as JobResponse
+if (!res.ok) throw new Error(`Queue API returned ${res.status}`);
+const job: unknown = await res.json();
+// Validate the response shape before using it in application code.
 ```
+
+In 0.5.1, `GlideMQApiType` resolves to a router with Hono's `BlankSchema`. `hc<GlideMQApiType>` therefore does not infer the HTTP endpoint names or response types. Typed middleware context and registry access are available, but end-to-end RPC route inference is not supported by this release.
 
 ## Endpoints
 
@@ -155,8 +185,8 @@ const job = await res.json(); // typed as JobResponse
 ## Features
 
 - **Full queue HTTP API** -- jobs, counts, metrics, pause/resume, drain, retry, clean, workers, queue events, schedulers, producers, flow create/read/tree/delete, flow usage/budget, usage summary, and broadcast routes
-- **Type-safe RPC** -- `hc<GlideMQApiType>` gives end-to-end typed HTTP calls with no codegen
-- **Edge/serverless producers** -- re-exports `Producer`, `ServerlessPool`, and `serverlessPool` from glide-mq for lightweight job enqueuing without worker overhead
+- **Typed middleware context** - application variables are available to `authorize` through the router's generic environment type
+- **Serverless producers** - re-exports `Producer`, `ServerlessPool`, and `serverlessPool` from glide-mq for server-side NAPI runtimes
 - **Real-time SSE** -- streams `completed`, `failed`, `progress`, `active`, `waiting`, `stalled`, `usage`, `suspended`, `budget-exceeded`, and `heartbeat` events via Hono's `streamSSE`
 - **Queue access control** -- restrict which queues and producers are exposed via `GlideMQApiConfig`; the queue allowlist also governs broadcast names and `/usage/summary?queues=...`
 - **Optional Zod validation** -- auto-detected at startup; degrades gracefully to manual parsing when not installed
@@ -194,13 +224,14 @@ interface ProducerConfig {
 ### GlideMQApiConfig
 
 ```ts
-interface GlideMQApiConfig {
+interface GlideMQApiConfig<E extends Env = GlideMQEnv> {
+  authorize: (context: Context<E & GlideMQEnv>) => boolean | Promise<boolean>;
   queues?: string[];     // Restrict to specific queue names
   producers?: string[];  // Restrict to specific producer names
 }
 ```
 
-Producers are lightweight alternatives to queues for serverless/edge -- they only support `add()` and `addBulk()`, return string IDs, and carry no worker or event-emitter overhead. Configure them alongside queues and use `POST /:name/produce` or access them directly via `c.var.glideMQ.getProducer(name)`.
+Producers are lightweight alternatives to queues for server-side NAPI runtimes - they only support `add()` and `addBulk()`, return string IDs, and carry no worker or event-emitter overhead. Configure them alongside queues and use `POST /:name/produce` or access them directly via `c.var.glideMQ.getProducer(name)`.
 
 ## Testing
 
@@ -224,6 +255,8 @@ await registry.closeAll();
 ```
 
 > **Note:** SSE in testing mode emits `counts` events (polling-based state diffs) rather than job lifecycle events.
+
+`createTestApp` explicitly authorizes its in-memory fixture requests. It does not test your application's authentication. For authorization checks, mount `glideMQApi({ authorize })` with your own testing-mode registry. Testing mode itself never grants access.
 
 ## Direct Registry Access
 

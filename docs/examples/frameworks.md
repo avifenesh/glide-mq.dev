@@ -14,14 +14,14 @@ Simple Hono app using glide-mq directly (no `@glidemq/hono` package needed). Sho
 ```typescript
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
-import { Queue, Worker } from 'glide-mq';
+import { Queue, Worker, type Job } from 'glide-mq';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
 const emailQueue = new Queue('emails', { connection });
 
 // Worker - processes jobs in background
-const worker = new Worker('emails', async (job) => {
+const worker = new Worker('emails', async (job: Job) => {
   console.log(`Sending email to ${job.data.to}: ${job.data.subject}`);
   // Simulate email sending
   await new Promise(r => setTimeout(r, 500));
@@ -56,10 +56,11 @@ serve({ fetch: app.fetch, port: 3000 }, () => {
 
 ## Hono API
 
-Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, type-safe RPC, and direct queue access via `c.var.glideMQ`.
+Full REST API + SSE events for glide-mq queue management using `@glidemq/hono`. The wrapper exposes queue control, schedulers, flow create/read/tree/delete endpoints, flow usage and budget endpoints, queue-wide usage summaries, durable broadcast SSE, and typed registry access via `c.var.glideMQ`.
 
 ```typescript
 import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
 import { serve } from '@hono/node-server';
 import { glideMQ, glideMQApi, QueueRegistryImpl } from '@glidemq/hono';
 import type { GlideMQEnv } from '@glidemq/hono';
@@ -89,12 +90,18 @@ const registry = new QueueRegistryImpl({
 });
 
 const app = new Hono<GlideMQEnv>();
+const apiToken = process.env.QUEUE_API_TOKEN;
+if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before starting the API');
+
+app.use('*', bearerAuth({ token: apiToken }));
 
 // Mount middleware - injects registry into c.var.glideMQ
 app.use(glideMQ(registry));
 
 // Mount queue HTTP API + SSE
-app.route('/api/queues', glideMQApi());
+app.route('/api/queues', glideMQApi({
+  authorize: (c) => c.req.header('Authorization') === `Bearer ${apiToken}`,
+}));
 
 // Custom route using the queue directly
 app.post('/send-email', async (c) => {
@@ -235,7 +242,7 @@ emailWorker.on('error', (err) => console.error('Email worker error:', err));
 orderWorker.on('error', (err) => console.error('Order worker error:', err));
 
 // Queue registry helper
-function getQueue(name: string): Queue | null {
+function getQueue(name: unknown): Queue | null {
   if (name === 'emails') return emailQueue;
   if (name === 'orders') return orderQueue;
   return null;
@@ -287,7 +294,9 @@ server.route({
     const queue = getQueue(request.params.name);
     if (!queue) return h.response({ error: 'Queue not found' }).code(404);
 
-    const job = await queue.getJob(request.params.id);
+    const id = request.params.id;
+    if (typeof id !== 'string') return h.response({ error: 'Invalid job ID' }).code(400);
+    const job = await queue.getJob(id);
     if (!job) return h.response({ error: 'Job not found' }).code(404);
 
     return h.response({ id: job.id, name: job.name, data: job.data });
@@ -378,7 +387,7 @@ Full REST API + SSE events for glide-mq queue management using `@glidemq/hapi`. 
 
 ```typescript
 import Hapi from '@hapi/hapi';
-import { glideMQPlugin, glideMQRoutes, QueueRegistryImpl } from '@glidemq/hapi';
+import { glideMQPlugin } from '@glidemq/hapi';
 import type { Job } from 'glide-mq';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
@@ -395,28 +404,18 @@ async function processOrder(job: Job) {
   return { orderId: job.data.orderId, status: 'shipped' };
 }
 
-// Create registry for graceful shutdown access
-const registry = new QueueRegistryImpl({
-  connection,
-  queues: {
-    emails: { processor: processEmail, concurrency: 5 },
-    orders: { processor: processOrder, concurrency: 3 },
-  },
-});
+const queues = {
+  emails: { processor: processEmail, concurrency: 5 },
+  orders: { processor: processOrder, concurrency: 3 },
+};
 
 const server = Hapi.server({ port: 3000, host: 'localhost' });
 
-// Register core plugin with pre-built registry
+// Register the plugin and mount its HTTP API in a prefixed Hapi realm.
 await server.register({
   plugin: glideMQPlugin,
-  options: registry as any,
-});
-
-// Mount queue HTTP API + SSE
-await server.register({
-  plugin: glideMQRoutes,
-  options: { prefix: '/api/queues' },
-});
+  options: { connection, queues, routes: true },
+}, { routes: { prefix: '/api/queues' } });
 
 // Custom route using the queue directly
 server.route({
@@ -905,7 +904,7 @@ Web UI for monitoring and managing glide-mq queues using `@glidemq/dashboard`. F
 
 ```typescript
 import express from 'express';
-import { Queue, Worker } from 'glide-mq';
+import { Queue, Worker, type Job } from 'glide-mq';
 import { createDashboard } from '@glidemq/dashboard';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
@@ -916,17 +915,17 @@ const slow = new Queue('slow-queue', { connection });
 const flaky = new Queue('flaky-queue', { connection });
 
 // Workers
-const fastWorker = new Worker('fast-queue', async (job) => {
+const fastWorker = new Worker('fast-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 30 + Math.random() * 70));
   return { processed: job.name, seq: job.data.i };
 }, { connection, concurrency: 5, blockTimeout: 1000 });
 
-const slowWorker = new Worker('slow-queue', async (job) => {
+const slowWorker = new Worker('slow-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
   return { result: 'done', size: job.data.size };
 }, { connection, concurrency: 1, blockTimeout: 1000 });
 
-const flakyWorker = new Worker('flaky-queue', async (job) => {
+const flakyWorker = new Worker('flaky-queue', async (job: Job) => {
   await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
   if (Math.random() < 0.3) throw new Error('Random failure on attempt ' + (job.attemptsMade + 1));
   return { ok: true };

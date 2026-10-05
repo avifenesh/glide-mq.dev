@@ -1,6 +1,6 @@
 # Class: QueueEvents
 
-Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/queue-events.ts#L7)
+Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L7)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-
 new QueueEvents(name, opts): QueueEvents;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:19](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/queue-events.ts#L19)
+Defined in: [glide-mq/src/queue-events.ts:20](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L20)
 
 #### Parameters
 
@@ -41,7 +41,7 @@ EventEmitter.constructor
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:8](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/queue-events.ts#L8)
+Defined in: [glide-mq/src/queue-events.ts:8](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L8)
 
 ***
 
@@ -178,9 +178,10 @@ EventEmitter.errorMonitor
 
 ```ts
 optional [captureRejectionSymbol]<K>(
-   error, 
-   event, ...
-   args): void;
+   error,
+   event,
+   ...args
+): void;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
@@ -256,7 +257,7 @@ EventEmitter.addListener
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:161](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/queue-events.ts#L161)
+Defined in: [glide-mq/src/queue-events.ts:210](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L210)
 
 Close the QueueEvents listener.
 Idempotent: safe to call multiple times.
@@ -1022,7 +1023,7 @@ EventEmitter.setMaxListeners
 waitUntilReady(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:40](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/queue-events.ts#L40)
+Defined in: [glide-mq/src/queue-events.ts:46](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L46)
 
 Wait until the QueueEvents instance is connected and listening.
 
@@ -1260,9 +1261,10 @@ EventEmitter.listenerCount
 
 ```ts
 static on(
-   emitter, 
-   eventName, 
-options?): AsyncIterator&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): AsyncIterator&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:270
@@ -1372,9 +1374,10 @@ EventEmitter.on
 
 ```ts
 static on(
-   emitter, 
-   eventName, 
-options?): AsyncIterator&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): AsyncIterator&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:275
@@ -1488,9 +1491,10 @@ EventEmitter.on
 
 ```ts
 static once(
-   emitter, 
-   eventName, 
-options?): Promise&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): Promise&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:184
@@ -1598,9 +1602,10 @@ EventEmitter.once
 
 ```ts
 static once(
-   emitter, 
-   eventName, 
-options?): Promise&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): Promise&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:189

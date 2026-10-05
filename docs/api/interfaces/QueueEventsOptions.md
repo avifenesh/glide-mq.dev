@@ -1,6 +1,8 @@
 # Interface: QueueEventsOptions
 
-Defined in: [glide-mq/src/types.ts:297](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L297)
+Defined in: [glide-mq/src/types.ts:486](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L486)
+
+Configuration options for creating a QueueEvents listener.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:297](https://github.com/avifenesh/glide-mq/bl
 optional blockTimeout?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:303](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L303)
+Defined in: [glide-mq/src/types.ts:492](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L492)
 
 XREAD BLOCK timeout in milliseconds. Defaults to 5000.
 
@@ -22,7 +24,7 @@ XREAD BLOCK timeout in milliseconds. Defaults to 5000.
 connection: ConnectionOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:298](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L298)
+Defined in: [glide-mq/src/types.ts:487](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L487)
 
 ***
 
@@ -32,7 +34,7 @@ Defined in: [glide-mq/src/types.ts:298](https://github.com/avifenesh/glide-mq/bl
 optional lastEventId?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:301](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L301)
+Defined in: [glide-mq/src/types.ts:490](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L490)
 
 Starting stream ID. Defaults to '$' (new events only). Use '0' for historical replay.
 
@@ -44,4 +46,4 @@ Starting stream ID. Defaults to '$' (new events only). Use '0' for historical re
 optional prefix?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:299](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L299)
+Defined in: [glide-mq/src/types.ts:488](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L488)

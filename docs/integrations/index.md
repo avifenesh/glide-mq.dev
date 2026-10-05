@@ -31,7 +31,7 @@ The integrations share the same core queue model, but they expose it in differen
 
 | If you use... | Install |
 |---------------|---------|
-| **Hono** (edge, Bun, Cloudflare Workers) | `@glidemq/hono` - type-safe RPC, edge-native |
+| **Hono** (Node.js, Bun, Deno with NAPI) | `@glidemq/hono` - typed context and authorization; edge callers use HTTP |
 | **Fastify** (high-performance Node.js) | `@glidemq/fastify` - encapsulation-aware, Zod validation |
 | **NestJS** (enterprise, decorators, DI) | `@glidemq/nestjs` - `@Processor`, `@InjectQueue`, full lifecycle |
 | **Hapi** (enterprise, Joi validation) | `@glidemq/hapi` - Joi schemas, access control, SSE |
@@ -45,17 +45,24 @@ Every integration follows the same pattern - declare queues, register the plugin
 ```typescript
 // Example with Hono
 import { Hono } from 'hono';
+import { bearerAuth } from 'hono/bearer-auth';
 import { glideMQ, glideMQApi } from '@glidemq/hono';
+import type { GlideMQEnv } from '@glidemq/hono';
 
-const app = new Hono();
+const apiToken = process.env.QUEUE_API_TOKEN;
+if (!apiToken) throw new Error('Set QUEUE_API_TOKEN before starting the API');
+const app = new Hono<GlideMQEnv>();
+app.use('*', bearerAuth({ token: apiToken }));
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 
 app.use('/mq/*', glideMQ({
   connection,
-  queues: { emails: { name: 'emails' } },
+  queues: { emails: {} },
 }));
 
-app.route('/mq', glideMQApi());
+app.route('/mq', glideMQApi({
+  authorize: (c) => c.req.header('Authorization') === `Bearer ${apiToken}`,
+}));
 
 export default app;
 ```

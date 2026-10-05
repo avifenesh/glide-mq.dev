@@ -1,6 +1,8 @@
 # Interface: BatchOptions
 
-Defined in: [glide-mq/src/types.ts:262](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L262)
+Defined in: [glide-mq/src/types.ts:337](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L337)
+
+Configuration for batch processing mode.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:262](https://github.com/avifenesh/glide-mq/bl
 size: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:264](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L264)
+Defined in: [glide-mq/src/types.ts:339](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L339)
 
 Maximum number of jobs to collect before invoking the batch processor.
 
@@ -22,6 +24,6 @@ Maximum number of jobs to collect before invoking the batch processor.
 optional timeout?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:266](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L266)
+Defined in: [glide-mq/src/types.ts:341](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L341)
 
 Maximum time in ms to wait for a full batch. If not set, processes whatever is available immediately.

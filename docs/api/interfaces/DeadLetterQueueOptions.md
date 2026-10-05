@@ -1,18 +1,24 @@
 # Interface: DeadLetterQueueOptions
 
-Defined in: [glide-mq/src/types.ts:56](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L56)
+Defined in: [glide-mq/src/types.ts:65](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L65)
+
+Configuration for dead letter queue routing.
 
 ## Properties
 
-### maxRetries?
+### ~~maxRetries?~~
 
 ```ts
 optional maxRetries?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:60](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L60)
+Defined in: [glide-mq/src/types.ts:73](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L73)
 
-Max retries before moving to DLQ. If not set, uses the job's own attempts config.
+#### Deprecated
+
+Not read and scheduled for removal in the next major version. A job
+moves to the DLQ when it fails terminally, which is decided by the job's own
+`attempts` option; there is no separate DLQ retry count.
 
 ***
 
@@ -22,6 +28,6 @@ Max retries before moving to DLQ. If not set, uses the job's own attempts config
 name: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:58](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L58)
+Defined in: [glide-mq/src/types.ts:67](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L67)
 
 Queue name to use as the dead letter queue.

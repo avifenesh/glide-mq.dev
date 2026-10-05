@@ -60,6 +60,10 @@
         "link": "/api/classes/ServerlessPool.md"
       },
       {
+        "text": "SuspendError",
+        "link": "/api/classes/SuspendError.md"
+      },
+      {
         "text": "UnrecoverableError",
         "link": "/api/classes/UnrecoverableError.md"
       },
@@ -92,6 +96,10 @@
       {
         "text": "BroadcastWorkerOptions",
         "link": "/api/interfaces/BroadcastWorkerOptions.md"
+      },
+      {
+        "text": "BudgetOptions",
+        "link": "/api/interfaces/BudgetOptions.md"
       },
       {
         "text": "ConnectionOptions",
@@ -130,12 +138,20 @@
         "link": "/api/interfaces/IamCredentials.md"
       },
       {
+        "text": "IndexCreateOptions",
+        "link": "/api/interfaces/IndexCreateOptions.md"
+      },
+      {
         "text": "JobCounts",
         "link": "/api/interfaces/JobCounts.md"
       },
       {
         "text": "JobData",
         "link": "/api/interfaces/JobData.md"
+      },
+      {
+        "text": "JobIndexOptions",
+        "link": "/api/interfaces/JobIndexOptions.md"
       },
       {
         "text": "JobNode",
@@ -148,6 +164,10 @@
       {
         "text": "JobTemplate",
         "link": "/api/interfaces/JobTemplate.md"
+      },
+      {
+        "text": "JobUsage",
+        "link": "/api/interfaces/JobUsage.md"
       },
       {
         "text": "Metrics",
@@ -182,6 +202,10 @@
         "link": "/api/interfaces/RateLimitConfig.md"
       },
       {
+        "text": "ReadStreamOptions",
+        "link": "/api/interfaces/ReadStreamOptions.md"
+      },
+      {
         "text": "SandboxOptions",
         "link": "/api/interfaces/SandboxOptions.md"
       },
@@ -198,12 +222,44 @@
         "link": "/api/interfaces/SearchJobsOptions.md"
       },
       {
+        "text": "SearchQueryOptions",
+        "link": "/api/interfaces/SearchQueryOptions.md"
+      },
+      {
         "text": "Serializer",
         "link": "/api/interfaces/Serializer.md"
       },
       {
+        "text": "SignalEntry",
+        "link": "/api/interfaces/SignalEntry.md"
+      },
+      {
+        "text": "SuspendOptions",
+        "link": "/api/interfaces/SuspendOptions.md"
+      },
+      {
         "text": "TokenBucketConfig",
         "link": "/api/interfaces/TokenBucketConfig.md"
+      },
+      {
+        "text": "UsageQueueSummary",
+        "link": "/api/interfaces/UsageQueueSummary.md"
+      },
+      {
+        "text": "UsageSummary",
+        "link": "/api/interfaces/UsageSummary.md"
+      },
+      {
+        "text": "UsageSummaryOptions",
+        "link": "/api/interfaces/UsageSummaryOptions.md"
+      },
+      {
+        "text": "VectorSearchOptions",
+        "link": "/api/interfaces/VectorSearchOptions.md"
+      },
+      {
+        "text": "VectorSearchResult",
+        "link": "/api/interfaces/VectorSearchResult.md"
       },
       {
         "text": "WorkerInfo",
@@ -228,6 +284,14 @@
         "link": "/api/type-aliases/BatchProcessor.md"
       },
       {
+        "text": "ClosableWorkflow",
+        "link": "/api/type-aliases/ClosableWorkflow.md"
+      },
+      {
+        "text": "Field",
+        "link": "/api/type-aliases/Field.md"
+      },
+      {
         "text": "GracefulShutdownHandle",
         "link": "/api/type-aliases/GracefulShutdownHandle.md"
       },
@@ -238,6 +302,10 @@
       {
         "text": "ReadFrom",
         "link": "/api/type-aliases/ReadFrom.md"
+      },
+      {
+        "text": "WorkflowConnection",
+        "link": "/api/type-aliases/WorkflowConnection.md"
       }
     ]
   },

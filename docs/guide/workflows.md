@@ -7,20 +7,23 @@ description: FlowProducer parent-child trees, DAG workflows, chain, group, chord
 
 ## Table of Contents
 
-- [FlowProducer - Parent-Child Job Trees](#flowproducer)
+- [FlowProducer  -  Parent-Child Job Trees](#flowproducer)
 - [Reading Child Results](#reading-child-results)
-- [DAG Workflows - Multiple Parents](#dag-workflows--multiple-parents)
-- [moveToWaitingChildren - Dynamic Children](#movetowaitingchildren--dynamic-children)
-- [`chain` - Sequential Pipeline](#chain)
-- [`group` - Parallel Execution](#group)
-- [`chord` - Parallel + Callback](#chord)
+- [DAG Workflows  -  Multiple Parents](#dag-workflows--multiple-parents)
+- [moveToWaitingChildren  -  Dynamic Children](#movetowaitingchildren--dynamic-children)
+- [`chain`  -  Sequential Pipeline](#chain)
+- [`group`  -  Parallel Execution](#group)
+- [`chord`  -  Parallel + Callback](#chord)
+- [Suspend/Resume as a Workflow Primitive](#suspendresume-as-a-workflow-primitive)
+- [Budget on Flows](#budget-on-flows)
+- [AI Workflow Patterns](#ai-workflow-patterns)
 - [Broadcast](#broadcast)
 
 ---
 
 ## FlowProducer
 
-`FlowProducer` lets you atomically enqueue a tree of parent and child jobs. A parent job only becomes runnable once **all** of its children have successfully completed; failed or dead-lettered children do not unblock the parent.
+`FlowProducer` enqueues a tree of parent and child jobs. Each level (a parent and its leaf children) is created in one atomic call. Nested sub-flows are separate calls made bottom-up, and in cluster mode leaf children in another queue are created and wired to the parent separately, so a failure part way can leave the lower levels created. A parent job only becomes runnable once **all** of its children have successfully completed; failed or dead-lettered children do not unblock the parent.
 
 ```typescript
 import { FlowProducer } from 'glide-mq';
@@ -32,8 +35,8 @@ const { job: parent } = await flow.add({
   queueName: 'reports',
   data: { month: '2025-01' },
   children: [
-    { name: 'fetch-sales',    queueName: 'data', data: { region: 'eu' } },
-    { name: 'fetch-returns',  queueName: 'data', data: { region: 'eu' } },
+    { name: 'fetch-sales', queueName: 'data', data: { region: 'eu' } },
+    { name: 'fetch-returns', queueName: 'data', data: { region: 'eu' } },
     {
       name: 'fetch-inventory',
       queueName: 'data',
@@ -57,11 +60,15 @@ await flow.close();
 ```typescript
 const nodes = await flow.addBulk([
   {
-    name: 'report-jan', queueName: 'reports', data: {},
+    name: 'report-jan',
+    queueName: 'reports',
+    data: {},
     children: [{ name: 'data-jan', queueName: 'data', data: {} }],
   },
   {
-    name: 'report-feb', queueName: 'reports', data: {},
+    name: 'report-feb',
+    queueName: 'reports',
+    data: {},
     children: [{ name: 'data-feb', queueName: 'data', data: {} }],
   },
 ]);
@@ -71,24 +78,28 @@ const nodes = await flow.addBulk([
 
 ## Reading Child Results
 
-In the parent processor, call `job.getChildrenValues()` to retrieve the return values of all direct children. The keys are internal dependency identifiers (implementation detail - prefer `Object.values()` when you only need the results).
+In the parent processor, call `job.getChildrenValues()` to retrieve the return values of all direct children. The keys are internal dependency identifiers (implementation detail  -  prefer `Object.values()` when you only need the results).
 
 ```typescript
-const worker = new Worker('reports', async (job) => {
-  // Runs only after all children have completed
-  const childValues = await job.getChildrenValues();
-  // Keys are opaque internal identifiers; use Object.values() for the results:
-  const results = Object.values(childValues);
-  // [ { sales: 42000 }, { returns: 300 } ]
+const worker = new Worker(
+  'reports',
+  async (job) => {
+    // Runs only after all children have completed
+    const childValues = await job.getChildrenValues();
+    // Keys are opaque internal identifiers; use Object.values() for the results:
+    const results = Object.values(childValues);
+    // [ { sales: 42000 }, { returns: 300 } ]
 
-  const totalSales = results.reduce((s, v) => s + (v.sales ?? 0), 0);
-  return { totalSales };
-}, { connection });
+    const totalSales = results.reduce((s, v) => s + (v.sales ?? 0), 0);
+    return { totalSales };
+  },
+  { connection },
+);
 ```
 
 ---
 
-## DAG Workflows - Multiple Parents
+## DAG Workflows  -  Multiple Parents
 
 `FlowProducer.addDAG()` lets you define **arbitrary DAG (Directed Acyclic Graph) topologies** where any job can have multiple parent dependencies. A job only becomes runnable once **all** of its dependencies have successfully completed.
 
@@ -106,12 +117,15 @@ import { FlowProducer, dag } from 'glide-mq';
 const flow = new FlowProducer({ connection });
 
 // Submit a DAG using the helper function
-const jobs = await dag('queueName', [
-  { name: 'A', data: { step: 1 } },
-  { name: 'B', data: { step: 2 }, deps: ['A'] },
-  { name: 'C', data: { step: 3 }, deps: ['A'] },
-  { name: 'D', data: { step: 4 }, deps: ['B', 'C'] },
-], connection);
+const jobs = await dag(
+  [
+    { name: 'A', queueName: 'tasks', data: { step: 1 } },
+    { name: 'B', queueName: 'tasks', data: { step: 2 }, deps: ['A'] },
+    { name: 'C', queueName: 'tasks', data: { step: 3 }, deps: ['A'] },
+    { name: 'D', queueName: 'tasks', data: { step: 4 }, deps: ['B', 'C'] },
+  ],
+  connection,
+);
 
 // Or use FlowProducer.addDAG() directly
 const jobs = await flow.addDAG({
@@ -126,11 +140,12 @@ const jobs = await flow.addDAG({
 ```
 
 Each **DAGNode** has:
-- `name` - unique identifier within this DAG (used in `deps` arrays)
-- `queueName` - queue to submit this job to
-- `data` - job payload
-- `opts?` - job options (delay, priority, attempts, etc.)
-- `deps?` - array of node names that must complete before this job runs
+
+- `name`  -  unique identifier within this DAG (used in `deps` arrays)
+- `queueName`  -  queue to submit this job to
+- `data`  -  job payload
+- `opts?`  -  job options (delay, priority, attempts, etc.)
+- `deps?`  -  array of node names that must complete before this job runs
 
 ### Example: Fan-in merge
 
@@ -138,16 +153,20 @@ Each **DAGNode** has:
 import { dag } from 'glide-mq';
 
 // Three parallel data fetches, then one merge job
-const jobs = await dag('data', [
-  { name: 'fetch-sales', data: { source: 'sales-db' } },
-  { name: 'fetch-inventory', data: { source: 'warehouse-db' } },
-  { name: 'fetch-returns', data: { source: 'returns-db' } },
-  {
-    name: 'merge-reports',
-    data: { reportId: 'Q1-2025' },
-    deps: ['fetch-sales', 'fetch-inventory', 'fetch-returns'],
-  },
-], connection);
+const jobs = await dag(
+  [
+    { name: 'fetch-sales', queueName: 'data', data: { source: 'sales-db' } },
+    { name: 'fetch-inventory', queueName: 'data', data: { source: 'warehouse-db' } },
+    { name: 'fetch-returns', queueName: 'data', data: { source: 'returns-db' } },
+    {
+      name: 'merge-reports',
+      queueName: 'data',
+      data: { reportId: 'Q1-2025' },
+      deps: ['fetch-sales', 'fetch-inventory', 'fetch-returns'],
+    },
+  ],
+  connection,
+);
 
 // All three fetches run in parallel.
 // 'merge-reports' runs only after all three complete.
@@ -165,51 +184,55 @@ import { dag } from 'glide-mq';
 //      \ /
 //       D
 
-const jobs = await dag('tasks', [
-  { name: 'A', data: { step: 'root' } },
-  { name: 'B', data: { step: 'left' }, deps: ['A'] },
-  { name: 'C', data: { step: 'right' }, deps: ['A'] },
-  { name: 'D', data: { step: 'converge' }, deps: ['B', 'C'] },
-], connection);
+const jobs = await dag(
+  [
+    { name: 'A', queueName: 'tasks', data: { step: 'root' } },
+    { name: 'B', queueName: 'tasks', data: { step: 'left' }, deps: ['A'] },
+    { name: 'C', queueName: 'tasks', data: { step: 'right' }, deps: ['A'] },
+    { name: 'D', queueName: 'tasks', data: { step: 'converge' }, deps: ['B', 'C'] },
+  ],
+  connection,
+);
 
 // A runs first, then B and C in parallel, then D after both complete.
 ```
 
 **Implementation notes:**
+
 - DAG validation runs automatically - cycles are detected and rejected with `CycleError`.
-- Jobs are submitted in topological order (leaves first, roots last).
+- Jobs are submitted level by level in reverse-topological order (dependents first, prerequisites last) so each node's BullMQ-parents already exist by the time we wire it; all jobs within a level are pipelined in a single batch, so submission cost is O(levels) round trips rather than O(N). Before the leaf level is added, each leaf is registered in all of its dependents' deps sets, so a parent is never released by a fast sibling while another of its deps is still being wired.
 - If any parent fails or is dead-lettered, dependent jobs remain blocked indefinitely (manual cleanup required).
-- Cross-queue dependencies are supported - each node can specify its own `queueName`.
+- Cross-queue dependencies are supported - each node can specify its own `queueName`. A child that completes before its registration reaches the parent is parked on the parent (`depearly`) and counted once the registration lands. A producer on a library before 126 registers with a plain `SADD`, which cannot count a parked completion; the scheduler tick's `glidemq_healEarlyDeps` counts it and releases the parent, so a mixed-version rollout does not leave a parent waiting for children that already finished.
 
 ### Reading results from multiple parents
 
-Use `job.getParents()` to fetch all parent jobs and their results:
+Use `job.getParents()` to list all parent references, then fetch each parent job to read its result:
 
 ```typescript
-const worker = new Worker('tasks', async (job) => {
-  if (job.name === 'D') {
-    const parents = await job.getParents();
-    // parents is an array of Job instances
-    const results = parents.map(p => p.returnvalue);
-    return { merged: results };
-  }
-}, { connection });
-```
-
-Alternatively, manually fetch specific parents if you know their IDs:
-
-```typescript
-const parentB = await Job.fromId(queue, 'B-job-id');
-const parentC = await Job.fromId(queue, 'C-job-id');
-const resultB = parentB?.returnvalue;
-const resultC = parentC?.returnvalue;
+const worker = new Worker(
+  'tasks',
+  async (job) => {
+    if (job.name === 'D') {
+      const parentRefs = await job.getParents();
+      // parentRefs: Array<{ queue: string; id: string }>
+      // Fetch each parent job to read its return value:
+      const results = [];
+      for (const ref of parentRefs) {
+        const parentJob = await queue.getJob(ref.id);
+        if (parentJob) results.push(parentJob.returnvalue);
+      }
+      return { merged: results };
+    }
+  },
+  { connection },
+);
 ```
 
 ---
 
-## moveToWaitingChildren - Dynamic Children
+## moveToWaitingChildren  -  Dynamic Children
 
-`FlowProducer` and `addDAG()` define the job graph **up front** before any processing begins. Sometimes a parent processor needs to **spawn children dynamically** based on runtime data - for example, splitting a file into N chunks where N is unknown until the file is read.
+`FlowProducer` and `addDAG()` define the job graph **up front** before any processing begins. Sometimes a parent processor needs to **spawn children dynamically** based on runtime data  -  for example, splitting a file into N chunks where N is unknown until the file is read.
 
 `job.moveToWaitingChildren()` handles this. It pauses the parent job (transitions it back to `waiting-children`) until all dynamically-added children complete. When the last child finishes, the parent processor **re-executes from the top**.
 
@@ -218,46 +241,52 @@ const resultC = parentC?.returnvalue;
 1. The parent processor runs and decides it needs child jobs.
 2. It creates children via `queue.add()` (or `FlowProducer`) with a `parent` option pointing back to the current job.
 3. It calls `await job.moveToWaitingChildren()`.
-4. This throws a `WaitingChildrenError` internally - the worker framework catches it and moves the parent to `waiting-children` state.
+4. This throws a `WaitingChildrenError` internally  -  the worker framework catches it and moves the parent to `waiting-children` state.
 5. When all children complete, the parent processor is invoked again from the top.
 6. On re-entry, call `job.getChildrenValues()` to collect results and return the final value.
 
 ### Example: dynamic fan-out
 
 ```typescript
-import { Queue, Worker, FlowProducer } from 'glide-mq';
+import { Queue, Worker } from 'glide-mq';
 
 const connection = { addresses: [{ host: 'localhost', port: 6379 }] };
 const queue = new Queue('processing', { connection });
 
-const worker = new Worker('processing', async (job) => {
-  // Check if children have already completed (re-entry after waiting)
-  const existing = await job.getChildrenValues();
-  if (Object.keys(existing).length > 0) {
-    // All children done — aggregate and return
-    const results = Object.values(existing);
-    return { total: results.reduce((sum, r) => sum + r.count, 0) };
-  }
+const worker = new Worker(
+  'processing',
+  async (job) => {
+    // Check if children have already completed (re-entry after waiting)
+    const existing = await job.getChildrenValues();
+    if (Object.keys(existing).length > 0) {
+      // All children done  -  aggregate and return
+      const results = Object.values(existing);
+      return { total: results.reduce((sum, r) => sum + r.count, 0) };
+    }
 
-  // First execution: inspect data and spawn children dynamically
-  const { urls } = job.data;
+    // First execution: inspect data and spawn children dynamically
+    const { urls } = job.data;
 
-  const flow = new FlowProducer({ connection });
-  for (const url of urls) {
-    await queue.add('fetch-url', { url }, {
-      parent: { id: job.id!, queue: job.queueQualifiedName },
-    });
-  }
-  await flow.close();
+    for (const url of urls) {
+      await queue.add(
+        'fetch-url',
+        { url },
+        {
+          parent: { id: job.id!, queue: 'processing' }, // plain queue name of the parent
+        },
+      );
+    }
 
-  // Pause until all children complete — throws WaitingChildrenError
-  await job.moveToWaitingChildren();
-}, { connection });
+    // Pause until all children complete  -  throws WaitingChildrenError
+    await job.moveToWaitingChildren();
+  },
+  { connection },
+);
 ```
 
 ### Key points
 
-- `moveToWaitingChildren()` always throws (`WaitingChildrenError`). Do not put code after it - it will not execute.
+- `moveToWaitingChildren()` always throws (`WaitingChildrenError`). Do not put code after it  -  it will not execute.
 - The processor re-runs **from the top** when children complete. Use `getChildrenValues()` or `job.data` to detect re-entry.
 - You can call `moveToWaitingChildren()` multiple times across re-entries to create multi-round fan-out patterns.
 - Children must reference the parent via `opts.parent: { id, queue }` so the dependency tracking works.
@@ -272,27 +301,38 @@ Execute a list of jobs **sequentially**, specified in **reverse execution order*
 import { chain } from 'glide-mq';
 
 // Execution order: download → parse → transform → upload
-await chain('pipeline', [
-  { name: 'upload',    data: { bucket: 'my-bucket' } },   // runs last  (root)
-  { name: 'transform', data: {} },
-  { name: 'parse',     data: {} },
-  { name: 'download',  data: { url: 'https://example.com/file.csv' } }, // runs first (leaf)
-], connection);
+await chain(
+  'pipeline',
+  [
+    { name: 'upload', data: { bucket: 'my-bucket' } }, // runs last  (root)
+    { name: 'transform', data: {} },
+    { name: 'parse', data: {} },
+    { name: 'download', data: { url: 'https://example.com/file.csv' } }, // runs first (leaf)
+  ],
+  connection,
+);
+
+// Pass a shared `client` when you need the returned jobs (getState, waitUntilFinished).
+// Without it, chain/group/chord/dag close their owned connection after submit.
 ```
 
-- The **last** element in the array is the leaf - it runs first.
-- The **first** element in the array is the root - it runs last (after all descendants complete).
+- The **last** element in the array is the leaf  -  it runs first.
+- The **first** element in the array is the root  -  it runs last (after all descendants complete).
 - Each step's processor can access the prior step's return value via `Object.values(job.getChildrenValues())[0]`.
 
 ```typescript
-const worker = new Worker('pipeline', async (job) => {
-  if (job.name === 'parse') {
-    const prev = await job.getChildrenValues();
-    const raw = Object.values(prev)[0]; // result from 'download'
-    return parse(raw);
-  }
-  // ...
-}, { connection });
+const worker = new Worker(
+  'pipeline',
+  async (job) => {
+    if (job.name === 'parse') {
+      const prev = await job.getChildrenValues();
+      const raw = Object.values(prev)[0]; // result from 'download'
+      return parse(raw);
+    }
+    // ...
+  },
+  { connection },
+);
 ```
 
 ---
@@ -304,11 +344,15 @@ Execute a list of jobs **in parallel**. A synthetic `__group__` parent waits for
 ```typescript
 import { group } from 'glide-mq';
 
-await group('tasks', [
-  { name: 'resize-thumb',  data: { imageId: 1, size: 'sm' } },
-  { name: 'resize-medium', data: { imageId: 1, size: 'md' } },
-  { name: 'resize-large',  data: { imageId: 1, size: 'lg' } },
-], connection);
+await group(
+  'tasks',
+  [
+    { name: 'resize-thumb', data: { imageId: 1, size: 'sm' } },
+    { name: 'resize-medium', data: { imageId: 1, size: 'md' } },
+    { name: 'resize-large', data: { imageId: 1, size: 'lg' } },
+  ],
+  connection,
+);
 ```
 
 The `__group__` parent processor (if you define one) can collect results from all children via `getChildrenValues()`.
@@ -339,147 +383,74 @@ await chord(
 In the callback processor:
 
 ```typescript
-const worker = new Worker('tasks', async (job) => {
-  if (job.name === 'select-best-model') {
-    const scores = await job.getChildrenValues();
-    // Keys are opaque — use Object.entries() if you need them, or Object.values():
-    const best = Object.entries(scores).sort((a, b) => b[1].score - a[1].score)[0];
-    return { score: best[1].score };
-  }
-  // ... other processors
-}, { connection });
-```
-
----
-
----
-
-## Budget Caps for Flows
-
-Cap total token usage or USD cost across all jobs in a flow. Pass a `budget` option to `FlowProducer.add()`.
-
-```typescript
-import { FlowProducer } from 'glide-mq';
-
-const flow = new FlowProducer({ connection });
-const node = await flow.add(
-  {
-    name: 'rag-pipeline',
-    queueName: 'ai',
-    data: { query: 'Explain message queues' },
-    children: [
-      { name: 'embed', queueName: 'ai', data: { step: 'embed' } },
-      { name: 'search', queueName: 'ai', data: { step: 'search' } },
-      { name: 'generate', queueName: 'ai', data: { step: 'generate' } },
-    ],
+const worker = new Worker(
+  'tasks',
+  async (job) => {
+    if (job.name === 'select-best-model') {
+      const scores = await job.getChildrenValues();
+      // Keys are opaque  -  use Object.entries() if you need them, or Object.values():
+      const best = Object.entries(scores).sort((a, b) => b[1].score - a[1].score)[0];
+      return { score: best[1].score };
+    }
+    // ... other processors
   },
-  {
-    budget: {
-      maxTotalTokens: 5000,
-      maxTotalCost: 0.10,
-      onExceeded: 'fail',  // or 'pause'
-    },
-  },
+  { connection },
 );
 ```
 
-Each child job that calls `job.reportUsage()` increments the flow's budget counters. When the budget is exceeded, remaining jobs fail (or pause) based on the `onExceeded` policy.
-
-```typescript
-const budget = await queue.getFlowBudget(node.job.id);
-console.log(`Used: ${budget.usedTokens}/${budget.maxTotalTokens} tokens`);
-console.log(`Cost: $${budget.usedCost}/${budget.maxTotalCost}`);
-```
-
-See [AI-Native Features: Budget Caps](./ai-native#budget-caps) for details.
+---
 
 ---
 
-## Suspend / Resume in Workflows
+## Suspend/Resume as a Workflow Primitive
 
-Suspend a job mid-pipeline for human-in-the-loop approval, then resume based on the signal.
+job.suspend() can be used within any workflow pattern (chain, group, chord, DAG) to introduce external wait points. This is fundamentally different from moveToDelayed (timer-based) and moveToWaitingChildren (child-completion-based) - suspend waits for an explicit signal from outside the queue system.
 
-```typescript
-const worker = new Worker('ai', async (job) => {
-  if (job.data.step === 'moderate') {
-    // Check for resume signal
-    if (job.signals.length > 0) {
-      const decision = job.signals[0].data;
-      if (decision.action === 'approve') return { approved: true };
-      throw new Error('Content rejected');
-    }
+### Use cases
 
-    // First run: classify and suspend for review
-    const result = await classifyContent(job.data.content);
-    if (result.category === 'borderline') {
-      await job.suspend({ reason: 'human-review-needed', timeout: 3600_000 });
-    }
-    return { classification: result.category };
-  }
-}, { connection });
-```
+- **Approval gates**: A content pipeline generates a draft, suspends for review, then publishes on approval.
+- **Webhook callbacks**: An order flow suspends after sending a payment request, resumes when the webhook arrives.
+- **Agent loops**: An AI agent suspends after presenting options to the user, resumes with the user's choice.
 
-Resume from an API endpoint:
+In a DAG, suspending a node does not block sibling branches. Other branches with satisfied dependencies continue executing. The suspended node resumes only when queue.signal() is called.
 
-```typescript
-await queue.signal(jobId, 'moderation-decision', { action: 'approve' });
-```
+---
 
-See [AI-Native Features: Suspend / Resume](./ai-native#suspend--resume) for details.
+## Budget on Flows
+
+FlowProducer.add() accepts an optional budget parameter that creates a shared budget hash for the entire flow. Every job in the flow (parent and children) shares this budget.
+
+Each child job has a budgetKey that points to the shared budget hash. The usage a job reports with reportUsage() is charged when the attempt ends, whether it completes or fails: the worker increments the budget counters via glidemq_recordUsageAndCheckBudget. A retry that reports no new usage is not charged again. Batch workers charge and check budgets the same way, per job. Before each job runs, the worker checks the budget. If limits are exceeded:
+
+- **fail**: The job that crossed the limit completes normally. Each later job fails with `Budget exceeded` when it starts (normal retry rules apply).
+- **pause**: Each later job is moved back to delayed when it starts and re-checks the budget every 60 seconds (`Worker.BUDGET_PAUSE_RECHECK_MS`) until the limits are raised. Raise them with `queue.updateFlowBudget(flowId, { maxTotalCost: 2 })`: it re-evaluates `exceeded` against the usage already charged, and the paused jobs run at their next re-check, or right away after `job.promote()`.
 
 ---
 
 ## AI Workflow Patterns
 
-### RAG pipeline
+### RAG pipeline (chain)
 
-Retrieval-augmented generation with embed, search, and generate steps:
+Use chain() to model embed -> retrieve -> generate as a sequential pipeline with budget caps.
 
-```typescript
-const node = await flow.add({
-  name: 'rag',
-  queueName: 'ai',
-  data: { step: 'aggregate', query },
-  children: [
-    { name: 'embed', queueName: 'ai', data: { step: 'embed', query },
-      opts: { lockDuration: 5_000 } },
-    { name: 'search', queueName: 'ai', data: { step: 'search', query },
-      opts: { lockDuration: 5_000 } },
-    { name: 'generate', queueName: 'ai',
-      data: { step: 'generate', query, context: docs },
-      opts: { lockDuration: 60_000, fallbacks: [
-        { model: 'gpt-5.4-nano' }, { model: 'claude-sonnet-4-20250514' },
-      ], attempts: 3 } },
-  ],
-}, { budget: { maxTotalTokens: 5000 } });
-```
+### Agent loop (suspend/resume cycle)
 
-### Content moderation pipeline
+The processor checks job.signals on re-entry. If empty, it suspends and waits for user input. When the signal arrives, the processor continues with the user's response.
 
-Classify, optionally suspend for human review, then polish:
+### Content pipeline with approval (chain + suspend)
 
-```typescript
-const node = await flow.add({
-  name: 'pipeline',
-  queueName: 'content',
-  data: { step: 'aggregate' },
-  children: [
-    { name: 'classify', queueName: 'content', data: { step: 'classify', content } },
-    { name: 'moderate', queueName: 'content', data: { step: 'moderate', content } },
-    { name: 'polish', queueName: 'content', data: { step: 'polish', content },
-      opts: { lockDuration: 30_000 } },
-  ],
-}, { budget: { maxTotalTokens: 3000, onExceeded: 'fail' } });
-```
+Combine chain() with job.suspend() at the review step. The pipeline halts until an editor approves.
 
-See [Examples: AI Pipelines](/examples/ai-pipelines) for complete runnable examples.
+### Parallel model comparison (group + budget)
+
+Use FlowProducer.add() with multiple child jobs (one per model) and a shared budget to compare model outputs while enforcing cost limits across all calls.
 
 ---
 
 ## Broadcast
 
-The workflow patterns above (`FlowProducer`, DAG, `chain`, `group`, `chord`, `moveToWaitingChildren`) all model **dependency graphs** - jobs wait for other jobs to complete before running.
+The workflow patterns above (`FlowProducer`, DAG, `chain`, `group`, `chord`, `moveToWaitingChildren`) all model **dependency graphs**  -  jobs wait for other jobs to complete before running.
 
-glide-mq also supports a **Broadcast / BroadcastWorker** pub/sub pattern for real-time fan-out where every subscriber receives every message. This is a fundamentally different paradigm: no job state, no retries, no dependencies - just fire-and-forget delivery to all connected workers.
+glide-mq also supports a **Broadcast / BroadcastWorker** pub/sub pattern for real-time fan-out where every subscriber receives every message. This is a fundamentally different paradigm: no dependencies between messages  -  just fire-and-forget delivery to all connected workers.
 
-See [Usage](./usage) for the `Broadcast` and `BroadcastWorker` API.
+See [USAGE.md](./usage) for the `Broadcast` and `BroadcastWorker` API.

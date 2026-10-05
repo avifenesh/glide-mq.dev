@@ -1,6 +1,13 @@
 # Interface: SandboxOptions
 
-Defined in: [glide-mq/src/types.ts:90](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L90)
+Defined in: [glide-mq/src/types.ts:116](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L116)
+
+Options for sandboxed (file-path) processors running in worker threads or child processes.
+When a job's abort signal fires (timeout or revocation), the abort is forwarded to the processor.
+If it has not settled 5 seconds later, its worker thread is terminated (or its child process is
+SIGKILLed) and replaced, so a hung processor cannot hold a sandbox slot. During that window the
+worker no longer owns the job: `job.updateProgress()`, `job.updateData()` and `job.moveToDelayed()`
+reject with `Job aborted`; `job.log()` still works.
 
 ## Properties
 
@@ -10,7 +17,7 @@ Defined in: [glide-mq/src/types.ts:90](https://github.com/avifenesh/glide-mq/blo
 optional maxWorkers?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:94](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L94)
+Defined in: [glide-mq/src/types.ts:120](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L120)
 
 Maximum number of concurrent sandbox workers. Defaults to the Worker concurrency.
 
@@ -22,6 +29,6 @@ Maximum number of concurrent sandbox workers. Defaults to the Worker concurrency
 optional useWorkerThreads?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:92](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L92)
+Defined in: [glide-mq/src/types.ts:118](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L118)
 
 Use worker_threads (default: true). When false, uses child_process.fork.

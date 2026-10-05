@@ -1,6 +1,8 @@
 # Class: DelayedError
 
-Defined in: [glide-mq/src/errors.ts:32](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L32)
+Defined in: [glide-mq/src/errors.ts:37](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L37)
+
+Internal control-flow error thrown by `job.moveToDelayed()`. Caught by the Worker.
 
 ## Extends
 
@@ -14,7 +16,7 @@ Defined in: [glide-mq/src/errors.ts:32](https://github.com/avifenesh/glide-mq/bl
 new DelayedError(delayedUntil, message?): DelayedError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:35](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L35)
+Defined in: [glide-mq/src/errors.ts:40](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L40)
 
 #### Parameters
 
@@ -39,7 +41,7 @@ Defined in: [glide-mq/src/errors.ts:35](https://github.com/avifenesh/glide-mq/bl
 optional cause?: unknown;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
@@ -53,7 +55,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:26
 readonly delayedUntil: number;
 ```
 
-Defined in: [glide-mq/src/errors.ts:33](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/errors.ts#L33)
+Defined in: [glide-mq/src/errors.ts:38](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L38)
 
 ***
 
@@ -63,7 +65,7 @@ Defined in: [glide-mq/src/errors.ts:33](https://github.com/avifenesh/glide-mq/bl
 message: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1077
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
@@ -77,7 +79,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1077
 name: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
@@ -91,7 +93,7 @@ Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 optional stack?: string;
 ```
 
-Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1078
+Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 

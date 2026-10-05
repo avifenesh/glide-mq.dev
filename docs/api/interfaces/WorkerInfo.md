@@ -1,6 +1,8 @@
 # Interface: WorkerInfo
 
-Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L395)
+Defined in: [glide-mq/src/types.ts:603](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L603)
+
+Information about a live worker instance.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/bl
 activeJobs: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L401)
+Defined in: [glide-mq/src/types.ts:609](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L609)
 
 ***
 
@@ -20,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/bl
 addr: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L397)
+Defined in: [glide-mq/src/types.ts:605](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L605)
 
 ***
 
@@ -30,7 +32,21 @@ Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/bl
 age: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:400](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L400)
+Defined in: [glide-mq/src/types.ts:608](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L608)
+
+***
+
+### concurrency?
+
+```ts
+optional concurrency?: number;
+```
+
+Defined in: [glide-mq/src/types.ts:615](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L615)
+
+The worker's configured `concurrency` option. In batch mode it counts batches, so up to
+`concurrency * batch.size` jobs can be active at once. Absent for a worker that registered with a
+glide-mq version that predates this field.
 
 ***
 
@@ -40,7 +56,7 @@ Defined in: [glide-mq/src/types.ts:400](https://github.com/avifenesh/glide-mq/bl
 id: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:396](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L396)
+Defined in: [glide-mq/src/types.ts:604](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L604)
 
 ***
 
@@ -50,7 +66,7 @@ Defined in: [glide-mq/src/types.ts:396](https://github.com/avifenesh/glide-mq/bl
 pid: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:398](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L398)
+Defined in: [glide-mq/src/types.ts:606](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L606)
 
 ***
 
@@ -60,4 +76,4 @@ Defined in: [glide-mq/src/types.ts:398](https://github.com/avifenesh/glide-mq/bl
 startedAt: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:399](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L399)
+Defined in: [glide-mq/src/types.ts:607](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L607)

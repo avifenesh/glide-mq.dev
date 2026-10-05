@@ -1,6 +1,8 @@
 # Interface: ConnectionOptions
 
-Defined in: [glide-mq/src/types.ts:28](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L28)
+Defined in: [glide-mq/src/types.ts:29](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L29)
+
+Options for connecting to a Valkey/Redis server or cluster.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:28](https://github.com/avifenesh/glide-mq/blo
 addresses: object[];
 ```
 
-Defined in: [glide-mq/src/types.ts:29](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L29)
+Defined in: [glide-mq/src/types.ts:30](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L30)
 
 #### host
 
@@ -32,7 +34,7 @@ port: number;
 optional clientAz?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:48](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L48)
+Defined in: [glide-mq/src/types.ts:49](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L49)
 
 Availability zone of the client (e.g., 'us-east-1a').
 Used with readFrom 'AZAffinity' or 'AZAffinityReplicasAndPrimary' to route
@@ -46,19 +48,19 @@ read commands to nodes in the same AZ, reducing cross-AZ latency and cost.
 optional clusterMode?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:32](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L32)
+Defined in: [glide-mq/src/types.ts:33](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L33)
 
 ***
 
 ### credentials?
 
 ```ts
-optional credentials?: 
+optional credentials?:
   | PasswordCredentials
   | IamCredentials;
 ```
 
-Defined in: [glide-mq/src/types.ts:31](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L31)
+Defined in: [glide-mq/src/types.ts:32](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L32)
 
 ***
 
@@ -68,7 +70,7 @@ Defined in: [glide-mq/src/types.ts:31](https://github.com/avifenesh/glide-mq/blo
 optional inflightRequestsLimit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:53](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L53)
+Defined in: [glide-mq/src/types.ts:54](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L54)
 
 Maximum concurrent in-flight requests per client connection.
 Passed through to GLIDE. Default: 1000.
@@ -81,7 +83,7 @@ Passed through to GLIDE. Default: 1000.
 optional readFrom?: ReadFrom;
 ```
 
-Defined in: [glide-mq/src/types.ts:42](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L42)
+Defined in: [glide-mq/src/types.ts:43](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L43)
 
 Read strategy for the client. Controls how read commands are routed.
 - 'primary': Always read from primary (default).
@@ -93,10 +95,25 @@ AZ-based strategies require `clientAz` to be set.
 
 ***
 
+### requestTimeout?
+
+```ts
+optional requestTimeout?: number;
+```
+
+Defined in: [glide-mq/src/types.ts:61](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L61)
+
+Request timeout in milliseconds. Commands that exceed this timeout
+throw a TimeoutError. Default: 500.
+Increase for operations that may take longer (e.g. FT.CREATE with many existing keys,
+FUNCTION LOAD with large libraries).
+
+***
+
 ### useTLS?
 
 ```ts
 optional useTLS?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:30](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L30)
+Defined in: [glide-mq/src/types.ts:31](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L31)

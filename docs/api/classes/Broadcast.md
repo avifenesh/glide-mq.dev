@@ -1,6 +1,6 @@
 # Class: Broadcast&lt;D&gt;
 
-Defined in: [glide-mq/src/broadcast.ts:30](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L30)
+Defined in: [glide-mq/src/broadcast.ts:35](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L35)
 
 Broadcast - Fan-out message publisher for pub/sub patterns.
 
@@ -24,6 +24,9 @@ await broadcast.publish('order.placed', { orderId: 42 });
 // Both workers receive the message
 ```
 
+Events: 'error' (from the underlying queue) and, with `maxMessages`,
+'trimmed' ({ trimmed, unread }) after a publish that trimmed the stream.
+
 ## Extends
 
 - `EventEmitter`
@@ -42,7 +45,7 @@ await broadcast.publish('order.placed', { orderId: 42 });
 new Broadcast<D>(name, opts): Broadcast<D>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L36)
+Defined in: [glide-mq/src/broadcast.ts:41](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L41)
 
 #### Parameters
 
@@ -69,7 +72,23 @@ EventEmitter.constructor
 readonly keys: object;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:34](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L34)
+Defined in: [glide-mq/src/broadcast.ts:39](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L39)
+
+#### budget
+
+```ts
+budget: (flowId) => string;
+```
+
+##### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `flowId` | `string` |
+
+##### Returns
+
+`string`
 
 #### completed
 
@@ -165,6 +184,22 @@ job: (id) => string;
 
 `string`
 
+#### jstream
+
+```ts
+jstream: (id) => string;
+```
+
+##### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` |
+
+##### Returns
+
+`string`
+
 #### lifo
 
 ```ts
@@ -175,6 +210,12 @@ lifo: string;
 
 ```ts
 listActive: string;
+```
+
+#### listActiveIds
+
+```ts
+listActiveIds: string;
 ```
 
 #### log
@@ -209,6 +250,12 @@ metricsCompleted: string;
 
 ```ts
 metricsFailed: string;
+```
+
+#### name
+
+```ts
+name: string = queueName;
 ```
 
 #### ordering
@@ -263,10 +310,60 @@ scheduled: string;
 schedulers: string;
 ```
 
+#### signals
+
+```ts
+signals: (id) => string;
+```
+
+##### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` |
+
+##### Returns
+
+`string`
+
 #### stream
 
 ```ts
 stream: string;
+```
+
+#### suspended
+
+```ts
+suspended: string;
+```
+
+#### tpm
+
+```ts
+tpm: string;
+```
+
+#### usageBucket
+
+```ts
+usageBucket: (bucketTs) => string;
+```
+
+##### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `bucketTs` | `number` |
+
+##### Returns
+
+`string`
+
+#### usageQueues
+
+```ts
+usageQueues: string;
 ```
 
 #### worker
@@ -285,6 +382,12 @@ worker: (id) => string;
 
 `string`
 
+#### xqPending
+
+```ts
+xqPending: string;
+```
+
 ***
 
 ### name
@@ -293,7 +396,7 @@ worker: (id) => string;
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:31](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L31)
+Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L36)
 
 ***
 
@@ -430,9 +533,10 @@ EventEmitter.errorMonitor
 
 ```ts
 optional [captureRejectionSymbol]<K>(
-   error, 
-   event, ...
-   args): void;
+   error,
+   event,
+   ...args
+): void;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
@@ -508,7 +612,7 @@ EventEmitter.addListener
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:117](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L117)
+Defined in: [glide-mq/src/broadcast.ts:127](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L127)
 
 Close the broadcast publisher and release connections.
 
@@ -640,7 +744,7 @@ EventEmitter.eventNames
 getClient(): Promise<Client>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:110](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L110)
+Defined in: [glide-mq/src/broadcast.ts:120](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L120)
 
 Get the underlying client for advanced operations.
 
@@ -935,7 +1039,7 @@ EventEmitter.once
 pause(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L96)
+Defined in: [glide-mq/src/broadcast.ts:106](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L106)
 
 Pause message publication (delayed/scheduled messages won't be promoted).
 
@@ -1047,12 +1151,13 @@ EventEmitter.prependOnceListener
 
 ```ts
 publish(
-   subject, 
-   data, 
-opts?): Promise&lt;string | null>;
+   subject,
+   data,
+   opts?
+): Promise&lt;string | null>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:65](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L65)
+Defined in: [glide-mq/src/broadcast.ts:70](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L70)
 
 Publish a message to all subscribers.
 Each subscriber (consumer group) receives a copy.
@@ -1298,7 +1403,7 @@ EventEmitter.removeListener
 resume(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:103](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L103)
+Defined in: [glide-mq/src/broadcast.ts:113](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L113)
 
 Resume message publication.
 
@@ -1314,7 +1419,7 @@ Resume message publication.
 setGlobalRateLimit(config): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:86](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/broadcast.ts#L86)
+Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L96)
 
 Set global rate limit for all subscribers.
 
@@ -1595,9 +1700,10 @@ EventEmitter.listenerCount
 
 ```ts
 static on(
-   emitter, 
-   eventName, 
-options?): AsyncIterator&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): AsyncIterator&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:270
@@ -1707,9 +1813,10 @@ EventEmitter.on
 
 ```ts
 static on(
-   emitter, 
-   eventName, 
-options?): AsyncIterator&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): AsyncIterator&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:275
@@ -1823,9 +1930,10 @@ EventEmitter.on
 
 ```ts
 static once(
-   emitter, 
-   eventName, 
-options?): Promise&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): Promise&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:184
@@ -1933,9 +2041,10 @@ EventEmitter.once
 
 ```ts
 static once(
-   emitter, 
-   eventName, 
-options?): Promise&lt;any[]>;
+   emitter,
+   eventName,
+   options?
+): Promise&lt;any[]>;
 ```
 
 Defined in: glide-mq/node\_modules/@types/node/events.d.ts:189

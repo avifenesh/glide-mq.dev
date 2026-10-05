@@ -1,6 +1,6 @@
 # Class: ServerlessPool
 
-Defined in: [glide-mq/src/serverless-pool.ts:29](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/serverless-pool.ts#L29)
+Defined in: [glide-mq/src/serverless-pool.ts:70](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/serverless-pool.ts#L70)
 
 ## Constructors
 
@@ -24,7 +24,7 @@ new ServerlessPool(): ServerlessPool;
 get size(): number;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:72](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/serverless-pool.ts#L72)
+Defined in: [glide-mq/src/serverless-pool.ts:116](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/serverless-pool.ts#L116)
 
 Number of cached producers.
 
@@ -40,7 +40,7 @@ Number of cached producers.
 closeAll(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:63](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/serverless-pool.ts#L63)
+Defined in: [glide-mq/src/serverless-pool.ts:107](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/serverless-pool.ts#L107)
 
 Close all cached producers and clear the cache.
 Call this during Lambda SIGTERM or explicit cleanup.
@@ -57,7 +57,7 @@ Call this during Lambda SIGTERM or explicit cleanup.
 getProducer<D>(name, opts): Producer<D>;
 ```
 
-Defined in: [glide-mq/src/serverless-pool.ts:40](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/serverless-pool.ts#L40)
+Defined in: [glide-mq/src/serverless-pool.ts:81](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/serverless-pool.ts#L81)
 
 Get or create a Producer for the given queue name and options.
 Returns a cached instance if one exists with matching connection parameters.

@@ -4,7 +4,7 @@
 type BatchProcessor<D, R> = (jobs) => Promise<R[]>;
 ```
 
-Defined in: [glide-mq/src/types.ts:269](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L269)
+Defined in: [glide-mq/src/types.ts:344](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L344)
 
 ## Type Parameters
 

@@ -23,7 +23,7 @@ Those structures survive restarts only if Valkey is configured to persist them.
 - `appendfsync always` minimizes the persistence window further, but costs throughput and latency.
 - RDB-only snapshots are usually not enough for queues unless you can tolerate losing all writes since the last snapshot.
 - glide-mq provides **at-least-once** delivery semantics, not exactly-once.
-- If a worker crashes after claiming a job but before acking it, the job is not silently lost; another worker can reclaim it from the pending entries list.
+- If a worker crashes after claiming a job but before acking it, the job is not silently lost; another worker can reclaim it from the pending entries list. Priority and LIFO jobs have no pending entry and are found by a bounded keyspace scan instead.
 
 ## What Persists
 
@@ -109,8 +109,18 @@ If a worker crashes mid-processing:
 
 1. the job has already been claimed into the consumer group's pending entries list
 2. it is **not** removed from Valkey just because the worker died
-3. another worker's scheduler can reclaim the stalled entry via `XAUTOCLAIM`
-4. after enough stalled-recovery cycles, glide-mq moves the job to `failed` instead of leaving it in limbo
+3. another worker's scheduler reclaims the stalled entry via `XAUTOCLAIM`
+4. the reclaim path increments `stalledCount` and:
+   - **redispatches** the job back to the queue so a healthy worker can pick it up again, when `stalledCount <= maxStalledCount` (default `1`)
+   - **fails** the job (state = `failed`, reason = `job stalled more than maxStalledCount`) once `stalledCount` exceeds the limit, instead of leaving it in limbo
+
+Priority and LIFO jobs are popped from lists and have no pending entry, so `XAUTOCLAIM` cannot see them. `glidemq_reclaimStalledListJobs` finds them through a same-slot `list-active-ids` set that every list claim and release maintains. Until one complete `SCAN` has seeded that set, and whenever the set has fewer members than the `list-active` counter (for example, jobs claimed by workers on an older library), it falls back to a bounded `SCAN` over job hashes (at most 1000 SCAN steps per call, starting from cursor 0), so on a very large keyspace a stalled list job past that bound can stay unrecovered in that fallback. The periodic `glidemq_healListActive` (every 10th promotion tick of each worker) trusts the seeded set while it has at least as many members as the counter: it drops members that are no longer active claims and corrects the counter from what is left, with no `SCAN`. When the seed marker is missing or the set has fewer members than the counter (claims made by an older library), it re-seeds from a `SCAN` that resumes from a cursor kept in `meta` (`listActiveScanCursor`, at most 500 pages per call), so a large keyspace completes over several ticks and the set is trusted again only once the scan has wrapped; a set left inconsistent by a library downgrade and re-upgrade heals this way. Neither reclaim path runs while the queue is paused.
+
+A stream claim a worker holds while waiting for a `globalConcurrency` slot is an un-activated claim like any other: if it sat in the pending list longer than `stalledInterval`, stalled reclaim redispatches it and counts a stall. Workers hand such claims back after at most half the shorter of `lockDuration` and `stalledInterval`, so this only happens to a worker that died while holding one.
+
+Consumers are cleaned up too. A graceful `worker.close()` deletes the worker's consumer from the group once it holds no pending entry (`glidemq_removeIdleConsumer` checks and deletes in one step, because `XGROUP DELCONSUMER` would drop pending entries). Each stalled reclaim also deletes up to 20 other consumers of the group that hold nothing and have been idle longer than `max(10 * stalledInterval, 3 * blockTimeout, 60s)`, so consumers of dead processes do not accumulate. A live idle worker that gets deleted this way is recreated by its next `XREADGROUP`.
+
+This means a single crash gets a retry; chronic crashing produces a clean terminal failure. AI-style workloads that take minutes-to-hours per job benefit from the retry: a transient worker death does not cost the whole run, and processors that store progress via `job.moveToDelayed(timestamp, nextStep)` resume from the most recent checkpoint.
 
 This is an important difference from older queue designs that rely on destructive pops and app-side lock bookkeeping.
 
@@ -140,12 +150,12 @@ glide-mq does **not** guarantee:
 
 ## Comparison at a Glance
 
-| System | Typical durability model | Delivery semantics | Main trade-off |
-|--------|---------------------------|--------------------|----------------|
-| glide-mq + Valkey AOF (`everysec`) | AOF-backed queue state with a small crash window | At-least-once | Lower write cost than `always`, in exchange for a small possible loss window on hard crash |
-| glide-mq + Valkey AOF (`always`) | Strongest Valkey persistence mode | At-least-once | Smallest persistence window, in exchange for higher write cost |
-| pg-boss / PostgreSQL | Backed by PostgreSQL WAL / transaction durability | At-least-once | Strong database durability, in exchange for PostgreSQL operational and latency tradeoffs |
-| RabbitMQ with durable queues + persistent messages | Broker durability when queues/messages are durable and producers use publisher confirms appropriately | At-least-once | Mature broker durability model, in exchange for more broker-specific configuration surface |
+| System                                             | Typical durability model                                                                              | Delivery semantics | Main trade-off                                                                             |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| glide-mq + Valkey AOF (`everysec`)                 | AOF-backed queue state with a small crash window                                                      | At-least-once      | Lower write cost than `always`, in exchange for a small possible loss window on hard crash |
+| glide-mq + Valkey AOF (`always`)                   | Strongest Valkey persistence mode                                                                     | At-least-once      | Smallest persistence window, in exchange for higher write cost                             |
+| pg-boss / PostgreSQL                               | Backed by PostgreSQL WAL / transaction durability                                                     | At-least-once      | Strong database durability, in exchange for PostgreSQL operational and latency tradeoffs   |
+| RabbitMQ with durable queues + persistent messages | Broker durability when queues/messages are durable and producers use publisher confirms appropriately | At-least-once      | Mature broker durability model, in exchange for more broker-specific configuration surface |
 
 Compared with BullMQ-style Redis queues, glide-mq still depends on the same underlying Valkey durability settings, but its in-flight recovery model is built on Streams consumer groups, the PEL, and `XAUTOCLAIM` rather than a separate lock-renew / stall-detection cycle.
 
@@ -175,7 +185,7 @@ When a processor calls `moveToDelayed`, the job is moved to the scheduled ZSet w
 
 ### Broadcast
 
-Stream entries in broadcast queues are intentionally not deleted after processing (no XDEL). Entries are retained according to the `maxMessages` XTRIM policy. Each consumer group independently tracks its own read offset. After a restart, consumer groups resume from their last acknowledged position, so no subscriber misses messages that were added while it was down.
+Stream entries in broadcast queues are intentionally not deleted after processing (no XDEL). Each consumer group independently tracks its own read offset. After a restart, consumer groups resume from their last acknowledged position, so a subscriber sees the messages added while it was down as long as they are still in the stream. `maxMessages` is a hard cap: it trims the oldest entries on publish even when a subscription has not read them, and those messages are lost for that subscription. A message a subscription's worker claimed but did not finish is reclaimed and run again by another worker of the same subscription (see [Broadcast - Crash and stall recovery](./broadcast#crash-and-stall-recovery)).
 
 ## Practical Guidance
 

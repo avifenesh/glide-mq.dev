@@ -1,6 +1,8 @@
 # Interface: TokenBucketConfig
 
-Defined in: [glide-mq/src/types.ts:226](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L226)
+Defined in: [glide-mq/src/types.ts:299](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L299)
+
+Configuration for token bucket rate limiting with burst capacity and refill rate.
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:226](https://github.com/avifenesh/glide-mq/bl
 capacity: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:228](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L228)
+Defined in: [glide-mq/src/types.ts:301](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L301)
 
 Maximum bucket capacity in tokens (burst size).
 
@@ -22,6 +24,6 @@ Maximum bucket capacity in tokens (burst size).
 refillRate: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:230](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L230)
+Defined in: [glide-mq/src/types.ts:303](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L303)
 
 Refill rate in tokens per second.

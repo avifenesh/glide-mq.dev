@@ -1,6 +1,8 @@
 # Interface: ScheduleOpts
 
-Defined in: [glide-mq/src/types.ts:306](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L306)
+Defined in: [glide-mq/src/types.ts:496](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L496)
+
+Options for defining a job schedule (cron, interval, or repeat-after-complete).
 
 ## Properties
 
@@ -10,7 +12,7 @@ Defined in: [glide-mq/src/types.ts:306](https://github.com/avifenesh/glide-mq/bl
 optional endDate?: number | Date;
 ```
 
-Defined in: [glide-mq/src/types.ts:321](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L321)
+Defined in: [glide-mq/src/types.ts:516](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L516)
 
 Latest scheduled run time allowed before the scheduler auto-removes itself.
 
@@ -22,7 +24,7 @@ Latest scheduled run time allowed before the scheduler auto-removes itself.
 optional every?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:310](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L310)
+Defined in: [glide-mq/src/types.ts:505](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L505)
 
 Repeat interval in milliseconds
 
@@ -34,7 +36,7 @@ Repeat interval in milliseconds
 optional limit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:323](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L323)
+Defined in: [glide-mq/src/types.ts:518](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L518)
 
 Maximum number of jobs to create before the scheduler auto-removes itself.
 
@@ -46,9 +48,12 @@ Maximum number of jobs to create before the scheduler auto-removes itself.
 optional pattern?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:308](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L308)
+Defined in: [glide-mq/src/types.ts:503](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L503)
 
-Cron pattern (5 fields: minute hour dayOfMonth month dayOfWeek)
+Cron pattern: `minute hour dayOfMonth month dayOfWeek`, or 6 fields with a
+leading `second`. Accepts names (JAN-DEC, SUN-SAT), dayOfWeek 0-7 (0 and 7
+are Sunday), `?`, `L`, `W` and `#`. cron-parser (BullMQ) compatible; see
+docs/ADVANCED.md "Cron syntax".
 
 ***
 
@@ -58,7 +63,7 @@ Cron pattern (5 fields: minute hour dayOfMonth month dayOfWeek)
 optional repeatAfterComplete?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:315](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L315)
+Defined in: [glide-mq/src/types.ts:510](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L510)
 
 Schedule next job N ms after the current one completes (or terminally fails).
 Mutually exclusive with `pattern` and `every`.
@@ -71,7 +76,7 @@ Mutually exclusive with `pattern` and `every`.
 optional startDate?: number | Date;
 ```
 
-Defined in: [glide-mq/src/types.ts:319](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L319)
+Defined in: [glide-mq/src/types.ts:514](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L514)
 
 Earliest time the scheduler may create a job. Accepts a Date or epoch milliseconds.
 
@@ -83,6 +88,6 @@ Earliest time the scheduler may create a job. Accepts a Date or epoch millisecon
 optional tz?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:317](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/types.ts#L317)
+Defined in: [glide-mq/src/types.ts:512](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L512)
 
 IANA timezone for cron patterns (e.g. 'America/New_York'). Defaults to UTC.

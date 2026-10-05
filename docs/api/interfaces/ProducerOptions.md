@@ -1,6 +1,6 @@
 # Interface: ProducerOptions
 
-Defined in: [glide-mq/src/producer.ts:34](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L34)
+Defined in: [glide-mq/src/producer.ts:35](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L35)
 
 ## Properties
 
@@ -10,7 +10,7 @@ Defined in: [glide-mq/src/producer.ts:34](https://github.com/avifenesh/glide-mq/
 optional client?: Client;
 ```
 
-Defined in: [glide-mq/src/producer.ts:38](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L38)
+Defined in: [glide-mq/src/producer.ts:39](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L39)
 
 Pre-existing GLIDE client. When provided, the Producer does NOT own this client - close() will not destroy it.
 
@@ -22,7 +22,7 @@ Pre-existing GLIDE client. When provided, the Producer does NOT own this client 
 optional compression?: "none" | "gzip";
 ```
 
-Defined in: [glide-mq/src/producer.ts:42](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L42)
+Defined in: [glide-mq/src/producer.ts:43](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L43)
 
 Enable transparent compression of job data. Default: 'none'.
 
@@ -34,7 +34,7 @@ Enable transparent compression of job data. Default: 'none'.
 optional connection?: ConnectionOptions;
 ```
 
-Defined in: [glide-mq/src/producer.ts:36](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L36)
+Defined in: [glide-mq/src/producer.ts:37](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L37)
 
 Connection options for creating a new client. Required unless `client` is provided.
 
@@ -46,7 +46,7 @@ Connection options for creating a new client. Required unless `client` is provid
 optional events?: boolean;
 ```
 
-Defined in: [glide-mq/src/producer.ts:46](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L46)
+Defined in: [glide-mq/src/producer.ts:47](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L47)
 
 Emit 'added' events on the events stream when adding jobs. Default: true.
 
@@ -58,7 +58,7 @@ Emit 'added' events on the events stream when adding jobs. Default: true.
 optional prefix?: string;
 ```
 
-Defined in: [glide-mq/src/producer.ts:40](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L40)
+Defined in: [glide-mq/src/producer.ts:41](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L41)
 
 Key prefix. Default: 'glide'.
 
@@ -70,6 +70,6 @@ Key prefix. Default: 'glide'.
 optional serializer?: Serializer;
 ```
 
-Defined in: [glide-mq/src/producer.ts:44](https://github.com/avifenesh/glide-mq/blob/f6a5c7595ff743e61619f5819e55b798fd4c1306/src/producer.ts#L44)
+Defined in: [glide-mq/src/producer.ts:45](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/producer.ts#L45)
 
 Custom serializer for job data. Default: JSON.
