@@ -614,6 +614,7 @@ for (const { event, payload } of webhookEvents) {
       // Prevent double-delivery of the same event to the same endpoint (1-hour TTL)
       deduplication: {
         id: eventId,
+        mode: 'throttle',
         ttl: 3600000,
       },
     });

@@ -1,6 +1,6 @@
 # Class: Broadcast&lt;D&gt;
 
-Defined in: [glide-mq/src/broadcast.ts:35](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L35)
+Defined in: [glide-mq/src/broadcast.ts:35](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L35)
 
 Broadcast - Fan-out message publisher for pub/sub patterns.
 
@@ -35,7 +35,7 @@ Events: 'error' (from the underlying queue) and, with `maxMessages`,
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `D` | `any` |
+| <a id="type-parameter-d"></a> `D` | `any` |
 
 ## Constructors
 
@@ -45,7 +45,7 @@ Events: 'error' (from the underlying queue) and, with `maxMessages`,
 new Broadcast<D>(name, opts): Broadcast<D>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:41](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L41)
+Defined in: [glide-mq/src/broadcast.ts:41](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L41)
 
 #### Parameters
 
@@ -60,9 +60,7 @@ Defined in: [glide-mq/src/broadcast.ts:41](https://github.com/avifenesh/glide-mq
 
 #### Overrides
 
-```ts
-EventEmitter.constructor
-```
+`EventEmitter.constructor`
 
 ## Properties
 
@@ -72,7 +70,7 @@ EventEmitter.constructor
 readonly keys: object;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:39](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L39)
+Defined in: [glide-mq/src/broadcast.ts:39](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L39)
 
 #### budget
 
@@ -396,7 +394,7 @@ xqPending: string;
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L36)
+Defined in: [glide-mq/src/broadcast.ts:36](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L36)
 
 ***
 
@@ -418,9 +416,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejections
-```
+`EventEmitter.captureRejections`
 
 ***
 
@@ -442,9 +438,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejectionSymbol
-```
+`EventEmitter.captureRejectionSymbol`
 
 ***
 
@@ -498,9 +492,7 @@ v0.11.2
 
 #### Inherited from
 
-```ts
-EventEmitter.defaultMaxListeners
-```
+`EventEmitter.defaultMaxListeners`
 
 ***
 
@@ -523,16 +515,14 @@ v13.6.0, v12.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.errorMonitor
-```
+`EventEmitter.errorMonitor`
 
 ## Methods
 
 ### \[captureRejectionSymbol\]()?
 
 ```ts
-optional [captureRejectionSymbol]<K>(
+[captureRejectionSymbol]?<K>(
    error,
    event,
    ...args
@@ -545,7 +535,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k"></a> `K` |
 
 #### Parameters
 
@@ -561,9 +551,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 #### Inherited from
 
-```ts
-EventEmitter.[captureRejectionSymbol]
-```
+`EventEmitter.[captureRejectionSymbol]`
 
 ***
 
@@ -581,7 +569,7 @@ Alias for `emitter.on(eventName, listener)`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-1"></a> `K` |
 
 #### Parameters
 
@@ -600,9 +588,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.addListener
-```
+`EventEmitter.addListener`
 
 ***
 
@@ -612,7 +598,7 @@ EventEmitter.addListener
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:127](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L127)
+Defined in: [glide-mq/src/broadcast.ts:127](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L127)
 
 Close the broadcast publisher and release connections.
 
@@ -672,7 +658,7 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-2"></a> `K` |
 
 #### Parameters
 
@@ -691,9 +677,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.emit
-```
+`EventEmitter.emit`
 
 ***
 
@@ -732,9 +716,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.eventNames
-```
+`EventEmitter.eventNames`
 
 ***
 
@@ -744,7 +726,7 @@ EventEmitter.eventNames
 getClient(): Promise<Client>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:120](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L120)
+Defined in: [glide-mq/src/broadcast.ts:120](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L120)
 
 Get the underlying client for advanced operations.
 
@@ -775,9 +757,7 @@ v1.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -797,7 +777,7 @@ in the list of the listeners of the event.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-3"></a> `K` |
 
 #### Parameters
 
@@ -816,9 +796,7 @@ v3.2.0
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -844,7 +822,7 @@ console.log(util.inspect(server.listeners('connection')));
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-4"></a> `K` |
 
 #### Parameters
 
@@ -862,9 +840,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.listeners
-```
+`EventEmitter.listeners`
 
 ***
 
@@ -882,7 +858,7 @@ Alias for `emitter.removeListener()`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-5"></a> `K` |
 
 #### Parameters
 
@@ -901,9 +877,7 @@ v10.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.off
-```
+`EventEmitter.off`
 
 ***
 
@@ -946,7 +920,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-6"></a> `K` |
 
 #### Parameters
 
@@ -965,9 +939,7 @@ v0.1.101
 
 #### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -1008,7 +980,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-7"></a> `K` |
 
 #### Parameters
 
@@ -1027,9 +999,7 @@ v0.3.0
 
 #### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -1039,7 +1009,7 @@ EventEmitter.once
 pause(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:106](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L106)
+Defined in: [glide-mq/src/broadcast.ts:106](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L106)
 
 Pause message publication (delayed/scheduled messages won't be promoted).
 
@@ -1074,7 +1044,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-8"></a> `K` |
 
 #### Parameters
 
@@ -1093,9 +1063,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependListener
-```
+`EventEmitter.prependListener`
 
 ***
 
@@ -1122,7 +1090,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-9"></a> `K` |
 
 #### Parameters
 
@@ -1141,9 +1109,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependOnceListener
-```
+`EventEmitter.prependOnceListener`
 
 ***
 
@@ -1157,7 +1123,7 @@ publish(
 ): Promise&lt;string | null>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:70](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L70)
+Defined in: [glide-mq/src/broadcast.ts:70](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L70)
 
 Publish a message to all subscribers.
 Each subscriber (consumer group) receives a copy.
@@ -1218,7 +1184,7 @@ emitter.emit('log');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-10"></a> `K` |
 
 #### Parameters
 
@@ -1236,9 +1202,7 @@ v9.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.rawListeners
-```
+`EventEmitter.rawListeners`
 
 ***
 
@@ -1274,9 +1238,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeAllListeners
-```
+`EventEmitter.removeAllListeners`
 
 ***
 
@@ -1372,7 +1334,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-11"></a> `K` |
 
 #### Parameters
 
@@ -1391,9 +1353,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeListener
-```
+`EventEmitter.removeListener`
 
 ***
 
@@ -1403,7 +1363,7 @@ EventEmitter.removeListener
 resume(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:113](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L113)
+Defined in: [glide-mq/src/broadcast.ts:113](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L113)
 
 Resume message publication.
 
@@ -1419,7 +1379,7 @@ Resume message publication.
 setGlobalRateLimit(config): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast.ts#L96)
+Defined in: [glide-mq/src/broadcast.ts:96](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast.ts#L96)
 
 Set global rate limit for all subscribers.
 
@@ -1466,9 +1426,7 @@ v0.3.5
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`
 
 ***
 
@@ -1529,9 +1487,7 @@ v20.5.0
 
 #### Inherited from
 
-```ts
-EventEmitter.addAbortListener
-```
+`EventEmitter.addAbortListener`
 
 ***
 
@@ -1585,9 +1541,7 @@ v15.2.0, v14.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getEventListeners
-```
+`EventEmitter.getEventListeners`
 
 ***
 
@@ -1641,9 +1595,7 @@ v19.9.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -1688,9 +1640,7 @@ Since v3.2.0 - Use `listenerCount` instead.
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -1805,9 +1755,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 #### Call Signature
 
@@ -1918,9 +1866,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -2033,9 +1979,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 #### Call Signature
 
@@ -2144,9 +2088,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -2184,6 +2126,4 @@ v15.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`

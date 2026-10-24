@@ -15,9 +15,11 @@ const sections = {
   'Hapi API': 'hapi-api',
   'NestJS Module': 'nestjs-module',
   'Express Dashboard': 'express-dashboard',
+  'Next.js API Routes': 'nextjs-api-routes',
 };
 let failures = 0;
 const snippets = Object.entries(sections).map(([heading, directory]) => ({ heading, directory, markdown }));
+snippets.push({ heading: 'Webhook Delivery', directory: 'webhook-delivery', markdown: readFileSync(join(root, 'docs/examples/basics.md'), 'utf8') });
 const honoGuide = readFileSync(join(root, 'docs/integrations/hono.md'), 'utf8');
 snippets.push(
   { heading: 'Quick Start', directory: 'hono-api', markdown: honoGuide },

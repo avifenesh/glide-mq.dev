@@ -1167,6 +1167,7 @@ export async function POST(request: Request) {
   const job = await queue.add(type, payload, {
     deduplication: {
       id: payload.idempotencyKey,
+      mode: 'throttle',
       ttl: 3600000, // 1 hour
     },
   });

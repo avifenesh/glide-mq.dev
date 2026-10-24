@@ -1,6 +1,6 @@
 # Interface: JobTemplate
 
-Defined in: [glide-mq/src/types.ts:522](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L522)
+Defined in: [glide-mq/src/types.ts:532](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L532)
 
 Template for jobs created by a scheduler.
 
@@ -9,27 +9,27 @@ Template for jobs created by a scheduler.
 ### data?
 
 ```ts
-optional data?: any;
+data?: any;
 ```
 
-Defined in: [glide-mq/src/types.ts:524](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L524)
+Defined in: [glide-mq/src/types.ts:534](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L534)
 
 ***
 
 ### name?
 
 ```ts
-optional name?: string;
+name?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:523](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L523)
+Defined in: [glide-mq/src/types.ts:533](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L533)
 
 ***
 
 ### opts?
 
 ```ts
-optional opts?: Omit<JobOptions, "delay" | "jobId" | "deduplication" | "parent">;
+opts?: Omit<JobOptions, "delay" | "jobId" | "deduplication" | "parent">;
 ```
 
-Defined in: [glide-mq/src/types.ts:525](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L525)
+Defined in: [glide-mq/src/types.ts:535](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L535)

@@ -1,6 +1,6 @@
 # Class: FlowProducer
 
-Defined in: [glide-mq/src/flow-producer.ts:43](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L43)
+Defined in: [glide-mq/src/flow-producer.ts:43](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L43)
 
 Creates parent-child job flows and DAG workflows.
 Children are processed first; the parent runs after all children complete.
@@ -13,7 +13,7 @@ Children are processed first; the parent runs after all children complete.
 new FlowProducer(opts): FlowProducer;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:51](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L51)
+Defined in: [glide-mq/src/flow-producer.ts:51](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L51)
 
 #### Parameters
 
@@ -33,7 +33,7 @@ Defined in: [glide-mq/src/flow-producer.ts:51](https://github.com/avifenesh/glid
 add(flow, flowOpts?): Promise<JobNode>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:112](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L112)
+Defined in: [glide-mq/src/flow-producer.ts:112](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L112)
 
 Add a flow (parent with children) atomically.
 Children can have their own children (recursive flows), which are flattened
@@ -66,7 +66,7 @@ token and cost caps across the entire flow.
 addBulk(flows): Promise<JobNode[]>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:223](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L223)
+Defined in: [glide-mq/src/flow-producer.ts:223](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L223)
 
 Add multiple independent flows.
 
@@ -88,7 +88,7 @@ Add multiple independent flows.
 addDAG(dag): Promise<Map&lt;string, Job&lt;any, any>>>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:536](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L536)
+Defined in: [glide-mq/src/flow-producer.ts:536](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L536)
 
 Add a DAG (Directed Acyclic Graph) flow where jobs can have multiple parents.
 Validates the graph for cycles, performs topological sort, and submits nodes
@@ -124,7 +124,7 @@ Returns a map of node name to Job instance.
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/flow-producer.ts:1074](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/flow-producer.ts#L1074)
+Defined in: [glide-mq/src/flow-producer.ts:1074](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/flow-producer.ts#L1074)
 
 Close the FlowProducer and release the underlying client connection.
 Idempotent: safe to call multiple times.

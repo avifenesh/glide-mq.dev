@@ -4,7 +4,7 @@
 function isClusterClient(client): boolean;
 ```
 
-Defined in: [glide-mq/src/connection.ts:76](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/connection.ts#L76)
+Defined in: [glide-mq/src/connection.ts:76](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/connection.ts#L76)
 
 Detect whether a client is a GlideClusterClient.
 Uses instanceof with a duck-type fallback for cases where the client

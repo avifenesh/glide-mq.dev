@@ -1,6 +1,6 @@
 # Interface: Metrics
 
-Defined in: [glide-mq/src/types.ts:568](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L568)
+Defined in: [glide-mq/src/types.ts:578](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L578)
 
 Aggregated metrics result with total count and per-minute data points.
 
@@ -12,7 +12,7 @@ Aggregated metrics result with total count and per-minute data points.
 count: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:570](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L570)
+Defined in: [glide-mq/src/types.ts:580](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L580)
 
 Total count of completed or failed jobs.
 
@@ -24,7 +24,7 @@ Total count of completed or failed jobs.
 data: MetricsDataPoint[];
 ```
 
-Defined in: [glide-mq/src/types.ts:572](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L572)
+Defined in: [glide-mq/src/types.ts:582](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L582)
 
 Per-minute data points sorted oldest-first.
 
@@ -36,7 +36,7 @@ Per-minute data points sorted oldest-first.
 meta: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:574](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L574)
+Defined in: [glide-mq/src/types.ts:584](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L584)
 
 Resolution metadata.
 

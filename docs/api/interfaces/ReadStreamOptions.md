@@ -1,6 +1,6 @@
 # Interface: ReadStreamOptions
 
-Defined in: [glide-mq/src/types.ts:644](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L644)
+Defined in: [glide-mq/src/types.ts:654](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L654)
 
 Options for readStream() - reading entries from a job's streaming channel.
 
@@ -9,10 +9,10 @@ Options for readStream() - reading entries from a job's streaming channel.
 ### block?
 
 ```ts
-optional block?: number;
+block?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:649](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L649)
+Defined in: [glide-mq/src/types.ts:659](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L659)
 
 When set and > 0, use XREAD with BLOCK for long-polling (milliseconds).
  A value of 0 means non-blocking (equivalent to omitting).
@@ -22,17 +22,17 @@ When set and > 0, use XREAD with BLOCK for long-polling (milliseconds).
 ### count?
 
 ```ts
-optional count?: number;
+count?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:646](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L646)
+Defined in: [glide-mq/src/types.ts:656](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L656)
 
 ***
 
 ### lastId?
 
 ```ts
-optional lastId?: string;
+lastId?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:645](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L645)
+Defined in: [glide-mq/src/types.ts:655](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L655)

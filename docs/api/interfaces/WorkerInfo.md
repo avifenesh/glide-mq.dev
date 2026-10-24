@@ -1,6 +1,6 @@
 # Interface: WorkerInfo
 
-Defined in: [glide-mq/src/types.ts:603](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L603)
+Defined in: [glide-mq/src/types.ts:613](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L613)
 
 Information about a live worker instance.
 
@@ -12,7 +12,7 @@ Information about a live worker instance.
 activeJobs: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:609](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L609)
+Defined in: [glide-mq/src/types.ts:619](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L619)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:609](https://github.com/avifenesh/glide-mq/bl
 addr: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:605](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L605)
+Defined in: [glide-mq/src/types.ts:615](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L615)
 
 ***
 
@@ -32,17 +32,17 @@ Defined in: [glide-mq/src/types.ts:605](https://github.com/avifenesh/glide-mq/bl
 age: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:608](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L608)
+Defined in: [glide-mq/src/types.ts:618](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L618)
 
 ***
 
 ### concurrency?
 
 ```ts
-optional concurrency?: number;
+concurrency?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:615](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L615)
+Defined in: [glide-mq/src/types.ts:625](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L625)
 
 The worker's configured `concurrency` option. In batch mode it counts batches, so up to
 `concurrency * batch.size` jobs can be active at once. Absent for a worker that registered with a
@@ -56,7 +56,7 @@ glide-mq version that predates this field.
 id: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:604](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L604)
+Defined in: [glide-mq/src/types.ts:614](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L614)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [glide-mq/src/types.ts:604](https://github.com/avifenesh/glide-mq/bl
 pid: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:606](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L606)
+Defined in: [glide-mq/src/types.ts:616](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L616)
 
 ***
 
@@ -76,4 +76,4 @@ Defined in: [glide-mq/src/types.ts:606](https://github.com/avifenesh/glide-mq/bl
 startedAt: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:607](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L607)
+Defined in: [glide-mq/src/types.ts:617](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L617)

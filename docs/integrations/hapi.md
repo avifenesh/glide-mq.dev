@@ -27,7 +27,7 @@ Turns a Hapi v21 server into a queue management gateway. Built for teams that ru
 npm install @glidemq/hapi glide-mq @hapi/hapi
 ```
 
-This guide uses **@glidemq/hapi 0.4.2** with **glide-mq 0.17.0**.
+This guide uses **@glidemq/hapi 0.4.3** with **glide-mq 0.20.0**.
 
 ## Quick Start
 

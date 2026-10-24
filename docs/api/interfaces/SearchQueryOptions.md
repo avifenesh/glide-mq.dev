@@ -1,6 +1,6 @@
 # Interface: SearchQueryOptions
 
-Defined in: [glide-mq/src/types.ts:391](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L391)
+Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L401)
 
 Options passed through to FT.SEARCH (glide-mq owned, decoupled from speedkey).
 
@@ -9,10 +9,10 @@ Options passed through to FT.SEARCH (glide-mq owned, decoupled from speedkey).
 ### dialect?
 
 ```ts
-optional dialect?: number;
+dialect?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L395)
+Defined in: [glide-mq/src/types.ts:405](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L405)
 
 Query dialect version.
 
@@ -21,10 +21,10 @@ Query dialect version.
 ### inorder?
 
 ```ts
-optional inorder?: boolean;
+inorder?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:399](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L399)
+Defined in: [glide-mq/src/types.ts:409](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L409)
 
 Proximity terms must be in order.
 
@@ -33,10 +33,10 @@ Proximity terms must be in order.
 ### nocontent?
 
 ```ts
-optional nocontent?: boolean;
+nocontent?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:393](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L393)
+Defined in: [glide-mq/src/types.ts:403](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L403)
 
 Return only document IDs, no field content.
 
@@ -45,10 +45,10 @@ Return only document IDs, no field content.
 ### slop?
 
 ```ts
-optional slop?: number;
+slop?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:401](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L401)
+Defined in: [glide-mq/src/types.ts:411](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L411)
 
 Slop value for proximity matching.
 
@@ -57,10 +57,10 @@ Slop value for proximity matching.
 ### sortby?
 
 ```ts
-optional sortby?: object;
+sortby?: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:403](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L403)
+Defined in: [glide-mq/src/types.ts:413](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L413)
 
 Sort results by field.
 
@@ -73,7 +73,7 @@ field: string;
 #### order?
 
 ```ts
-optional order?: "ASC" | "DESC";
+order?: "ASC" | "DESC";
 ```
 
 ***
@@ -81,9 +81,9 @@ optional order?: "ASC" | "DESC";
 ### verbatim?
 
 ```ts
-optional verbatim?: boolean;
+verbatim?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L397)
+Defined in: [glide-mq/src/types.ts:407](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L407)
 
 Disable stemming in query.

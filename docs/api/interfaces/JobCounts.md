@@ -1,6 +1,6 @@
 # Interface: JobCounts
 
-Defined in: [glide-mq/src/types.ts:578](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L578)
+Defined in: [glide-mq/src/types.ts:588](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L588)
 
 Count of jobs in each state.
 
@@ -12,7 +12,7 @@ Count of jobs in each state.
 active: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:580](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L580)
+Defined in: [glide-mq/src/types.ts:590](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L590)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:580](https://github.com/avifenesh/glide-mq/bl
 completed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:582](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L582)
+Defined in: [glide-mq/src/types.ts:592](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L592)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [glide-mq/src/types.ts:582](https://github.com/avifenesh/glide-mq/bl
 delayed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:581](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L581)
+Defined in: [glide-mq/src/types.ts:591](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L591)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [glide-mq/src/types.ts:581](https://github.com/avifenesh/glide-mq/bl
 failed: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:583](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L583)
+Defined in: [glide-mq/src/types.ts:593](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L593)
 
 ***
 
@@ -52,4 +52,4 @@ Defined in: [glide-mq/src/types.ts:583](https://github.com/avifenesh/glide-mq/bl
 waiting: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:579](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L579)
+Defined in: [glide-mq/src/types.ts:589](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L589)

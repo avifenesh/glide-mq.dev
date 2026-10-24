@@ -1,6 +1,6 @@
 # Interface: BudgetOptions
 
-Defined in: [glide-mq/src/types.ts:347](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L347)
+Defined in: [glide-mq/src/types.ts:357](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L357)
 
 Budget constraints for a flow. Caps token usage and/or cost across all jobs.
 
@@ -9,10 +9,10 @@ Budget constraints for a flow. Caps token usage and/or cost across all jobs.
 ### costUnit?
 
 ```ts
-optional costUnit?: string;
+costUnit?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:363](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L363)
+Defined in: [glide-mq/src/types.ts:373](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L373)
 
 Unit for cost values (informational, e.g. 'usd', 'credits', 'ils').
 
@@ -21,10 +21,10 @@ Unit for cost values (informational, e.g. 'usd', 'credits', 'ils').
 ### maxCosts?
 
 ```ts
-optional maxCosts?: Record&lt;string, number>;
+maxCosts?: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:361](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L361)
+Defined in: [glide-mq/src/types.ts:371](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L371)
 
 Per-category cost caps. Each independently enforced.
 
@@ -33,10 +33,10 @@ Per-category cost caps. Each independently enforced.
 ### maxTokens?
 
 ```ts
-optional maxTokens?: Record&lt;string, number>;
+maxTokens?: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:351](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L351)
+Defined in: [glide-mq/src/types.ts:361](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L361)
 
 Per-category token caps (e.g. { input: 50000, reasoning: 5000 }). Each independently enforced.
 
@@ -45,10 +45,10 @@ Per-category token caps (e.g. { input: 50000, reasoning: 5000 }). Each independe
 ### maxTotalCost?
 
 ```ts
-optional maxTotalCost?: number;
+maxTotalCost?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:359](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L359)
+Defined in: [glide-mq/src/types.ts:369](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L369)
 
 Hard cap on total cost across all jobs in this flow.
 
@@ -57,10 +57,10 @@ Hard cap on total cost across all jobs in this flow.
 ### maxTotalTokens?
 
 ```ts
-optional maxTotalTokens?: number;
+maxTotalTokens?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:349](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L349)
+Defined in: [glide-mq/src/types.ts:359](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L359)
 
 Hard cap on weighted total tokens across all jobs in this flow.
 
@@ -69,10 +69,10 @@ Hard cap on weighted total tokens across all jobs in this flow.
 ### onExceeded?
 
 ```ts
-optional onExceeded?: "fail" | "pause";
+onExceeded?: "fail" | "pause";
 ```
 
-Defined in: [glide-mq/src/types.ts:365](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L365)
+Defined in: [glide-mq/src/types.ts:375](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L375)
 
 What happens when budget is exceeded. Default: 'fail'.
 
@@ -81,10 +81,10 @@ What happens when budget is exceeded. Default: 'fail'.
 ### tokenWeights?
 
 ```ts
-optional tokenWeights?: Record&lt;string, number>;
+tokenWeights?: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:357](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L357)
+Defined in: [glide-mq/src/types.ts:367](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L367)
 
 Weight multipliers for token categories when computing weighted total for maxTotalTokens.
 Unlisted categories default to weight 1.

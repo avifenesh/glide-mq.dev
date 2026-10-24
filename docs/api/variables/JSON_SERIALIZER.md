@@ -4,6 +4,6 @@
 const JSON_SERIALIZER: Serializer;
 ```
 
-Defined in: [glide-mq/src/types.ts:324](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L324)
+Defined in: [glide-mq/src/types.ts:334](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L334)
 
 Default JSON serializer used when no custom serializer is provided.

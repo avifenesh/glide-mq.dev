@@ -1,6 +1,6 @@
 # Interface: GetJobsOptions
 
-Defined in: [glide-mq/src/types.ts:587](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L587)
+Defined in: [glide-mq/src/types.ts:597](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L597)
 
 Options for getJob() and getJobs() methods.
 
@@ -9,9 +9,9 @@ Options for getJob() and getJobs() methods.
 ### excludeData?
 
 ```ts
-optional excludeData?: boolean;
+excludeData?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:589](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L589)
+Defined in: [glide-mq/src/types.ts:599](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L599)
 
 When true, excludes `data` and `returnvalue` fields from returned jobs.

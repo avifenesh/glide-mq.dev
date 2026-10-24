@@ -1,6 +1,6 @@
 # Interface: FlowProducerOptions
 
-Defined in: [glide-mq/src/types.ts:467](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L467)
+Defined in: [glide-mq/src/types.ts:477](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L477)
 
 Configuration options for creating a FlowProducer instance.
 
@@ -9,10 +9,10 @@ Configuration options for creating a FlowProducer instance.
 ### client?
 
 ```ts
-optional client?: Client;
+client?: Client;
 ```
 
-Defined in: [glide-mq/src/types.ts:474](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L474)
+Defined in: [glide-mq/src/types.ts:484](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L484)
 
 Pre-existing GLIDE client for non-blocking commands.
 When provided, the component does NOT own this client - close() will not destroy it.
@@ -22,10 +22,10 @@ When provided, the component does NOT own this client - close() will not destroy
 ### connection?
 
 ```ts
-optional connection?: ConnectionOptions;
+connection?: ConnectionOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:469](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L469)
+Defined in: [glide-mq/src/types.ts:479](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L479)
 
 Connection options for creating a new client. Required unless `client` is provided.
 
@@ -34,20 +34,20 @@ Connection options for creating a new client. Required unless `client` is provid
 ### prefix?
 
 ```ts
-optional prefix?: string;
+prefix?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:475](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L475)
+Defined in: [glide-mq/src/types.ts:485](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L485)
 
 ***
 
 ### serializer?
 
 ```ts
-optional serializer?: Serializer;
+serializer?: Serializer;
 ```
 
-Defined in: [glide-mq/src/types.ts:482](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L482)
+Defined in: [glide-mq/src/types.ts:492](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L492)
 
 Custom serializer for job data and return values. Default: JSON.
 

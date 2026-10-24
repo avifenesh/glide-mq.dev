@@ -4,14 +4,14 @@
 type BatchProcessor<D, R> = (jobs) => Promise<R[]>;
 ```
 
-Defined in: [glide-mq/src/types.ts:344](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L344)
+Defined in: [glide-mq/src/types.ts:354](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L354)
 
 ## Type Parameters
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `D` | `any` |
-| `R` | `any` |
+| <a id="type-parameter-d"></a> `D` | `any` |
+| <a id="type-parameter-r"></a> `R` | `any` |
 
 ## Parameters
 

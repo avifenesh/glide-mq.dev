@@ -1,6 +1,6 @@
 # Class: QueueEvents
 
-Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L7)
+Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue-events.ts#L7)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/queue-events.ts:7](https://github.com/avifenesh/glide-
 new QueueEvents(name, opts): QueueEvents;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:20](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L20)
+Defined in: [glide-mq/src/queue-events.ts:20](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue-events.ts#L20)
 
 #### Parameters
 
@@ -29,9 +29,7 @@ Defined in: [glide-mq/src/queue-events.ts:20](https://github.com/avifenesh/glide
 
 #### Overrides
 
-```ts
-EventEmitter.constructor
-```
+`EventEmitter.constructor`
 
 ## Properties
 
@@ -41,7 +39,7 @@ EventEmitter.constructor
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:8](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L8)
+Defined in: [glide-mq/src/queue-events.ts:8](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue-events.ts#L8)
 
 ***
 
@@ -63,9 +61,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejections
-```
+`EventEmitter.captureRejections`
 
 ***
 
@@ -87,9 +83,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejectionSymbol
-```
+`EventEmitter.captureRejectionSymbol`
 
 ***
 
@@ -143,9 +137,7 @@ v0.11.2
 
 #### Inherited from
 
-```ts
-EventEmitter.defaultMaxListeners
-```
+`EventEmitter.defaultMaxListeners`
 
 ***
 
@@ -168,16 +160,14 @@ v13.6.0, v12.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.errorMonitor
-```
+`EventEmitter.errorMonitor`
 
 ## Methods
 
 ### \[captureRejectionSymbol\]()?
 
 ```ts
-optional [captureRejectionSymbol]<K>(
+[captureRejectionSymbol]?<K>(
    error,
    event,
    ...args
@@ -190,7 +180,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k"></a> `K` |
 
 #### Parameters
 
@@ -206,9 +196,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 #### Inherited from
 
-```ts
-EventEmitter.[captureRejectionSymbol]
-```
+`EventEmitter.[captureRejectionSymbol]`
 
 ***
 
@@ -226,7 +214,7 @@ Alias for `emitter.on(eventName, listener)`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-1"></a> `K` |
 
 #### Parameters
 
@@ -245,9 +233,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.addListener
-```
+`EventEmitter.addListener`
 
 ***
 
@@ -257,7 +243,7 @@ EventEmitter.addListener
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:210](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L210)
+Defined in: [glide-mq/src/queue-events.ts:210](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue-events.ts#L210)
 
 Close the QueueEvents listener.
 Idempotent: safe to call multiple times.
@@ -318,7 +304,7 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-2"></a> `K` |
 
 #### Parameters
 
@@ -337,9 +323,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.emit
-```
+`EventEmitter.emit`
 
 ***
 
@@ -378,9 +362,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.eventNames
-```
+`EventEmitter.eventNames`
 
 ***
 
@@ -405,9 +387,7 @@ v1.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -427,7 +407,7 @@ in the list of the listeners of the event.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-3"></a> `K` |
 
 #### Parameters
 
@@ -446,9 +426,7 @@ v3.2.0
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -474,7 +452,7 @@ console.log(util.inspect(server.listeners('connection')));
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-4"></a> `K` |
 
 #### Parameters
 
@@ -492,9 +470,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.listeners
-```
+`EventEmitter.listeners`
 
 ***
 
@@ -512,7 +488,7 @@ Alias for `emitter.removeListener()`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-5"></a> `K` |
 
 #### Parameters
 
@@ -531,9 +507,7 @@ v10.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.off
-```
+`EventEmitter.off`
 
 ***
 
@@ -576,7 +550,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-6"></a> `K` |
 
 #### Parameters
 
@@ -595,9 +569,7 @@ v0.1.101
 
 #### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -638,7 +610,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-7"></a> `K` |
 
 #### Parameters
 
@@ -657,9 +629,7 @@ v0.3.0
 
 #### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -688,7 +658,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-8"></a> `K` |
 
 #### Parameters
 
@@ -707,9 +677,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependListener
-```
+`EventEmitter.prependListener`
 
 ***
 
@@ -736,7 +704,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-9"></a> `K` |
 
 #### Parameters
 
@@ -755,9 +723,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependOnceListener
-```
+`EventEmitter.prependOnceListener`
 
 ***
 
@@ -801,7 +767,7 @@ emitter.emit('log');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-10"></a> `K` |
 
 #### Parameters
 
@@ -819,9 +785,7 @@ v9.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.rawListeners
-```
+`EventEmitter.rawListeners`
 
 ***
 
@@ -857,9 +821,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeAllListeners
-```
+`EventEmitter.removeAllListeners`
 
 ***
 
@@ -955,7 +917,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-11"></a> `K` |
 
 #### Parameters
 
@@ -974,9 +936,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeListener
-```
+`EventEmitter.removeListener`
 
 ***
 
@@ -1011,9 +971,7 @@ v0.3.5
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`
 
 ***
 
@@ -1023,7 +981,7 @@ EventEmitter.setMaxListeners
 waitUntilReady(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue-events.ts:46](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue-events.ts#L46)
+Defined in: [glide-mq/src/queue-events.ts:46](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue-events.ts#L46)
 
 Wait until the QueueEvents instance is connected and listening.
 
@@ -1090,9 +1048,7 @@ v20.5.0
 
 #### Inherited from
 
-```ts
-EventEmitter.addAbortListener
-```
+`EventEmitter.addAbortListener`
 
 ***
 
@@ -1146,9 +1102,7 @@ v15.2.0, v14.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getEventListeners
-```
+`EventEmitter.getEventListeners`
 
 ***
 
@@ -1202,9 +1156,7 @@ v19.9.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -1249,9 +1201,7 @@ Since v3.2.0 - Use `listenerCount` instead.
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -1366,9 +1316,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 #### Call Signature
 
@@ -1479,9 +1427,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -1594,9 +1540,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 #### Call Signature
 
@@ -1705,9 +1649,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -1745,6 +1687,4 @@ v15.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`

@@ -1,6 +1,6 @@
 # Class: DelayedError
 
-Defined in: [glide-mq/src/errors.ts:37](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L37)
+Defined in: [glide-mq/src/errors.ts:37](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L37)
 
 Internal control-flow error thrown by `job.moveToDelayed()`. Caught by the Worker.
 
@@ -16,14 +16,14 @@ Internal control-flow error thrown by `job.moveToDelayed()`. Caught by the Worke
 new DelayedError(delayedUntil, message?): DelayedError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:40](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L40)
+Defined in: [glide-mq/src/errors.ts:40](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L40)
 
 #### Parameters
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
 | `delayedUntil` | `number` | `undefined` |
-| `message` | `string` | `'Job moved to delayed state'` |
+| `message?` | `string` | `'Job moved to delayed state'` |
 
 #### Returns
 
@@ -38,10 +38,10 @@ Defined in: [glide-mq/src/errors.ts:40](https://github.com/avifenesh/glide-mq/bl
 ### cause?
 
 ```ts
-optional cause?: unknown;
+cause?: unknown;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
@@ -55,7 +55,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 readonly delayedUntil: number;
 ```
 
-Defined in: [glide-mq/src/errors.ts:38](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L38)
+Defined in: [glide-mq/src/errors.ts:38](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L38)
 
 ***
 
@@ -65,7 +65,7 @@ Defined in: [glide-mq/src/errors.ts:38](https://github.com/avifenesh/glide-mq/bl
 message: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
@@ -79,7 +79,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
 name: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
@@ -90,10 +90,10 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
 ### stack?
 
 ```ts
-optional stack?: string;
+stack?: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 

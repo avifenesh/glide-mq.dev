@@ -8,7 +8,7 @@ function dag(
 ): Promise<ClosableWorkflow<Map&lt;string, Job&lt;any, any>>>>;
 ```
 
-Defined in: [glide-mq/src/workflows.ts:175](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/workflows.ts#L175)
+Defined in: [glide-mq/src/workflows.ts:175](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/workflows.ts#L175)
 
 DAG: submit a directed acyclic graph of jobs where each job can depend on
 multiple other jobs. The graph is validated for cycles and submitted in

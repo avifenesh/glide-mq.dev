@@ -32,7 +32,7 @@ Optional Zod validation:
 npm install zod @hono/zod-validator
 ```
 
-This guide uses **@glidemq/hono 0.5.1** with **glide-mq >= 0.17.0**. Direct use requires a server-side runtime with NAPI support.
+This guide uses **@glidemq/hono 0.5.2** with **glide-mq >= 0.20.0**. Direct use requires a server-side runtime with NAPI support.
 
 ## Quick Start
 
@@ -122,7 +122,7 @@ const job: unknown = await res.json();
 // Validate the response shape before using it in application code.
 ```
 
-In 0.5.1, `GlideMQApiType` resolves to a router with Hono's `BlankSchema`. `hc<GlideMQApiType>` therefore does not infer the HTTP endpoint names or response types. Typed middleware context and registry access are available, but end-to-end RPC route inference is not supported by this release.
+In 0.5.2, `GlideMQApiType` resolves to a router with Hono's `BlankSchema`. `hc<GlideMQApiType>` therefore does not infer the HTTP endpoint names or response types. Typed middleware context and registry access are available, but end-to-end RPC route inference is not supported by this release.
 
 ## Endpoints
 
