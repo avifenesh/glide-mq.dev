@@ -1,6 +1,6 @@
 # Class: CycleError
 
-Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/dag-utils.ts#L8)
+Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/dag-utils.ts#L8)
 
 ## Extends
 
@@ -14,7 +14,7 @@ Defined in: [glide-mq/src/dag-utils.ts:8](https://github.com/avifenesh/glide-mq/
 new CycleError(cycle): CycleError;
 ```
 
-Defined in: [glide-mq/src/dag-utils.ts:11](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/dag-utils.ts#L11)
+Defined in: [glide-mq/src/dag-utils.ts:11](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/dag-utils.ts#L11)
 
 #### Parameters
 
@@ -28,25 +28,21 @@ Defined in: [glide-mq/src/dag-utils.ts:11](https://github.com/avifenesh/glide-mq
 
 #### Overrides
 
-```ts
-Error.constructor
-```
+`Error.constructor`
 
 ## Properties
 
 ### cause?
 
 ```ts
-optional cause?: unknown;
+cause?: unknown;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
-```ts
-Error.cause
-```
+`Error.cause`
 
 ***
 
@@ -56,7 +52,7 @@ Error.cause
 readonly cycle: string[];
 ```
 
-Defined in: [glide-mq/src/dag-utils.ts:9](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/dag-utils.ts#L9)
+Defined in: [glide-mq/src/dag-utils.ts:9](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/dag-utils.ts#L9)
 
 ***
 
@@ -66,13 +62,11 @@ Defined in: [glide-mq/src/dag-utils.ts:9](https://github.com/avifenesh/glide-mq/
 message: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
-```ts
-Error.message
-```
+`Error.message`
 
 ***
 
@@ -82,29 +76,25 @@ Error.message
 name: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
-```ts
-Error.name
-```
+`Error.name`
 
 ***
 
 ### stack?
 
 ```ts
-optional stack?: string;
+stack?: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 
-```ts
-Error.stack
-```
+`Error.stack`
 
 ***
 
@@ -128,9 +118,7 @@ not capture any frames.
 
 #### Inherited from
 
-```ts
-Error.stackTraceLimit
-```
+`Error.stackTraceLimit`
 
 ## Methods
 
@@ -199,9 +187,7 @@ a();
 
 #### Inherited from
 
-```ts
-Error.captureStackTrace
-```
+`Error.captureStackTrace`
 
 ***
 
@@ -230,6 +216,4 @@ https://v8.dev/docs/stack-trace-api#customizing-stack-traces
 
 #### Inherited from
 
-```ts
-Error.prepareStackTrace
-```
+`Error.prepareStackTrace`

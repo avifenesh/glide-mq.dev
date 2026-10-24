@@ -1,6 +1,6 @@
 # Interface: SignalEntry
 
-Defined in: [glide-mq/src/types.ts:740](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L740)
+Defined in: [glide-mq/src/types.ts:750](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L750)
 
 A signal entry delivered to a suspended job on resume.
 
@@ -12,7 +12,7 @@ A signal entry delivered to a suspended job on resume.
 data: any;
 ```
 
-Defined in: [glide-mq/src/types.ts:744](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L744)
+Defined in: [glide-mq/src/types.ts:754](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L754)
 
 Arbitrary signal payload (deserialized from JSON).
 
@@ -24,7 +24,7 @@ Arbitrary signal payload (deserialized from JSON).
 name: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:742](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L742)
+Defined in: [glide-mq/src/types.ts:752](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L752)
 
 Signal name (e.g. 'approve', 'reject').
 
@@ -36,6 +36,6 @@ Signal name (e.g. 'approve', 'reject').
 receivedAt: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:746](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L746)
+Defined in: [glide-mq/src/types.ts:756](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L756)
 
 Epoch ms when the signal was received.

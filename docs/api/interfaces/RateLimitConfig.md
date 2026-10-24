@@ -1,6 +1,6 @@
 # Interface: RateLimitConfig
 
-Defined in: [glide-mq/src/types.ts:291](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L291)
+Defined in: [glide-mq/src/types.ts:301](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L301)
 
 Configuration for time-window rate limiting.
 
@@ -12,7 +12,7 @@ Configuration for time-window rate limiting.
 duration: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:295](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L295)
+Defined in: [glide-mq/src/types.ts:305](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L305)
 
 Time window in milliseconds.
 
@@ -24,6 +24,6 @@ Time window in milliseconds.
 max: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:293](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L293)
+Defined in: [glide-mq/src/types.ts:303](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L303)
 
 Maximum jobs allowed within the time window.

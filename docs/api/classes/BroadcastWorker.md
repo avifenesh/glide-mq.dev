@@ -1,6 +1,6 @@
 # Class: BroadcastWorker&lt;D, R&gt;
 
-Defined in: [glide-mq/src/broadcast-worker.ts:9](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast-worker.ts#L9)
+Defined in: [glide-mq/src/broadcast-worker.ts:9](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast-worker.ts#L9)
 
 ## Extends
 
@@ -10,8 +10,8 @@ Defined in: [glide-mq/src/broadcast-worker.ts:9](https://github.com/avifenesh/gl
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `D` | `any` |
-| `R` | `any` |
+| <a id="type-parameter-d"></a> `D` | `any` |
+| <a id="type-parameter-r"></a> `R` | `any` |
 
 ## Constructors
 
@@ -25,7 +25,7 @@ new BroadcastWorker<D, R>(
 ): BroadcastWorker<D, R>;
 ```
 
-Defined in: [glide-mq/src/broadcast-worker.ts:12](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast-worker.ts#L12)
+Defined in: [glide-mq/src/broadcast-worker.ts:12](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast-worker.ts#L12)
 
 #### Parameters
 
@@ -41,9 +41,7 @@ Defined in: [glide-mq/src/broadcast-worker.ts:12](https://github.com/avifenesh/g
 
 #### Overrides
 
-```ts
-BaseWorker<D, R>.constructor
-```
+`BaseWorker<D, R>.constructor`
 
 ## Properties
 
@@ -53,13 +51,11 @@ BaseWorker<D, R>.constructor
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:144](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L144)
+Defined in: [glide-mq/src/base-worker.ts:144](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L144)
 
 #### Inherited from
 
-```ts
-BaseWorker.name
-```
+`BaseWorker.name`
 
 ***
 
@@ -69,7 +65,7 @@ BaseWorker.name
 readonly static BUDGET_PAUSE_RECHECK_MS: 60000 = 60_000;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:224](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L224)
+Defined in: [glide-mq/src/base-worker.ts:224](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L224)
 
 How long a job of a budget with onExceeded 'pause' waits in delayed
 before the worker re-checks the budget. Raise the limits with
@@ -77,9 +73,7 @@ Queue.updateFlowBudget() to resume; Job.promote() re-checks sooner.
 
 #### Inherited from
 
-```ts
-BaseWorker.BUDGET_PAUSE_RECHECK_MS
-```
+`BaseWorker.BUDGET_PAUSE_RECHECK_MS`
 
 ***
 
@@ -101,9 +95,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-BaseWorker.captureRejections
-```
+`BaseWorker.captureRejections`
 
 ***
 
@@ -125,9 +117,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-BaseWorker.captureRejectionSymbol
-```
+`BaseWorker.captureRejectionSymbol`
 
 ***
 
@@ -181,9 +171,7 @@ v0.11.2
 
 #### Inherited from
 
-```ts
-BaseWorker.defaultMaxListeners
-```
+`BaseWorker.defaultMaxListeners`
 
 ***
 
@@ -206,9 +194,7 @@ v13.6.0, v12.17.0
 
 #### Inherited from
 
-```ts
-BaseWorker.errorMonitor
-```
+`BaseWorker.errorMonitor`
 
 ***
 
@@ -218,7 +204,7 @@ BaseWorker.errorMonitor
 readonly static MAX_SUSPEND_CONTINUATIONS: 10000 = 10000;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:218](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L218)
+Defined in: [glide-mq/src/base-worker.ts:218](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L218)
 
 Cap on in-process onResume continuations. An entry is only removed when
 its job returns to this worker, so jobs resumed elsewhere, timed out or
@@ -227,9 +213,7 @@ documented as best-effort: an evicted job runs the main processor.
 
 #### Inherited from
 
-```ts
-BaseWorker.MAX_SUSPEND_CONTINUATIONS
-```
+`BaseWorker.MAX_SUSPEND_CONTINUATIONS`
 
 ***
 
@@ -239,22 +223,20 @@ BaseWorker.MAX_SUSPEND_CONTINUATIONS
 static RateLimitError: typeof __class = BaseWorker.RateLimitError;
 ```
 
-Defined in: [glide-mq/src/broadcast-worker.ts:300](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/broadcast-worker.ts#L300)
+Defined in: [glide-mq/src/broadcast-worker.ts:300](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/broadcast-worker.ts#L300)
 
 Backward-compatible static RateLimitError from BaseWorker.
 
 #### Overrides
 
-```ts
-BaseWorker.RateLimitError
-```
+`BaseWorker.RateLimitError`
 
 ## Methods
 
 ### \[captureRejectionSymbol\]()?
 
 ```ts
-optional [captureRejectionSymbol]<K>(
+[captureRejectionSymbol]?<K>(
    error,
    event,
    ...args
@@ -267,7 +249,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k"></a> `K` |
 
 #### Parameters
 
@@ -283,9 +265,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 #### Inherited from
 
-```ts
-BaseWorker.[captureRejectionSymbol]
-```
+`BaseWorker.[captureRejectionSymbol]`
 
 ***
 
@@ -295,7 +275,7 @@ BaseWorker.[captureRejectionSymbol]
 abortJob(jobId): boolean;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2223](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2223)
+Defined in: [glide-mq/src/base-worker.ts:2223](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2223)
 
 Abort a job that is currently being processed by this worker.
 The processor receives the abort signal via job.abortSignal and must check it cooperatively.
@@ -313,9 +293,7 @@ Returns true if the job was found and aborted, false if not currently active.
 
 #### Inherited from
 
-```ts
-BaseWorker.abortJob
-```
+`BaseWorker.abortJob`
 
 ***
 
@@ -333,7 +311,7 @@ Alias for `emitter.on(eventName, listener)`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-1"></a> `K` |
 
 #### Parameters
 
@@ -352,9 +330,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-BaseWorker.addListener
-```
+`BaseWorker.addListener`
 
 ***
 
@@ -364,7 +340,7 @@ BaseWorker.addListener
 close(force?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2716](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2716)
+Defined in: [glide-mq/src/base-worker.ts:2716](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2716)
 
 Close the worker. If force=false (default), waits for active jobs to finish.
 Idempotent: safe to call multiple times.
@@ -381,9 +357,7 @@ Idempotent: safe to call multiple times.
 
 #### Inherited from
 
-```ts
-BaseWorker.close
-```
+`BaseWorker.close`
 
 ***
 
@@ -393,7 +367,7 @@ BaseWorker.close
 drain(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2692](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2692)
+Defined in: [glide-mq/src/base-worker.ts:2692](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2692)
 
 Process all remaining jobs in the queue, then stop gracefully.
 Keeps polling until isDrainComplete() returns true, then closes the worker.
@@ -404,9 +378,7 @@ Keeps polling until isDrainComplete() returns true, then closes the worker.
 
 #### Inherited from
 
-```ts
-BaseWorker.drain
-```
+`BaseWorker.drain`
 
 ***
 
@@ -460,7 +432,7 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-2"></a> `K` |
 
 #### Parameters
 
@@ -479,9 +451,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-BaseWorker.emit
-```
+`BaseWorker.emit`
 
 ***
 
@@ -520,9 +490,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-BaseWorker.eventNames
-```
+`BaseWorker.eventNames`
 
 ***
 
@@ -547,9 +515,7 @@ v1.0.0
 
 #### Inherited from
 
-```ts
-BaseWorker.getMaxListeners
-```
+`BaseWorker.getMaxListeners`
 
 ***
 
@@ -559,7 +525,7 @@ BaseWorker.getMaxListeners
 isPaused(): boolean;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2621](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2621)
+Defined in: [glide-mq/src/base-worker.ts:2621](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2621)
 
 Check if the worker is currently paused.
 
@@ -569,9 +535,7 @@ Check if the worker is currently paused.
 
 #### Inherited from
 
-```ts
-BaseWorker.isPaused
-```
+`BaseWorker.isPaused`
 
 ***
 
@@ -581,7 +545,7 @@ BaseWorker.isPaused
 isRunning(): boolean;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2614](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2614)
+Defined in: [glide-mq/src/base-worker.ts:2614](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2614)
 
 Check if the worker is currently running and not paused.
 
@@ -591,9 +555,7 @@ Check if the worker is currently running and not paused.
 
 #### Inherited from
 
-```ts
-BaseWorker.isRunning
-```
+`BaseWorker.isRunning`
 
 ***
 
@@ -613,7 +575,7 @@ in the list of the listeners of the event.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-3"></a> `K` |
 
 #### Parameters
 
@@ -632,9 +594,7 @@ v3.2.0
 
 #### Inherited from
 
-```ts
-BaseWorker.listenerCount
-```
+`BaseWorker.listenerCount`
 
 ***
 
@@ -660,7 +620,7 @@ console.log(util.inspect(server.listeners('connection')));
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-4"></a> `K` |
 
 #### Parameters
 
@@ -678,9 +638,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-BaseWorker.listeners
-```
+`BaseWorker.listeners`
 
 ***
 
@@ -698,7 +656,7 @@ Alias for `emitter.removeListener()`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-5"></a> `K` |
 
 #### Parameters
 
@@ -717,9 +675,7 @@ v10.0.0
 
 #### Inherited from
 
-```ts
-BaseWorker.off
-```
+`BaseWorker.off`
 
 ***
 
@@ -762,7 +718,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-6"></a> `K` |
 
 #### Parameters
 
@@ -781,9 +737,7 @@ v0.1.101
 
 #### Inherited from
 
-```ts
-BaseWorker.on
-```
+`BaseWorker.on`
 
 ***
 
@@ -824,7 +778,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-7"></a> `K` |
 
 #### Parameters
 
@@ -843,9 +797,7 @@ v0.3.0
 
 #### Inherited from
 
-```ts
-BaseWorker.once
-```
+`BaseWorker.once`
 
 ***
 
@@ -855,7 +807,7 @@ BaseWorker.once
 pause(force?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2636](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2636)
+Defined in: [glide-mq/src/base-worker.ts:2636](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2636)
 
 Pause the worker. If force=false (default), waits for active jobs to finish.
 
@@ -871,9 +823,7 @@ Pause the worker. If force=false (default), waits for active jobs to finish.
 
 #### Inherited from
 
-```ts
-BaseWorker.pause
-```
+`BaseWorker.pause`
 
 ***
 
@@ -902,7 +852,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-8"></a> `K` |
 
 #### Parameters
 
@@ -921,9 +871,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-BaseWorker.prependListener
-```
+`BaseWorker.prependListener`
 
 ***
 
@@ -950,7 +898,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-9"></a> `K` |
 
 #### Parameters
 
@@ -969,9 +917,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-BaseWorker.prependOnceListener
-```
+`BaseWorker.prependOnceListener`
 
 ***
 
@@ -981,7 +927,7 @@ BaseWorker.prependOnceListener
 rateLimit(ms): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2629](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2629)
+Defined in: [glide-mq/src/base-worker.ts:2629](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2629)
 
 Manually trigger a rate limit pause for the given duration.
 Subsequent jobs will wait until the pause expires.
@@ -998,9 +944,7 @@ Subsequent jobs will wait until the pause expires.
 
 #### Inherited from
 
-```ts
-BaseWorker.rateLimit
-```
+`BaseWorker.rateLimit`
 
 ***
 
@@ -1044,7 +988,7 @@ emitter.emit('log');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-10"></a> `K` |
 
 #### Parameters
 
@@ -1062,9 +1006,7 @@ v9.4.0
 
 #### Inherited from
 
-```ts
-BaseWorker.rawListeners
-```
+`BaseWorker.rawListeners`
 
 ***
 
@@ -1100,9 +1042,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-BaseWorker.removeAllListeners
-```
+`BaseWorker.removeAllListeners`
 
 ***
 
@@ -1198,7 +1138,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-11"></a> `K` |
 
 #### Parameters
 
@@ -1217,9 +1157,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-BaseWorker.removeListener
-```
+`BaseWorker.removeListener`
 
 ***
 
@@ -1229,7 +1167,7 @@ BaseWorker.removeListener
 resume(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2668](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2668)
+Defined in: [glide-mq/src/base-worker.ts:2668](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2668)
 
 Resume the worker after a pause.
 
@@ -1239,9 +1177,7 @@ Resume the worker after a pause.
 
 #### Inherited from
 
-```ts
-BaseWorker.resume
-```
+`BaseWorker.resume`
 
 ***
 
@@ -1276,9 +1212,7 @@ v0.3.5
 
 #### Inherited from
 
-```ts
-BaseWorker.setMaxListeners
-```
+`BaseWorker.setMaxListeners`
 
 ***
 
@@ -1288,7 +1222,7 @@ BaseWorker.setMaxListeners
 waitUntilReady(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:351](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L351)
+Defined in: [glide-mq/src/base-worker.ts:351](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L351)
 
 Wait for the worker to be fully initialized and connected.
 
@@ -1298,9 +1232,7 @@ Wait for the worker to be fully initialized and connected.
 
 #### Inherited from
 
-```ts
-BaseWorker.waitUntilReady
-```
+`BaseWorker.waitUntilReady`
 
 ***
 
@@ -1361,9 +1293,7 @@ v20.5.0
 
 #### Inherited from
 
-```ts
-BaseWorker.addAbortListener
-```
+`BaseWorker.addAbortListener`
 
 ***
 
@@ -1417,9 +1347,7 @@ v15.2.0, v14.17.0
 
 #### Inherited from
 
-```ts
-BaseWorker.getEventListeners
-```
+`BaseWorker.getEventListeners`
 
 ***
 
@@ -1473,9 +1401,7 @@ v19.9.0
 
 #### Inherited from
 
-```ts
-BaseWorker.getMaxListeners
-```
+`BaseWorker.getMaxListeners`
 
 ***
 
@@ -1485,7 +1411,7 @@ BaseWorker.getMaxListeners
 static isRateLimitError(error): boolean;
 ```
 
-Defined in: [glide-mq/src/base-worker.ts:2872](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/base-worker.ts#L2872)
+Defined in: [glide-mq/src/base-worker.ts:2872](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/base-worker.ts#L2872)
 
 #### Parameters
 
@@ -1499,9 +1425,7 @@ Defined in: [glide-mq/src/base-worker.ts:2872](https://github.com/avifenesh/glid
 
 #### Inherited from
 
-```ts
-BaseWorker.isRateLimitError
-```
+`BaseWorker.isRateLimitError`
 
 ***
 
@@ -1546,9 +1470,7 @@ Since v3.2.0 - Use `listenerCount` instead.
 
 #### Inherited from
 
-```ts
-BaseWorker.listenerCount
-```
+`BaseWorker.listenerCount`
 
 ***
 
@@ -1663,9 +1585,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-BaseWorker.on
-```
+`BaseWorker.on`
 
 #### Call Signature
 
@@ -1776,9 +1696,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-BaseWorker.on
-```
+`BaseWorker.on`
 
 ***
 
@@ -1891,9 +1809,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-BaseWorker.once
-```
+`BaseWorker.once`
 
 #### Call Signature
 
@@ -2002,9 +1918,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-BaseWorker.once
-```
+`BaseWorker.once`
 
 ***
 
@@ -2042,6 +1956,4 @@ v15.4.0
 
 #### Inherited from
 
-```ts
-BaseWorker.setMaxListeners
-```
+`BaseWorker.setMaxListeners`

@@ -1,6 +1,6 @@
 # Interface: MetricsDataPoint
 
-Defined in: [glide-mq/src/types.ts:550](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L550)
+Defined in: [glide-mq/src/types.ts:560](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L560)
 
 A single per-minute metrics data point.
 
@@ -12,7 +12,7 @@ A single per-minute metrics data point.
 avgDuration: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:556](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L556)
+Defined in: [glide-mq/src/types.ts:566](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L566)
 
 Average processing duration in ms for this bucket.
 
@@ -24,7 +24,7 @@ Average processing duration in ms for this bucket.
 count: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:554](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L554)
+Defined in: [glide-mq/src/types.ts:564](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L564)
 
 Number of jobs completed/failed in this bucket.
 
@@ -36,6 +36,6 @@ Number of jobs completed/failed in this bucket.
 timestamp: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:552](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L552)
+Defined in: [glide-mq/src/types.ts:562](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L562)
 
 Minute-bucket epoch ms (floored to start of minute).

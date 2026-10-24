@@ -1,6 +1,6 @@
 # Interface: DeadLetterQueueOptions
 
-Defined in: [glide-mq/src/types.ts:65](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L65)
+Defined in: [glide-mq/src/types.ts:65](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L65)
 
 Configuration for dead letter queue routing.
 
@@ -9,10 +9,10 @@ Configuration for dead letter queue routing.
 ### ~~maxRetries?~~
 
 ```ts
-optional maxRetries?: number;
+maxRetries?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:73](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L73)
+Defined in: [glide-mq/src/types.ts:73](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L73)
 
 #### Deprecated
 
@@ -28,6 +28,6 @@ moves to the DLQ when it fails terminally, which is decided by the job's own
 name: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:67](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L67)
+Defined in: [glide-mq/src/types.ts:67](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L67)
 
 Queue name to use as the dead letter queue.

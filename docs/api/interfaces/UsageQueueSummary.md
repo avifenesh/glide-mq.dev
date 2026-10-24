@@ -1,6 +1,6 @@
 # Interface: UsageQueueSummary
 
-Defined in: [glide-mq/src/types.ts:705](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L705)
+Defined in: [glide-mq/src/types.ts:715](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L715)
 
 Aggregated usage totals for a single queue inside a usage summary response.
 
@@ -12,17 +12,17 @@ Aggregated usage totals for a single queue inside a usage summary response.
 costs: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:709](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L709)
+Defined in: [glide-mq/src/types.ts:719](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L719)
 
 ***
 
 ### costUnit?
 
 ```ts
-optional costUnit?: string;
+costUnit?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:711](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L711)
+Defined in: [glide-mq/src/types.ts:721](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L721)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [glide-mq/src/types.ts:711](https://github.com/avifenesh/glide-mq/bl
 jobCount: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:706](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L706)
+Defined in: [glide-mq/src/types.ts:716](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L716)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [glide-mq/src/types.ts:706](https://github.com/avifenesh/glide-mq/bl
 models: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:712](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L712)
+Defined in: [glide-mq/src/types.ts:722](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L722)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [glide-mq/src/types.ts:712](https://github.com/avifenesh/glide-mq/bl
 tokens: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:707](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L707)
+Defined in: [glide-mq/src/types.ts:717](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L717)
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: [glide-mq/src/types.ts:707](https://github.com/avifenesh/glide-mq/bl
 totalCost: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:710](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L710)
+Defined in: [glide-mq/src/types.ts:720](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L720)
 
 ***
 
@@ -72,4 +72,4 @@ Defined in: [glide-mq/src/types.ts:710](https://github.com/avifenesh/glide-mq/bl
 totalTokens: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:708](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L708)
+Defined in: [glide-mq/src/types.ts:718](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L718)

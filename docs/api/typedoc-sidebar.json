@@ -288,6 +288,10 @@
         "link": "/api/type-aliases/ClosableWorkflow.md"
       },
       {
+        "text": "DeduplicationOptions",
+        "link": "/api/type-aliases/DeduplicationOptions.md"
+      },
+      {
         "text": "Field",
         "link": "/api/type-aliases/Field.md"
       },

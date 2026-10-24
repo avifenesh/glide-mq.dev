@@ -1,6 +1,6 @@
 # Interface: SuspendOptions
 
-Defined in: [glide-mq/src/types.ts:732](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L732)
+Defined in: [glide-mq/src/types.ts:742](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L742)
 
 Options for suspending a job.
 
@@ -9,10 +9,10 @@ Options for suspending a job.
 ### reason?
 
 ```ts
-optional reason?: string;
+reason?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:734](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L734)
+Defined in: [glide-mq/src/types.ts:744](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L744)
 
 Human-readable reason for the suspension.
 
@@ -21,9 +21,9 @@ Human-readable reason for the suspension.
 ### timeout?
 
 ```ts
-optional timeout?: number;
+timeout?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:736](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L736)
+Defined in: [glide-mq/src/types.ts:746](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L746)
 
 Timeout in milliseconds. 0 means infinite (default).

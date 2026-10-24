@@ -1,6 +1,6 @@
 # Interface: IndexCreateOptions
 
-Defined in: [glide-mq/src/types.ts:369](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L369)
+Defined in: [glide-mq/src/types.ts:379](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L379)
 
 Options passed through to FT.CREATE (glide-mq owned, decoupled from speedkey).
 
@@ -9,10 +9,10 @@ Options passed through to FT.CREATE (glide-mq owned, decoupled from speedkey).
 ### language?
 
 ```ts
-optional language?: string;
+language?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:373](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L373)
+Defined in: [glide-mq/src/types.ts:383](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L383)
 
 Default language for stemming.
 
@@ -21,10 +21,10 @@ Default language for stemming.
 ### minStemSize?
 
 ```ts
-optional minStemSize?: number;
+minStemSize?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:377](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L377)
+Defined in: [glide-mq/src/types.ts:387](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L387)
 
 Minimum word length for stemming.
 
@@ -33,10 +33,10 @@ Minimum word length for stemming.
 ### noOffsets?
 
 ```ts
-optional noOffsets?: boolean;
+noOffsets?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:381](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L381)
+Defined in: [glide-mq/src/types.ts:391](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L391)
 
 Do not store term offsets.
 
@@ -45,10 +45,10 @@ Do not store term offsets.
 ### noStopWords?
 
 ```ts
-optional noStopWords?: boolean;
+noStopWords?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:383](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L383)
+Defined in: [glide-mq/src/types.ts:393](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L393)
 
 Disable stop-word filtering.
 
@@ -57,10 +57,10 @@ Disable stop-word filtering.
 ### punctuation?
 
 ```ts
-optional punctuation?: string;
+punctuation?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:387](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L387)
+Defined in: [glide-mq/src/types.ts:397](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L397)
 
 Custom punctuation characters.
 
@@ -69,10 +69,10 @@ Custom punctuation characters.
 ### score?
 
 ```ts
-optional score?: number;
+score?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:371](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L371)
+Defined in: [glide-mq/src/types.ts:381](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L381)
 
 Default score for documents.
 
@@ -81,10 +81,10 @@ Default score for documents.
 ### skipInitialScan?
 
 ```ts
-optional skipInitialScan?: boolean;
+skipInitialScan?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:375](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L375)
+Defined in: [glide-mq/src/types.ts:385](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L385)
 
 Skip indexing existing documents on creation.
 
@@ -93,10 +93,10 @@ Skip indexing existing documents on creation.
 ### stopWords?
 
 ```ts
-optional stopWords?: string[];
+stopWords?: string[];
 ```
 
-Defined in: [glide-mq/src/types.ts:385](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L385)
+Defined in: [glide-mq/src/types.ts:395](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L395)
 
 Custom stop words.
 
@@ -105,9 +105,9 @@ Custom stop words.
 ### withOffsets?
 
 ```ts
-optional withOffsets?: boolean;
+withOffsets?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:379](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L379)
+Defined in: [glide-mq/src/types.ts:389](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L389)
 
 Store term offsets.

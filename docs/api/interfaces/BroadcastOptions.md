@@ -1,6 +1,6 @@
 # Interface: BroadcastOptions
 
-Defined in: [glide-mq/src/types.ts:176](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L176)
+Defined in: [glide-mq/src/types.ts:176](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L176)
 
 Configuration options for a Broadcast (pub/sub) queue.
 
@@ -13,10 +13,10 @@ Configuration options for a Broadcast (pub/sub) queue.
 ### client?
 
 ```ts
-optional client?: Client;
+client?: Client;
 ```
 
-Defined in: [glide-mq/src/types.ts:85](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L85)
+Defined in: [glide-mq/src/types.ts:85](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L85)
 
 Pre-existing GLIDE client for non-blocking commands.
 When provided, the component does NOT own this client - close() will not destroy it.
@@ -31,10 +31,10 @@ Must not be used for blocking reads (XREADGROUP BLOCK / XREAD BLOCK).
 ### compression?
 
 ```ts
-optional compression?: "none" | "gzip";
+compression?: "gzip" | "none";
 ```
 
-Defined in: [glide-mq/src/types.ts:94](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L94)
+Defined in: [glide-mq/src/types.ts:94](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L94)
 
 Enable transparent compression of job data. Default: 'none'.
 
@@ -47,10 +47,10 @@ Enable transparent compression of job data. Default: 'none'.
 ### connection?
 
 ```ts
-optional connection?: ConnectionOptions;
+connection?: ConnectionOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:79](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L79)
+Defined in: [glide-mq/src/types.ts:79](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L79)
 
 Connection options for creating a new client. Required unless `client` is provided.
 
@@ -63,10 +63,10 @@ Connection options for creating a new client. Required unless `client` is provid
 ### deadLetterQueue?
 
 ```ts
-optional deadLetterQueue?: DeadLetterQueueOptions;
+deadLetterQueue?: DeadLetterQueueOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:92](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L92)
+Defined in: [glide-mq/src/types.ts:92](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L92)
 
 Dead letter queue configuration. On a Worker, jobs that fail terminally are copied
 to this queue. On a Queue, it only records the DLQ name for `getDeadLetterJobs()`
@@ -81,10 +81,10 @@ and routes nothing.
 ### events?
 
 ```ts
-optional events?: boolean;
+events?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:105](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L105)
+Defined in: [glide-mq/src/types.ts:105](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L105)
 
 Emit events (e.g., 'added') on the events stream when adding jobs. Default: true.
 
@@ -97,10 +97,10 @@ Emit events (e.g., 'added') on the events stream when adding jobs. Default: true
 ### maxMessages?
 
 ```ts
-optional maxMessages?: number;
+maxMessages?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:182](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L182)
+Defined in: [glide-mq/src/types.ts:182](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L182)
 
 Max messages to retain in stream (must be a positive integer). Trimmed exactly (hard limit) on each publish,
 including messages a subscription has not read yet. Trimmed messages' job data is deleted once no subscription
@@ -111,10 +111,10 @@ holds them. Opt-in; no trimming by default.
 ### prefix?
 
 ```ts
-optional prefix?: string;
+prefix?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:86](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L86)
+Defined in: [glide-mq/src/types.ts:86](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L86)
 
 #### Inherited from
 
@@ -125,10 +125,10 @@ Defined in: [glide-mq/src/types.ts:86](https://github.com/avifenesh/glide-mq/blo
 ### serializer?
 
 ```ts
-optional serializer?: Serializer;
+serializer?: Serializer;
 ```
 
-Defined in: [glide-mq/src/types.ts:103](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L103)
+Defined in: [glide-mq/src/types.ts:103](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L103)
 
 Custom serializer for job data and return values. Default: JSON.
 

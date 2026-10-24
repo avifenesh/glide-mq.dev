@@ -1,6 +1,6 @@
 # Interface: JobUsage
 
-Defined in: [glide-mq/src/types.ts:653](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L653)
+Defined in: [glide-mq/src/types.ts:663](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L663)
 
 AI-specific usage metadata reported by a job processor.
 
@@ -9,10 +9,10 @@ AI-specific usage metadata reported by a job processor.
 ### cached?
 
 ```ts
-optional cached?: boolean;
+cached?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:677](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L677)
+Defined in: [glide-mq/src/types.ts:687](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L687)
 
 Whether the response came from a cache hit.
 
@@ -21,10 +21,10 @@ Whether the response came from a cache hit.
 ### costs?
 
 ```ts
-optional costs?: Record&lt;string, number>;
+costs?: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:669](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L669)
+Defined in: [glide-mq/src/types.ts:679](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L679)
 
 Cost breakdown by category. Values are in whatever unit `costUnit` specifies.
 Any string key is accepted.
@@ -34,10 +34,10 @@ Any string key is accepted.
 ### costUnit?
 
 ```ts
-optional costUnit?: string;
+costUnit?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:673](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L673)
+Defined in: [glide-mq/src/types.ts:683](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L683)
 
 Unit for cost values (e.g. 'usd', 'credits', 'ils'). Informational only.
 
@@ -46,10 +46,10 @@ Unit for cost values (e.g. 'usd', 'credits', 'ils'). Informational only.
 ### latencyMs?
 
 ```ts
-optional latencyMs?: number;
+latencyMs?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:675](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L675)
+Defined in: [glide-mq/src/types.ts:685](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L685)
 
 Inference latency in milliseconds (not including queue wait time).
 
@@ -58,10 +58,10 @@ Inference latency in milliseconds (not including queue wait time).
 ### model?
 
 ```ts
-optional model?: string;
+model?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:655](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L655)
+Defined in: [glide-mq/src/types.ts:665](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L665)
 
 Model identifier (e.g. 'gpt-5.4', 'claude-sonnet-4-20250514').
 
@@ -70,10 +70,10 @@ Model identifier (e.g. 'gpt-5.4', 'claude-sonnet-4-20250514').
 ### provider?
 
 ```ts
-optional provider?: string;
+provider?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:657](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L657)
+Defined in: [glide-mq/src/types.ts:667](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L667)
 
 Provider identifier (e.g. 'openai', 'anthropic').
 
@@ -82,10 +82,10 @@ Provider identifier (e.g. 'openai', 'anthropic').
 ### tokens?
 
 ```ts
-optional tokens?: Record&lt;string, number>;
+tokens?: Record&lt;string, number>;
 ```
 
-Defined in: [glide-mq/src/types.ts:662](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L662)
+Defined in: [glide-mq/src/types.ts:672](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L672)
 
 Token counts by category. Any string key is accepted.
 Well-known keys: input, output, reasoning, cachedInput, cachedOutput.
@@ -95,10 +95,10 @@ Well-known keys: input, output, reasoning, cachedInput, cachedOutput.
 ### totalCost?
 
 ```ts
-optional totalCost?: number;
+totalCost?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:671](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L671)
+Defined in: [glide-mq/src/types.ts:681](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L681)
 
 Total cost (auto-computed as sum of all values in `costs` if not provided).
 
@@ -107,9 +107,9 @@ Total cost (auto-computed as sum of all values in `costs` if not provided).
 ### totalTokens?
 
 ```ts
-optional totalTokens?: number;
+totalTokens?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:664](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L664)
+Defined in: [glide-mq/src/types.ts:674](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L674)
 
 Total tokens (auto-computed as sum of all values in `tokens` if not provided).

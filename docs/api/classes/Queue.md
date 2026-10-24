@@ -1,6 +1,6 @@
 # Class: Queue&lt;D, R&gt;
 
-Defined in: [glide-mq/src/queue.ts:275](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L275)
+Defined in: [glide-mq/src/queue.ts:278](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L278)
 
 Queue manages job submission, retrieval, scheduling, and lifecycle operations.
 Connects to Valkey/Redis and uses server-side functions for atomic operations.
@@ -13,8 +13,8 @@ Connects to Valkey/Redis and uses server-side functions for atomic operations.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `D` | `any` |
-| `R` | `any` |
+| <a id="type-parameter-d"></a> `D` | `any` |
+| <a id="type-parameter-r"></a> `R` | `any` |
 
 ## Constructors
 
@@ -24,7 +24,7 @@ Connects to Valkey/Redis and uses server-side functions for atomic operations.
 new Queue<D, R>(name, opts): Queue<D, R>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:297](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L297)
+Defined in: [glide-mq/src/queue.ts:300](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L300)
 
 #### Parameters
 
@@ -39,9 +39,7 @@ Defined in: [glide-mq/src/queue.ts:297](https://github.com/avifenesh/glide-mq/bl
 
 #### Overrides
 
-```ts
-EventEmitter.constructor
-```
+`EventEmitter.constructor`
 
 ## Properties
 
@@ -51,7 +49,7 @@ EventEmitter.constructor
 readonly name: string;
 ```
 
-Defined in: [glide-mq/src/queue.ts:276](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L276)
+Defined in: [glide-mq/src/queue.ts:279](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L279)
 
 ***
 
@@ -73,9 +71,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejections
-```
+`EventEmitter.captureRejections`
 
 ***
 
@@ -97,9 +93,7 @@ v13.4.0, v12.16.0
 
 #### Inherited from
 
-```ts
-EventEmitter.captureRejectionSymbol
-```
+`EventEmitter.captureRejectionSymbol`
 
 ***
 
@@ -153,9 +147,7 @@ v0.11.2
 
 #### Inherited from
 
-```ts
-EventEmitter.defaultMaxListeners
-```
+`EventEmitter.defaultMaxListeners`
 
 ***
 
@@ -178,16 +170,14 @@ v13.6.0, v12.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.errorMonitor
-```
+`EventEmitter.errorMonitor`
 
 ## Methods
 
 ### \[captureRejectionSymbol\]()?
 
 ```ts
-optional [captureRejectionSymbol]<K>(
+[captureRejectionSymbol]?<K>(
    error,
    event,
    ...args
@@ -200,7 +190,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k"></a> `K` |
 
 #### Parameters
 
@@ -216,9 +206,7 @@ Defined in: glide-mq/node\_modules/@types/node/events.d.ts:103
 
 #### Inherited from
 
-```ts
-EventEmitter.[captureRejectionSymbol]
-```
+`EventEmitter.[captureRejectionSymbol]`
 
 ***
 
@@ -232,7 +220,7 @@ add(
 ): Promise<Job<D, R> | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:744](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L744)
+Defined in: [glide-mq/src/queue.ts:747](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L747)
 
 Add a single job to the queue.
 Uses the glidemq_addJob server function to atomically create the job hash
@@ -262,7 +250,7 @@ addAndWait(
 ): Promise<R>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:902](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L902)
+Defined in: [glide-mq/src/queue.ts:905](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L905)
 
 Add a job and wait for its completed/failed event using the queue events stream.
 Captures the current tail entry ID before enqueue so fast completions are not missed.
@@ -287,7 +275,7 @@ Captures the current tail entry ID before enqueue so fast completions are not mi
 addBulk(jobs): Promise<Job<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:979](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L979)
+Defined in: [glide-mq/src/queue.ts:982](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L982)
 
 Add multiple jobs to the queue in a pipeline.
 Uses GLIDE's Batch API to pipeline all addJob FCALL commands in a single round trip.
@@ -319,7 +307,7 @@ Alias for `emitter.on(eventName, listener)`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-1"></a> `K` |
 
 #### Parameters
 
@@ -338,9 +326,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.addListener
-```
+`EventEmitter.addListener`
 
 ***
 
@@ -354,7 +340,7 @@ clean(
 ): Promise&lt;string[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1673](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1673)
+Defined in: [glide-mq/src/queue.ts:1676](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1676)
 
 Bulk-remove old completed or failed jobs by age.
 
@@ -380,7 +366,7 @@ Array of removed job IDs.
 close(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:3082](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L3082)
+Defined in: [glide-mq/src/queue.ts:3106](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L3106)
 
 Close the queue and release the underlying client connection.
 Idempotent: safe to call multiple times.
@@ -397,7 +383,7 @@ Idempotent: safe to call multiple times.
 count(): Promise&lt;number>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2156](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2156)
+Defined in: [glide-mq/src/queue.ts:2159](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2159)
 
 Get the count of waiting jobs (stream length).
 
@@ -413,7 +399,7 @@ Get the count of waiting jobs (stream length).
 createJobIndex(opts?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2874](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2874)
+Defined in: [glide-mq/src/queue.ts:2898](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2898)
 
 Create a Valkey Search index over job hashes for this queue.
 Auto-includes base fields: name (TAG), state (TAG), timestamp (NUMERIC), priority (NUMERIC).
@@ -439,7 +425,7 @@ Requires the valkey-search module to be loaded on the server (standalone mode).
 drain(delayed?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1685](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1685)
+Defined in: [glide-mq/src/queue.ts:1688](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1688)
 
 Drain the queue: remove all waiting jobs without touching active jobs.
 When delayed=true, also removes all delayed/scheduled jobs.
@@ -463,7 +449,7 @@ Deletes associated job hashes and emits a 'drained' event.
 dropJobIndex(name?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2948](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2948)
+Defined in: [glide-mq/src/queue.ts:2972](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2972)
 
 Drop a Valkey Search index. Indexed document keys (job hashes) are not affected.
 
@@ -529,7 +515,7 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-2"></a> `K` |
 
 #### Parameters
 
@@ -548,9 +534,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.emit
-```
+`EventEmitter.emit`
 
 ***
 
@@ -589,9 +573,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.eventNames
-```
+`EventEmitter.eventNames`
 
 ***
 
@@ -601,7 +583,7 @@ EventEmitter.eventNames
 getDeadLetterJob(jobId, opts?): Promise<Job<D, R> | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2679](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2679)
+Defined in: [glide-mq/src/queue.ts:2703](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2703)
 
 Retrieve a single job from the configured dead letter queue.
 Returns null when no DLQ is configured or the DLQ job does not exist.
@@ -629,7 +611,7 @@ getDeadLetterJobs(
 ): Promise<Job<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2608](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2608)
+Defined in: [glide-mq/src/queue.ts:2632](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2632)
 
 Retrieve jobs from the dead letter queue configured for this queue.
 Returns an empty array if no DLQ is configured.
@@ -638,8 +620,8 @@ Returns an empty array if no DLQ is configured.
 
 | Parameter | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
-| `start` | `number` | `0` | Start index (default 0) |
-| `end` | `number` | `-1` | End index (default -1, meaning all) |
+| `start?` | `number` | `0` | Start index (default 0) |
+| `end?` | `number` | `-1` | End index (default -1, meaning all) |
 | `opts?` | [`GetJobsOptions`](../interfaces/GetJobsOptions.md) | `undefined` | Set `excludeData: true` to omit `data` and `returnvalue` fields |
 
 #### Returns
@@ -667,7 +649,7 @@ getFlowBudget(flowId): Promise<
 | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2316](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2316)
+Defined in: [glide-mq/src/queue.ts:2340](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2340)
 
 Read the budget state for a flow. Returns null if no budget was set.
 
@@ -710,7 +692,7 @@ getFlowUsage(parentJobId): Promise<{
 }>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2216](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2216)
+Defined in: [glide-mq/src/queue.ts:2240](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2240)
 
 Aggregate AI usage metadata across a flow (parent + children).
 Walks the deps set of the parent job and sums token counts, cost, and model usage.
@@ -741,7 +723,7 @@ Walks the deps set of the parent job and sums token counts, cost, and model usag
 getGlobalRateLimit(): Promise<RateLimitConfig | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1418](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1418)
+Defined in: [glide-mq/src/queue.ts:1421](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1421)
 
 Get the current global rate limit for this queue.
 Returns null if no global rate limit is configured.
@@ -758,7 +740,7 @@ Returns null if no global rate limit is configured.
 getJob(id, opts?): Promise<Job<D, R> | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1335](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1335)
+Defined in: [glide-mq/src/queue.ts:1338](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1338)
 
 Retrieve a job by ID from the queue.
 Returns null if the job does not exist.
@@ -782,7 +764,7 @@ Returns null if the job does not exist.
 getJobCountByTypes(): Promise<JobCounts>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2140](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2140)
+Defined in: [glide-mq/src/queue.ts:2143](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2143)
 
 Get job counts by types. Alias for getJobCounts().
 
@@ -798,7 +780,7 @@ Get job counts by types. Alias for getJobCounts().
 getJobCounts(): Promise<JobCounts>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1713](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1713)
+Defined in: [glide-mq/src/queue.ts:1716](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1716)
 
 Get job counts by state.
 - waiting: stream length minus stream-active entries, plus LIFO and priority list lengths
@@ -826,7 +808,7 @@ getJobLogs(
 }>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2200](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2200)
+Defined in: [glide-mq/src/queue.ts:2224](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2224)
 
 Retrieve log entries for a job by ID.
 
@@ -835,8 +817,8 @@ Retrieve log entries for a job by ID.
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
 | `id` | `string` | `undefined` |
-| `start` | `number` | `0` |
-| `end` | `number` | `-1` |
+| `start?` | `number` | `0` |
+| `end?` | `number` | `-1` |
 
 #### Returns
 
@@ -858,7 +840,7 @@ getJobs(
 ): Promise<Job<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1875](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1875)
+Defined in: [glide-mq/src/queue.ts:1878](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1878)
 
 Retrieve jobs by state with optional pagination.
 
@@ -867,8 +849,8 @@ Retrieve jobs by state with optional pagination.
 | Parameter | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
 | `type` | `"completed"` \| `"failed"` \| `"delayed"` \| `"active"` \| `"waiting"` | `undefined` | The job state to query |
-| `start` | `number` | `0` | Start index for pagination (default 0) |
-| `end` | `number` | `-1` | End index for pagination (default -1, meaning all) |
+| `start?` | `number` | `0` | Start index for pagination (default 0) |
+| `end?` | `number` | `-1` | End index for pagination (default -1, meaning all) |
 | `opts?` | [`GetJobsOptions`](../interfaces/GetJobsOptions.md) | `undefined` | Set `excludeData: true` to omit `data` and `returnvalue` fields |
 
 #### Returns
@@ -883,7 +865,7 @@ Retrieve jobs by state with optional pagination.
 getJobScheduler(name): Promise<SchedulerEntry | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2186](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2186)
+Defined in: [glide-mq/src/queue.ts:2210](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2210)
 
 Get a single job scheduler entry by name.
 Returns null if no scheduler with that name exists or if stored data is malformed.
@@ -921,9 +903,7 @@ v1.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -933,7 +913,7 @@ EventEmitter.getMaxListeners
 getMetrics(type, opts?): Promise<Metrics>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1616](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1616)
+Defined in: [glide-mq/src/queue.ts:1619](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1619)
 
 Get metrics for completed or failed jobs.
 Returns total count and per-minute time-series data points with throughput and avg duration.
@@ -957,9 +937,33 @@ Returns total count and per-minute time-series data points with throughput and a
 getRepeatableJobs(): Promise&lt;object[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2164](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2164)
+Defined in: [glide-mq/src/queue.ts:2167](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2167)
 
 Get all registered job schedulers (repeatable jobs).
+
+#### Returns
+
+`Promise`&lt;`object`[]&gt;
+
+***
+
+### getRepeatableJobsBounded()
+
+```ts
+getRepeatableJobsBounded(maxEntries): Promise&lt;object[]>;
+```
+
+Defined in: [glide-mq/src/queue.ts:2190](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2190)
+
+Get all registered job schedulers when their count does not exceed maxEntries.
+Unlike getRepeatableJobs(), this bounded inventory fails closed on excess or
+malformed persisted entries and checks the count/read atomically in Valkey.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `maxEntries` | `number` |
 
 #### Returns
 
@@ -977,7 +981,7 @@ getSuspendedJobs(
 ): Promise<Job<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2783](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2783)
+Defined in: [glide-mq/src/queue.ts:2807](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2807)
 
 Retrieve jobs currently in the suspended state.
 Results are ordered by the suspended ZSet score (timeout deadline).
@@ -986,8 +990,8 @@ Results are ordered by the suspended ZSet score (timeout deadline).
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `start` | `number` | `0` |
-| `end` | `number` | `-1` |
+| `start?` | `number` | `0` |
+| `end?` | `number` | `-1` |
 | `opts?` | [`GetJobsOptions`](../interfaces/GetJobsOptions.md) | `undefined` |
 
 #### Returns
@@ -1009,7 +1013,7 @@ getSuspendInfo(jobId): Promise<
 | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2821](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2821)
+Defined in: [glide-mq/src/queue.ts:2845](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2845)
 
 Get suspension information for a job.
 Returns null if the job is not in the suspended state.
@@ -1039,7 +1043,7 @@ Returns null if the job is not in the suspended state.
 getUsageSummary(opts?): Promise<UsageSummary>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2450](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2450)
+Defined in: [glide-mq/src/queue.ts:2474](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2474)
 
 Aggregate reported AI usage across queues for a rolling time window.
 Uses per-minute buckets recorded by job.reportUsage(), avoiding job-hash scans.
@@ -1062,7 +1066,7 @@ Uses per-minute buckets recorded by job.reportUsage(), avoiding job-hash scans.
 getWorkers(): Promise<WorkerInfo[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1432](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1432)
+Defined in: [glide-mq/src/queue.ts:1435](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1435)
 
 List all active workers for this queue.
 Workers register themselves with TTL-based keys; only live workers appear.
@@ -1080,7 +1084,7 @@ Returns an array of WorkerInfo sorted by startedAt (oldest first).
 isPaused(): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2147](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2147)
+Defined in: [glide-mq/src/queue.ts:2150](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2150)
 
 Check if the queue is paused.
 
@@ -1106,7 +1110,7 @@ in the list of the listeners of the event.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-3"></a> `K` |
 
 #### Parameters
 
@@ -1125,9 +1129,7 @@ v3.2.0
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -1153,7 +1155,7 @@ console.log(util.inspect(server.listeners('connection')));
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-4"></a> `K` |
 
 #### Parameters
 
@@ -1171,9 +1173,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.listeners
-```
+`EventEmitter.listeners`
 
 ***
 
@@ -1183,7 +1183,7 @@ EventEmitter.listeners
 obliterate(opts?): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1756](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1756)
+Defined in: [glide-mq/src/queue.ts:1759](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1759)
 
 Remove all data associated with this queue from the server.
 If force=false (default), fails if there are active jobs (stream PEL
@@ -1217,7 +1217,7 @@ Alias for `emitter.removeListener()`.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-5"></a> `K` |
 
 #### Parameters
 
@@ -1236,9 +1236,7 @@ v10.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.off
-```
+`EventEmitter.off`
 
 ***
 
@@ -1281,7 +1279,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-6"></a> `K` |
 
 #### Parameters
 
@@ -1300,9 +1298,7 @@ v0.1.101
 
 #### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -1343,7 +1339,7 @@ myEE.emit('foo');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-7"></a> `K` |
 
 #### Parameters
 
@@ -1362,9 +1358,7 @@ v0.3.0
 
 #### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -1374,7 +1368,7 @@ EventEmitter.once
 pause(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1354](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1354)
+Defined in: [glide-mq/src/queue.ts:1357](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1357)
 
 Pause the queue. Workers will stop picking up new jobs.
 
@@ -1409,7 +1403,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-8"></a> `K` |
 
 #### Parameters
 
@@ -1428,9 +1422,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependListener
-```
+`EventEmitter.prependListener`
 
 ***
 
@@ -1457,7 +1449,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-9"></a> `K` |
 
 #### Parameters
 
@@ -1476,9 +1468,7 @@ v6.0.0
 
 #### Inherited from
 
-```ts
-EventEmitter.prependOnceListener
-```
+`EventEmitter.prependOnceListener`
 
 ***
 
@@ -1492,7 +1482,7 @@ rateLimitGroup(
 ): Promise&lt;number>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2798](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2798)
+Defined in: [glide-mq/src/queue.ts:2822](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2822)
 
 Rate-limit a specific ordering group from outside the worker processor.
 Registers the group in the ratelimited ZADD  -  the scheduler will unblock it after duration.
@@ -1553,7 +1543,7 @@ emitter.emit('log');
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-10"></a> `K` |
 
 #### Parameters
 
@@ -1571,9 +1561,7 @@ v9.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.rawListeners
-```
+`EventEmitter.rawListeners`
 
 ***
 
@@ -1583,7 +1571,7 @@ EventEmitter.rawListeners
 readStream(jobId, opts?): Promise&lt;object[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2557](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2557)
+Defined in: [glide-mq/src/queue.ts:2581](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2581)
 
 Read entries from a job's streaming channel.
 Uses XRANGE for non-blocking reads by default.
@@ -1635,9 +1623,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeAllListeners
-```
+`EventEmitter.removeAllListeners`
 
 ***
 
@@ -1647,7 +1633,7 @@ EventEmitter.removeAllListeners
 removeDeadLetterJob(jobId): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2703](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2703)
+Defined in: [glide-mq/src/queue.ts:2727](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2727)
 
 Remove a single job from the configured dead letter queue.
 Returns false when no DLQ is configured or the DLQ job does not exist.
@@ -1670,7 +1656,7 @@ Returns false when no DLQ is configured or the DLQ job does not exist.
 removeGlobalRateLimit(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1409](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1409)
+Defined in: [glide-mq/src/queue.ts:1412](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1412)
 
 Remove the global rate limit for this queue.
 Workers fall back to their local WorkerOptions.limiter if configured.
@@ -1687,7 +1673,7 @@ Workers fall back to their local WorkerOptions.limiter if configured.
 removeJobScheduler(name): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1602](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1602)
+Defined in: [glide-mq/src/queue.ts:1605](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1605)
 
 Remove a job scheduler by name.
 
@@ -1795,7 +1781,7 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 
 | Type Parameter |
 | ------ |
-| `K` |
+| <a id="type-parameter-k-11"></a> `K` |
 
 #### Parameters
 
@@ -1814,9 +1800,7 @@ v0.1.26
 
 #### Inherited from
 
-```ts
-EventEmitter.removeListener
-```
+`EventEmitter.removeListener`
 
 ***
 
@@ -1826,7 +1810,7 @@ EventEmitter.removeListener
 replayDeadLetterJob(jobId): Promise<Job&lt;any, any> | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2720](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2720)
+Defined in: [glide-mq/src/queue.ts:2744](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2744)
 
 Replay a job from the dead letter queue back to its original queue.
 Returns the newly added job, or null when the DLQ job does not exist.
@@ -1849,7 +1833,7 @@ Returns the newly added job, or null when the DLQ job does not exist.
 resume(): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1364](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1364)
+Defined in: [glide-mq/src/queue.ts:1367](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1367)
 
 Resume the queue after a pause.
 
@@ -1865,7 +1849,7 @@ Resume the queue after a pause.
 retryJobs(opts?): Promise&lt;number>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1697](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1697)
+Defined in: [glide-mq/src/queue.ts:1700](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1700)
 
 Bulk retry failed jobs.
 Moves jobs from the failed set to the scheduled ZSet (delayed state).
@@ -1892,7 +1876,7 @@ Number of jobs retried.
 revoke(jobId): Promise&lt;string>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1376](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1376)
+Defined in: [glide-mq/src/queue.ts:1379](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1379)
 
 Revoke a job by ID.
 If the job is waiting/delayed, it is immediately moved to the failed set with reason 'revoked'.
@@ -1918,7 +1902,7 @@ Returns 'revoked', 'flagged', or 'not_found'.
 searchJobs(opts): Promise<Job<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1954](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1954)
+Defined in: [glide-mq/src/queue.ts:1957](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1957)
 
 Search for jobs matching the given criteria.
 Supports filtering by state, name (exact match), and data fields (shallow key-value match).
@@ -1944,7 +1928,7 @@ Default limit: 100.
 setGlobalConcurrency(n): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1387](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1387)
+Defined in: [glide-mq/src/queue.ts:1390](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1390)
 
 Set the global concurrency limit for this queue.
 When set, workers will not pick up new jobs if the total number of
@@ -1969,7 +1953,7 @@ Set to 0 to remove the limit.
 setGlobalRateLimit(config): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1397](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1397)
+Defined in: [glide-mq/src/queue.ts:1400](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1400)
 
 Set a global rate limit for this queue.
 All workers will respect this limit dynamically (picked up within one scheduler tick).
@@ -2018,9 +2002,7 @@ v0.3.5
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`
 
 ***
 
@@ -2034,7 +2016,7 @@ signal(
 ): Promise&lt;boolean>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2810](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2810)
+Defined in: [glide-mq/src/queue.ts:2834](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2834)
 
 Send a signal to a suspended job, resuming it.
 The job moves back to waiting state and re-enters the stream.
@@ -2073,7 +2055,7 @@ updateFlowBudget(flowId, limits): Promise<
 | null>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2357](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2357)
+Defined in: [glide-mq/src/queue.ts:2381](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2381)
 
 Change the limits of a flow budget. Only the given fields change; null
 deletes a limit. The exceeded flag is re-evaluated against the usage
@@ -2125,7 +2107,7 @@ upsertJobScheduler(
 ): Promise&lt;void>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:1484](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L1484)
+Defined in: [glide-mq/src/queue.ts:1487](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L1487)
 
 Upsert a job scheduler (repeatable/cron job).
 Stores the scheduler config in the schedulers hash.
@@ -2151,7 +2133,7 @@ Computes the initial nextRun based on the schedule.
 vectorSearch(embedding, opts?): Promise<VectorSearchResult<D, R>[]>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2964](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2964)
+Defined in: [glide-mq/src/queue.ts:2988](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2988)
 
 Search for jobs by vector similarity (KNN) using a Valkey Search index.
 Requires a prior call to createJobIndex with a vectorField configured.
@@ -2230,9 +2212,7 @@ v20.5.0
 
 #### Inherited from
 
-```ts
-EventEmitter.addAbortListener
-```
+`EventEmitter.addAbortListener`
 
 ***
 
@@ -2286,9 +2266,7 @@ v15.2.0, v14.17.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getEventListeners
-```
+`EventEmitter.getEventListeners`
 
 ***
 
@@ -2342,9 +2320,7 @@ v19.9.0
 
 #### Inherited from
 
-```ts
-EventEmitter.getMaxListeners
-```
+`EventEmitter.getMaxListeners`
 
 ***
 
@@ -2354,7 +2330,7 @@ EventEmitter.getMaxListeners
 static getUsageSummary(opts): Promise<UsageSummary>;
 ```
 
-Defined in: [glide-mq/src/queue.ts:2463](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/queue.ts#L2463)
+Defined in: [glide-mq/src/queue.ts:2487](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/queue.ts#L2487)
 
 Aggregate reported AI usage across queues for a rolling time window.
 Pass either an existing client or connection options for a temporary client.
@@ -2412,9 +2388,7 @@ Since v3.2.0 - Use `listenerCount` instead.
 
 #### Inherited from
 
-```ts
-EventEmitter.listenerCount
-```
+`EventEmitter.listenerCount`
 
 ***
 
@@ -2529,9 +2503,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 #### Call Signature
 
@@ -2642,9 +2614,7 @@ v13.6.0, v12.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.on
-```
+`EventEmitter.on`
 
 ***
 
@@ -2757,9 +2727,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 #### Call Signature
 
@@ -2868,9 +2836,7 @@ v11.13.0, v10.16.0
 
 ##### Inherited from
 
-```ts
-EventEmitter.once
-```
+`EventEmitter.once`
 
 ***
 
@@ -2908,6 +2874,4 @@ v15.4.0
 
 #### Inherited from
 
-```ts
-EventEmitter.setMaxListeners
-```
+`EventEmitter.setMaxListeners`

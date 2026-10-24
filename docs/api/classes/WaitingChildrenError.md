@@ -1,6 +1,6 @@
 # Class: WaitingChildrenError
 
-Defined in: [glide-mq/src/errors.ts:51](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L51)
+Defined in: [glide-mq/src/errors.ts:51](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L51)
 
 Internal control-flow error thrown by `job.moveToWaitingChildren()`. Caught by the Worker.
 
@@ -16,13 +16,13 @@ Internal control-flow error thrown by `job.moveToWaitingChildren()`. Caught by t
 new WaitingChildrenError(message?): WaitingChildrenError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:52](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L52)
+Defined in: [glide-mq/src/errors.ts:52](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L52)
 
 #### Parameters
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `message` | `string` | `'Job moved to waiting-children state'` |
+| `message?` | `string` | `'Job moved to waiting-children state'` |
 
 #### Returns
 
@@ -37,10 +37,10 @@ Defined in: [glide-mq/src/errors.ts:52](https://github.com/avifenesh/glide-mq/bl
 ### cause?
 
 ```ts
-optional cause?: unknown;
+cause?: unknown;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
@@ -54,7 +54,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 message: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
@@ -68,7 +68,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
 name: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
@@ -79,10 +79,10 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
 ### stack?
 
 ```ts
-optional stack?: string;
+stack?: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 

@@ -1,6 +1,6 @@
 # Interface: IamCredentials
 
-Defined in: [glide-mq/src/types.ts:14](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L14)
+Defined in: [glide-mq/src/types.ts:14](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L14)
 
 IAM authentication credentials for AWS ElastiCache/MemoryDB.
 
@@ -12,7 +12,7 @@ IAM authentication credentials for AWS ElastiCache/MemoryDB.
 clusterName: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:23](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L23)
+Defined in: [glide-mq/src/types.ts:23](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L23)
 
 The ElastiCache/MemoryDB cluster name.
 
@@ -21,10 +21,10 @@ The ElastiCache/MemoryDB cluster name.
 ### refreshIntervalSeconds?
 
 ```ts
-optional refreshIntervalSeconds?: number;
+refreshIntervalSeconds?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:25](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L25)
+Defined in: [glide-mq/src/types.ts:25](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L25)
 
 Token refresh interval in seconds. Defaults to 300 (5 min).
 
@@ -36,7 +36,7 @@ Token refresh interval in seconds. Defaults to 300 (5 min).
 region: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:19](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L19)
+Defined in: [glide-mq/src/types.ts:19](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L19)
 
 AWS region (e.g. 'us-east-1').
 
@@ -48,7 +48,7 @@ AWS region (e.g. 'us-east-1').
 serviceType: "elasticache" | "memorydb";
 ```
 
-Defined in: [glide-mq/src/types.ts:17](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L17)
+Defined in: [glide-mq/src/types.ts:17](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L17)
 
 ElastiCache or MemoryDB.
 
@@ -60,7 +60,7 @@ ElastiCache or MemoryDB.
 type: "iam";
 ```
 
-Defined in: [glide-mq/src/types.ts:15](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L15)
+Defined in: [glide-mq/src/types.ts:15](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L15)
 
 ***
 
@@ -70,6 +70,6 @@ Defined in: [glide-mq/src/types.ts:15](https://github.com/avifenesh/glide-mq/blo
 userId: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:21](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L21)
+Defined in: [glide-mq/src/types.ts:21](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L21)
 
 The IAM user ID used for authentication. Maps to username in Valkey AUTH.

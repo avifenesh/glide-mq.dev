@@ -1,6 +1,6 @@
 # Interface: FlowJob
 
-Defined in: [glide-mq/src/types.ts:458](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L458)
+Defined in: [glide-mq/src/types.ts:468](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L468)
 
 Definition of a job within a flow (parent-child hierarchy).
 
@@ -9,10 +9,10 @@ Definition of a job within a flow (parent-child hierarchy).
 ### children?
 
 ```ts
-optional children?: FlowJob[];
+children?: FlowJob[];
 ```
 
-Defined in: [glide-mq/src/types.ts:463](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L463)
+Defined in: [glide-mq/src/types.ts:473](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L473)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [glide-mq/src/types.ts:463](https://github.com/avifenesh/glide-mq/bl
 data: any;
 ```
 
-Defined in: [glide-mq/src/types.ts:461](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L461)
+Defined in: [glide-mq/src/types.ts:471](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L471)
 
 ***
 
@@ -32,17 +32,17 @@ Defined in: [glide-mq/src/types.ts:461](https://github.com/avifenesh/glide-mq/bl
 name: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:459](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L459)
+Defined in: [glide-mq/src/types.ts:469](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L469)
 
 ***
 
 ### opts?
 
 ```ts
-optional opts?: JobOptions;
+opts?: JobOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:462](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L462)
+Defined in: [glide-mq/src/types.ts:472](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L472)
 
 ***
 
@@ -52,4 +52,4 @@ Defined in: [glide-mq/src/types.ts:462](https://github.com/avifenesh/glide-mq/bl
 queueName: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:460](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L460)
+Defined in: [glide-mq/src/types.ts:470](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L470)

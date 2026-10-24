@@ -1,6 +1,6 @@
 # Interface: JobOptions
 
-Defined in: [glide-mq/src/types.ts:217](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L217)
+Defined in: [glide-mq/src/types.ts:227](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L227)
 
 Options for controlling individual job behavior (delay, priority, retry, etc.).
 
@@ -13,20 +13,20 @@ Options for controlling individual job behavior (delay, priority, retry, etc.).
 ### attempts?
 
 ```ts
-optional attempts?: number;
+attempts?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:251](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L251)
+Defined in: [glide-mq/src/types.ts:261](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L261)
 
 ***
 
 ### backoff?
 
 ```ts
-optional backoff?: object;
+backoff?: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:252](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L252)
+Defined in: [glide-mq/src/types.ts:262](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L262)
 
 #### delay
 
@@ -37,7 +37,7 @@ delay: number;
 #### jitter?
 
 ```ts
-optional jitter?: number;
+jitter?: number;
 ```
 
 #### type
@@ -51,10 +51,10 @@ type: string;
 ### cost?
 
 ```ts
-optional cost?: number;
+cost?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:250](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L250)
+Defined in: [glide-mq/src/types.ts:260](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L260)
 
 Job cost in tokens for token bucket rate limiting. Default: 1.
 
@@ -63,48 +63,30 @@ Job cost in tokens for token bucket rate limiting. Default: 1.
 ### deduplication?
 
 ```ts
-optional deduplication?: object;
+deduplication?: DeduplicationOptions;
 ```
 
-Defined in: [glide-mq/src/types.ts:259](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L259)
-
-#### id
-
-```ts
-id: string;
-```
-
-#### mode?
-
-```ts
-optional mode?: "simple" | "throttle" | "debounce";
-```
-
-#### ttl?
-
-```ts
-optional ttl?: number;
-```
+Defined in: [glide-mq/src/types.ts:269](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L269)
 
 ***
 
 ### delay?
 
 ```ts
-optional delay?: number;
+delay?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:225](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L225)
+Defined in: [glide-mq/src/types.ts:235](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L235)
 
 ***
 
 ### fallbacks?
 
 ```ts
-optional fallbacks?: object[];
+fallbacks?: object[];
 ```
 
-Defined in: [glide-mq/src/types.ts:272](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L272)
+Defined in: [glide-mq/src/types.ts:282](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L282)
 
 Ordered list of fallback configurations tried on retryable failure.
  Each entry provides model/provider info the processor reads via job.currentFallback.
@@ -112,7 +94,7 @@ Ordered list of fallback configurations tried on retryable failure.
 #### metadata?
 
 ```ts
-optional metadata?: Record&lt;string, unknown>;
+metadata?: Record&lt;string, unknown>;
 ```
 
 #### model
@@ -124,7 +106,7 @@ model: string;
 #### provider?
 
 ```ts
-optional provider?: string;
+provider?: string;
 ```
 
 ***
@@ -132,10 +114,10 @@ optional provider?: string;
 ### jobId?
 
 ```ts
-optional jobId?: string;
+jobId?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:224](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L224)
+Defined in: [glide-mq/src/types.ts:234](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L234)
 
 Custom job ID. Max 256 characters, must not contain control characters,
 curly braces, or colons. If a job with this ID already exists, Queue.add returns null
@@ -147,10 +129,10 @@ check runs first.
 ### lifo?
 
 ```ts
-optional lifo?: boolean;
+lifo?: boolean;
 ```
 
-Defined in: [glide-mq/src/types.ts:232](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L232)
+Defined in: [glide-mq/src/types.ts:242](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L242)
 
 Process jobs in LIFO (last-in-first-out) order. Cannot be combined with ordering keys.
 
@@ -159,10 +141,10 @@ Process jobs in LIFO (last-in-first-out) order. Cannot be combined with ordering
 ### lockDuration?
 
 ```ts
-optional lockDuration?: number;
+lockDuration?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:256](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L256)
+Defined in: [glide-mq/src/types.ts:266](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L266)
 
 Override worker-level lockDuration for this specific job (ms).
  Controls heartbeat frequency and stall detection threshold.
@@ -172,10 +154,10 @@ Override worker-level lockDuration for this specific job (ms).
 ### ordering?
 
 ```ts
-optional ordering?: object;
+ordering?: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:240](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L240)
+Defined in: [glide-mq/src/types.ts:250](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L250)
 
 Per-key ordering and group concurrency control.
 Jobs sharing the same key are constrained to run at most `concurrency`
@@ -186,7 +168,7 @@ When concurrency > 1, up to N jobs per key run in parallel.
 #### concurrency?
 
 ```ts
-optional concurrency?: number;
+concurrency?: number;
 ```
 
 Max concurrent jobs for this ordering key. Default: 1 (sequential).
@@ -200,7 +182,7 @@ key: string;
 #### rateLimit?
 
 ```ts
-optional rateLimit?: RateLimitConfig;
+rateLimit?: RateLimitConfig;
 ```
 
 Per-group rate limit: max N jobs per time window for this ordering key.
@@ -208,7 +190,7 @@ Per-group rate limit: max N jobs per time window for this ordering key.
 #### tokenBucket?
 
 ```ts
-optional tokenBucket?: TokenBucketConfig;
+tokenBucket?: TokenBucketConfig;
 ```
 
 Cost-based token bucket: capacity + refill rate. Jobs consume tokens based on cost.
@@ -218,10 +200,10 @@ Cost-based token bucket: capacity + refill rate. Jobs consume tokens based on co
 ### parent?
 
 ```ts
-optional parent?: object;
+parent?: object;
 ```
 
-Defined in: [glide-mq/src/types.ts:260](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L260)
+Defined in: [glide-mq/src/types.ts:270](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L270)
 
 #### id
 
@@ -240,10 +222,10 @@ queue: string;
 ### parents?
 
 ```ts
-optional parents?: object[];
+parents?: object[];
 ```
 
-Defined in: [glide-mq/src/types.ts:267](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L267)
+Defined in: [glide-mq/src/types.ts:277](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L277)
 
 Multiple parent dependencies for DAG flows.
 When set, this job waits for ALL parents to complete before it can run.
@@ -267,10 +249,10 @@ queue: string;
 ### priority?
 
 ```ts
-optional priority?: number;
+priority?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:230](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L230)
+Defined in: [glide-mq/src/types.ts:240](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L240)
 
 Integer 0-2048. 1 is the highest priority. 0 (default) means no priority: those jobs
 run after any waiting job with priority > 0. Other values throw.
@@ -280,7 +262,7 @@ run after any waiting job with priority > 0. Other values throw.
 ### removeOnComplete?
 
 ```ts
-optional removeOnComplete?:
+removeOnComplete?:
   | number
   | boolean
   | {
@@ -289,14 +271,14 @@ optional removeOnComplete?:
 };
 ```
 
-Defined in: [glide-mq/src/types.ts:257](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L257)
+Defined in: [glide-mq/src/types.ts:267](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L267)
 
 ***
 
 ### removeOnFail?
 
 ```ts
-optional removeOnFail?:
+removeOnFail?:
   | number
   | boolean
   | {
@@ -305,26 +287,26 @@ optional removeOnFail?:
 };
 ```
 
-Defined in: [glide-mq/src/types.ts:258](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L258)
+Defined in: [glide-mq/src/types.ts:268](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L268)
 
 ***
 
 ### timeout?
 
 ```ts
-optional timeout?: number;
+timeout?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:253](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L253)
+Defined in: [glide-mq/src/types.ts:263](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L263)
 
 ***
 
 ### ttl?
 
 ```ts
-optional ttl?: number;
+ttl?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:269](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L269)
+Defined in: [glide-mq/src/types.ts:279](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L279)
 
 Time-to-live in milliseconds. Jobs not processed within this window are failed as 'expired'.

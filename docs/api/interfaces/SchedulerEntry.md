@@ -1,6 +1,6 @@
 # Interface: SchedulerEntry
 
-Defined in: [glide-mq/src/types.ts:529](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L529)
+Defined in: [glide-mq/src/types.ts:539](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L539)
 
 Stored state of a registered job scheduler.
 
@@ -9,10 +9,10 @@ Stored state of a registered job scheduler.
 ### compression?
 
 ```ts
-optional compression?: "gzip";
+compression?: "gzip";
 ```
 
-Defined in: [glide-mq/src/types.ts:542](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L542)
+Defined in: [glide-mq/src/types.ts:552](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L552)
 
 Set when the upserting Queue has `compression: 'gzip'`; each run stores its data compressed.
 
@@ -21,30 +21,30 @@ Set when the upserting Queue has `compression: 'gzip'`; each run stores its data
 ### endDate?
 
 ```ts
-optional endDate?: number;
+endDate?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:537](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L537)
+Defined in: [glide-mq/src/types.ts:547](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L547)
 
 ***
 
 ### every?
 
 ```ts
-optional every?: number;
+every?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:531](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L531)
+Defined in: [glide-mq/src/types.ts:541](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L541)
 
 ***
 
 ### inflightJobId?
 
 ```ts
-optional inflightJobId?: string;
+inflightJobId?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:546](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L546)
+Defined in: [glide-mq/src/types.ts:556](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L556)
 
 Id of the job the last tick fired. Only its completion advances a repeatAfterComplete entry.
 
@@ -53,30 +53,30 @@ Id of the job the last tick fired. Only its completion advances a repeatAfterCom
 ### iterationCount?
 
 ```ts
-optional iterationCount?: number;
+iterationCount?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:539](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L539)
+Defined in: [glide-mq/src/types.ts:549](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L549)
 
 ***
 
 ### lastRun?
 
 ```ts
-optional lastRun?: number;
+lastRun?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:543](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L543)
+Defined in: [glide-mq/src/types.ts:553](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L553)
 
 ***
 
 ### limit?
 
 ```ts
-optional limit?: number;
+limit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:538](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L538)
+Defined in: [glide-mq/src/types.ts:548](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L548)
 
 ***
 
@@ -86,27 +86,27 @@ Defined in: [glide-mq/src/types.ts:538](https://github.com/avifenesh/glide-mq/bl
 nextRun: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:544](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L544)
+Defined in: [glide-mq/src/types.ts:554](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L554)
 
 ***
 
 ### pattern?
 
 ```ts
-optional pattern?: string;
+pattern?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:530](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L530)
+Defined in: [glide-mq/src/types.ts:540](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L540)
 
 ***
 
 ### repeatAfterComplete?
 
 ```ts
-optional repeatAfterComplete?: number;
+repeatAfterComplete?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:533](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L533)
+Defined in: [glide-mq/src/types.ts:543](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L543)
 
 Delay in ms after completion before scheduling the next job.
 
@@ -115,29 +115,29 @@ Delay in ms after completion before scheduling the next job.
 ### startDate?
 
 ```ts
-optional startDate?: number;
+startDate?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:536](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L536)
+Defined in: [glide-mq/src/types.ts:546](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L546)
 
 ***
 
 ### template?
 
 ```ts
-optional template?: JobTemplate;
+template?: JobTemplate;
 ```
 
-Defined in: [glide-mq/src/types.ts:540](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L540)
+Defined in: [glide-mq/src/types.ts:550](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L550)
 
 ***
 
 ### tz?
 
 ```ts
-optional tz?: string;
+tz?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:535](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L535)
+Defined in: [glide-mq/src/types.ts:545](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L545)
 
 IANA timezone for cron patterns (e.g. 'America/New_York'). Defaults to UTC.

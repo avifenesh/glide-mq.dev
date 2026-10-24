@@ -105,6 +105,12 @@ console.log('Done.');
 
 ---
 
+## Bounded Scheduler Inventory
+
+GlideMQ 0.20 adds [`queue.getRepeatableJobsBounded(maxEntries)`](/api/classes/Queue#getrepeatablejobsbounded). Supply a positive safe integer from your application's inventory limit. The call rejects if the number of stored schedulers exceeds that limit or a stored entry is corrupt. Keep that error visible; an empty list would falsely report that no schedulers exist. `getRepeatableJobs()` retains its existing behavior.
+
+Hono, Fastify and Hapi expose this method through `registry.get(queueName).queue`. NestJS exposes it on the injected `Queue`. Their built-in scheduler HTTP routes and the dashboard retain the existing inventory behavior; use the bounded method in your own handler when you need that limit.
+
 ## Bounded Schedulers
 
 Schedulers with execution limits and end dates. Demonstrates `limit` to stop after N executions, `endDate` to stop after a given timestamp, and combined `limit` + `endDate` where whichever condition is met first stops the scheduler.

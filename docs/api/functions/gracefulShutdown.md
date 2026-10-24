@@ -4,7 +4,7 @@
 function gracefulShutdown(components): GracefulShutdownHandle;
 ```
 
-Defined in: [glide-mq/src/graceful-shutdown.ts:24](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/graceful-shutdown.ts#L24)
+Defined in: [glide-mq/src/graceful-shutdown.ts:24](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/graceful-shutdown.ts#L24)
 
 Register SIGTERM and SIGINT handlers that gracefully close all provided components.
 Returns a Promise that resolves when all components have been closed.

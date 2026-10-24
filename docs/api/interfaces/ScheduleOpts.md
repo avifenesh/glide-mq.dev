@@ -1,6 +1,6 @@
 # Interface: ScheduleOpts
 
-Defined in: [glide-mq/src/types.ts:496](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L496)
+Defined in: [glide-mq/src/types.ts:506](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L506)
 
 Options for defining a job schedule (cron, interval, or repeat-after-complete).
 
@@ -9,10 +9,10 @@ Options for defining a job schedule (cron, interval, or repeat-after-complete).
 ### endDate?
 
 ```ts
-optional endDate?: number | Date;
+endDate?: number | Date;
 ```
 
-Defined in: [glide-mq/src/types.ts:516](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L516)
+Defined in: [glide-mq/src/types.ts:526](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L526)
 
 Latest scheduled run time allowed before the scheduler auto-removes itself.
 
@@ -21,10 +21,10 @@ Latest scheduled run time allowed before the scheduler auto-removes itself.
 ### every?
 
 ```ts
-optional every?: number;
+every?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:505](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L505)
+Defined in: [glide-mq/src/types.ts:515](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L515)
 
 Repeat interval in milliseconds
 
@@ -33,10 +33,10 @@ Repeat interval in milliseconds
 ### limit?
 
 ```ts
-optional limit?: number;
+limit?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:518](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L518)
+Defined in: [glide-mq/src/types.ts:528](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L528)
 
 Maximum number of jobs to create before the scheduler auto-removes itself.
 
@@ -45,10 +45,10 @@ Maximum number of jobs to create before the scheduler auto-removes itself.
 ### pattern?
 
 ```ts
-optional pattern?: string;
+pattern?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:503](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L503)
+Defined in: [glide-mq/src/types.ts:513](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L513)
 
 Cron pattern: `minute hour dayOfMonth month dayOfWeek`, or 6 fields with a
 leading `second`. Accepts names (JAN-DEC, SUN-SAT), dayOfWeek 0-7 (0 and 7
@@ -60,10 +60,10 @@ docs/ADVANCED.md "Cron syntax".
 ### repeatAfterComplete?
 
 ```ts
-optional repeatAfterComplete?: number;
+repeatAfterComplete?: number;
 ```
 
-Defined in: [glide-mq/src/types.ts:510](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L510)
+Defined in: [glide-mq/src/types.ts:520](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L520)
 
 Schedule next job N ms after the current one completes (or terminally fails).
 Mutually exclusive with `pattern` and `every`.
@@ -73,10 +73,10 @@ Mutually exclusive with `pattern` and `every`.
 ### startDate?
 
 ```ts
-optional startDate?: number | Date;
+startDate?: number | Date;
 ```
 
-Defined in: [glide-mq/src/types.ts:514](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L514)
+Defined in: [glide-mq/src/types.ts:524](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L524)
 
 Earliest time the scheduler may create a job. Accepts a Date or epoch milliseconds.
 
@@ -85,9 +85,9 @@ Earliest time the scheduler may create a job. Accepts a Date or epoch millisecon
 ### tz?
 
 ```ts
-optional tz?: string;
+tz?: string;
 ```
 
-Defined in: [glide-mq/src/types.ts:512](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/types.ts#L512)
+Defined in: [glide-mq/src/types.ts:522](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/types.ts#L522)
 
 IANA timezone for cron patterns (e.g. 'America/New_York'). Defaults to UTC.

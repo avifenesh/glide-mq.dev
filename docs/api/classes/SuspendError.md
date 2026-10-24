@@ -1,6 +1,6 @@
 # Class: SuspendError
 
-Defined in: [glide-mq/src/errors.ts:59](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L59)
+Defined in: [glide-mq/src/errors.ts:59](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L59)
 
 Internal control-flow error thrown by `job.suspend()`. Caught by the Worker.
 
@@ -16,7 +16,7 @@ Internal control-flow error thrown by `job.suspend()`. Caught by the Worker.
 new SuspendError(): SuspendError;
 ```
 
-Defined in: [glide-mq/src/errors.ts:60](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/errors.ts#L60)
+Defined in: [glide-mq/src/errors.ts:60](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/errors.ts#L60)
 
 #### Returns
 
@@ -31,10 +31,10 @@ Defined in: [glide-mq/src/errors.ts:60](https://github.com/avifenesh/glide-mq/bl
 ### cause?
 
 ```ts
-optional cause?: unknown;
+cause?: unknown;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 
 #### Inherited from
 
@@ -48,7 +48,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es2022.error.d.ts:24
 message: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1075
 
 #### Inherited from
 
@@ -62,7 +62,7 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1075
 name: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1074
 
 #### Inherited from
 
@@ -73,10 +73,10 @@ Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1074
 ### stack?
 
 ```ts
-optional stack?: string;
+stack?: string;
 ```
 
-Defined in: docs-sync-1015/node\_modules/typescript/lib/lib.es5.d.ts:1076
+Defined in: glide-mq.dev/node\_modules/typescript/lib/lib.es5.d.ts:1076
 
 #### Inherited from
 

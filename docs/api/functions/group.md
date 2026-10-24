@@ -9,7 +9,7 @@ function group(
 ): Promise<ClosableWorkflow<JobNode>>;
 ```
 
-Defined in: [glide-mq/src/workflows.ts:104](https://github.com/avifenesh/glide-mq/blob/71138fa39675548394a9017a647cdff781c9c6a8/src/workflows.ts#L104)
+Defined in: [glide-mq/src/workflows.ts:104](https://github.com/avifenesh/glide-mq/blob/47c4d1bc1a43508382107c8029ffd4a6304d342c/src/workflows.ts#L104)
 
 Group: execute jobs in parallel. All jobs run concurrently.
 A synthetic parent job (name: '__group__') waits for all children.
